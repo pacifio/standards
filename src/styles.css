@@ -11,12 +11,18 @@
      5. globals.css              the @theme inline bridge + @layer base
      6. utilities.css            the named @utility vocabulary
 
-   No web fonts are loaded, deliberately: the system font stack is what makes
-   the web app and the Tauri desktop app render the same text.
+   Geist is loaded as a variable font. The system stack was the earlier
+   choice — it let the web app and the Tauri desktop app render identical
+   text with no network cost — but a shared typeface across the product beats
+   a shared fallback, and a variable face is one file for the whole weight
+   range.
    ========================================================================== */
 
 @import "tailwindcss" source("../src");
 @import "shadcn/tailwind.css";
+
+@import "@fontsource-variable/geist";
+@import "@fontsource-variable/geist-mono";
 
 @import "./styles/tokens.css";
 @import "./styles/themes.css";

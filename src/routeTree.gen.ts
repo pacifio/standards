@@ -18,6 +18,7 @@ import { Route as MockIndexRouteImport } from './routes/mock/index'
 import { Route as MockAdminRouteImport } from './routes/mock/admin'
 import { Route as MockChatRouteImport } from './routes/mock/chat'
 import { Route as MockInboxRouteImport } from './routes/mock/inbox'
+import { Route as MockLoginRouteImport } from './routes/mock/login'
 import { Route as MockProjectsRouteImport } from './routes/mock/projects'
 import { Route as MockSettingsRouteRouteImport } from './routes/mock/settings/route'
 import { Route as MockTimelineRouteImport } from './routes/mock/timeline'
@@ -80,6 +81,11 @@ const MockChatRoute = MockChatRouteImport.update({
 const MockInboxRoute = MockInboxRouteImport.update({
   id: '/inbox',
   path: '/inbox',
+  getParentRoute: () => MockRouteRoute,
+} as any)
+const MockLoginRoute = MockLoginRouteImport.update({
+  id: '/login',
+  path: '/login',
   getParentRoute: () => MockRouteRoute,
 } as any)
 const MockProjectsRoute = MockProjectsRouteImport.update({
@@ -183,6 +189,7 @@ export interface FileRoutesByFullPath {
   '/mock/admin': typeof MockAdminRoute
   '/mock/chat': typeof MockChatRoute
   '/mock/inbox': typeof MockInboxRoute
+  '/mock/login': typeof MockLoginRoute
   '/mock/projects': typeof MockProjectsRoute
   '/mock/timeline': typeof MockTimelineRoute
   '/ds/': typeof DsIndexRoute
@@ -209,6 +216,7 @@ export interface FileRoutesByTo {
   '/mock/admin': typeof MockAdminRoute
   '/mock/chat': typeof MockChatRoute
   '/mock/inbox': typeof MockInboxRoute
+  '/mock/login': typeof MockLoginRoute
   '/mock/projects': typeof MockProjectsRoute
   '/mock/timeline': typeof MockTimelineRoute
   '/ds': typeof DsIndexRoute
@@ -239,6 +247,7 @@ export interface FileRoutesById {
   '/mock/admin': typeof MockAdminRoute
   '/mock/chat': typeof MockChatRoute
   '/mock/inbox': typeof MockInboxRoute
+  '/mock/login': typeof MockLoginRoute
   '/mock/projects': typeof MockProjectsRoute
   '/mock/timeline': typeof MockTimelineRoute
   '/ds/': typeof DsIndexRoute
@@ -270,6 +279,7 @@ export interface FileRouteTypes {
     | '/mock/admin'
     | '/mock/chat'
     | '/mock/inbox'
+    | '/mock/login'
     | '/mock/projects'
     | '/mock/timeline'
     | '/ds/'
@@ -296,6 +306,7 @@ export interface FileRouteTypes {
     | '/mock/admin'
     | '/mock/chat'
     | '/mock/inbox'
+    | '/mock/login'
     | '/mock/projects'
     | '/mock/timeline'
     | '/ds'
@@ -325,6 +336,7 @@ export interface FileRouteTypes {
     | '/mock/admin'
     | '/mock/chat'
     | '/mock/inbox'
+    | '/mock/login'
     | '/mock/projects'
     | '/mock/timeline'
     | '/ds/'
@@ -415,6 +427,13 @@ declare module '@tanstack/react-router' {
       path: '/inbox'
       fullPath: '/mock/inbox'
       preLoaderRoute: typeof MockInboxRouteImport
+      parentRoute: typeof MockRouteRoute
+    }
+    '/mock/login': {
+      id: '/mock/login'
+      path: '/login'
+      fullPath: '/mock/login'
+      preLoaderRoute: typeof MockLoginRouteImport
       parentRoute: typeof MockRouteRoute
     }
     '/mock/projects': {
@@ -603,6 +622,7 @@ interface MockRouteRouteChildren {
   MockAdminRoute: typeof MockAdminRoute
   MockChatRoute: typeof MockChatRoute
   MockInboxRoute: typeof MockInboxRoute
+  MockLoginRoute: typeof MockLoginRoute
   MockProjectsRoute: typeof MockProjectsRoute
   MockTimelineRoute: typeof MockTimelineRoute
   MockIndexRoute: typeof MockIndexRoute
@@ -613,6 +633,7 @@ const MockRouteRouteChildren: MockRouteRouteChildren = {
   MockAdminRoute: MockAdminRoute,
   MockChatRoute: MockChatRoute,
   MockInboxRoute: MockInboxRoute,
+  MockLoginRoute: MockLoginRoute,
   MockProjectsRoute: MockProjectsRoute,
   MockTimelineRoute: MockTimelineRoute,
   MockIndexRoute: MockIndexRoute,

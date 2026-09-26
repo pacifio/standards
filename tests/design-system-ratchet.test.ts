@@ -32,6 +32,11 @@ const EXEMPT: Record<string, string> = {
   // named module is what stops hex literals spreading through the gallery.
   "src/components/gallery/measured.ts":
     "the raw sampled values themes.css is derived from; documentation of a measurement, not styling",
+  // Third-party trademarks. Google's four-colour G is specified by their
+  // brand guidelines and must not be recoloured or themed; the colour is the
+  // mark. These are not theme values and have no light/dark counterpart.
+  "src/components/ui/brand-marks.tsx":
+    "third-party trademarks whose colours are fixed by brand guidelines and must not be themed",
 }
 
 type Rule = {

@@ -43,6 +43,18 @@ function ActionsGallery() {
         <code className="code">secondary</code>.
       </Callout>
 
+      <Callout tone="neutral">
+        <strong className="font-semibold text-foreground">
+          Buttons are pills.
+        </strong>{" "}
+        <code className="code">rounded-full</code> at every size and variant,
+        following Cursor and the Atlas landing site. This is the one place the
+        system departs from the 4/6/8/12 radius ladder: cards, inputs, menus and
+        dialogs keep it, and only the things you click are round. Badges stay{" "}
+        <code className="code">rounded-sm</code> — a badge is a statement, not
+        an action, and a page of pills has no hierarchy left.
+      </Callout>
+
       <Specimen title="Button variants">
         {VARIANTS.map((v) => (
           <Sample key={v} label={v}>
@@ -53,7 +65,7 @@ function ActionsGallery() {
 
       <Specimen
         title="States"
-        note="Focus is drawn once, globally, as a 2px outline at 1px offset — components do not carry their own ring. Disabled is one treatment everywhere: 50% opacity plus not-allowed."
+        note="Focus is drawn once, globally, as a 1px outline at 1px offset in the action colour — components do not carry their own ring. Press scales to 99%: small enough that you feel it rather than watch it, which on a pill reads as give. Disabled is one treatment everywhere: 50% opacity plus not-allowed."
       >
         <Sample label="default">
           <Button>Action</Button>

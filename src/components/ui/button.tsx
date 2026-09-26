@@ -1,3 +1,4 @@
+import { isValidElement } from "react"
 import { Button as ButtonPrimitive } from "@base-ui/react/button"
 import { cva } from "class-variance-authority"
 import type { VariantProps } from "class-variance-authority"
@@ -18,14 +19,25 @@ import { cn } from "cn"
  *   whole system; a second ring here would render inside it.
  * - No `active:translate-y-px`. Controls in a dense UI do not bounce.
  * - Base UI has no `asChild` — pass `render` to change the element.
+ *
+ * DO NOT use this for navigation. `<Button render={<Link/>}>` produces an
+ * anchor that Base UI then stamps with `role="button"`, so a screen reader
+ * announces "button" for something that changes the page — and the link
+ * affordances (open in new tab, the links rotor) go with it. A thing that
+ * navigates is a link: render a real `<a>` or `<Link>` and style it with the
+ * exported `buttonVariants`. That is what the export is for.
  */
 
 const buttonVariants = cva(
   [
-    "group/button inline-flex shrink-0 items-center justify-center gap-1.5",
-    "rounded-sm border border-transparent whitespace-nowrap select-none",
+    "group/button inline-flex shrink-0 cursor-pointer items-center justify-center gap-1.5",
+    "rounded-full border border-transparent whitespace-nowrap select-none",
     "font-medium",
-    "duration-fast transition-colors ease-out-strong",
+    // Named properties, not `transition-all`: the press scale needs a
+    // transition, and animating everything would drag border-color and
+    // colour along with it and make the glyph shimmer.
+    "duration-fast transition-[background-color,transform] ease-out-strong",
+    "active:scale-[0.99]",
     "disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50",
     "data-disabled:pointer-events-none data-disabled:cursor-not-allowed data-disabled:opacity-50",
     "aria-invalid:border-destructive",
@@ -79,11 +91,27 @@ function Button({
   className,
   variant,
   size,
+  nativeButton,
+  render,
   ...props
 }: ButtonPrimitive.Props & VariantProps<typeof buttonVariants>) {
+  /**
+   * Base UI warns — loudly, at runtime — when a button-role component renders
+   * as something other than a real <button> while `nativeButton` is still
+   * true, because that silently drops form submission and native keyboard
+   * behaviour. A link-styled button is common enough (`render={<Link/>}`,
+   * `render={<a/>}`) that making every call site remember the prop guarantees
+   * someone forgets. Infer it from what is actually being rendered, and let
+   * an explicit value win.
+   */
+  const rendersNativeButton =
+    !isValidElement(render) || render.type === "button"
+
   return (
     <ButtonPrimitive
       data-slot="button"
+      nativeButton={nativeButton ?? rendersNativeButton}
+      render={render}
       className={cn(buttonVariants({ variant, size }), className)}
       {...props}
     />

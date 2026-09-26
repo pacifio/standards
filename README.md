@@ -61,10 +61,14 @@ tests/          the ratchet
 - **Status and labels are different vocabularies.** Status is a state that
   changes (queued / running / done / failed). A label is an identity —
   `purple` means "the Design label", not "informational".
+- **Buttons are pills.** `rounded-full` at every size, following Cursor and
+  the Atlas landing site, with a 99% press scale. The only departure from the
+  4/6/8/12 radius ladder — cards, inputs, menus and dialogs keep it, and only
+  the things you click are round.
 - **Borders, not shadows.** A shadow means a surface is floating. Three
   elevation rungs, and no fourth.
-- **Nine type steps, two weights.** 500 and 600. Nothing lighter, nothing
-  heavier.
+- **Geist, nine type steps, two weights.** 500 and 600. Nothing lighter,
+  nothing heavier. Geist Mono for code, numerals and identifiers.
 - **A 4px grid** and five named control heights. 28px is the default control.
 - **Three easings, four durations.** No springs, no overshoot. Hover
   transitions `background-color` and nothing else.

@@ -8,6 +8,8 @@ import {
   SettingRow,
 } from "@/components/patterns/setting-card"
 import { Specimen } from "@/components/gallery/specimen"
+import { DitherField } from "@/components/ui/dither-field"
+import { GitHubMark, GoogleMark } from "@/components/ui/brand-marks"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Callout } from "@/components/ui/callout"
@@ -129,6 +131,46 @@ function PatternsGallery() {
             <DrillInRow label="Access and permissions" />
             <DrillInRow label="Slack notifications" value="Off" />
           </SettingCard>
+        </div>
+      </Specimen>
+
+      <Specimen
+        title="Dither field"
+        note="The landing site's hero backdrop, ported from the desktop app so the marketing page, the login pane and the app's empty states all print the same texture. A 4×4 Bayer matrix turns two octaves of value noise into glyph density, stepped at ~12fps because ordered dither reads as retro precisely when it snaps. It parks off screen, parks on a hidden tab, and paints exactly one frame under reduced motion — the texture is the design, only the drift is the accessibility problem."
+      >
+        <div className="flex w-full flex-col gap-3">
+          <div className="relative h-40 w-full overflow-hidden rounded-md border border-border bg-sidebar">
+            <DitherField mode="glyphs" hollow={[0.1, 0.5]} />
+          </div>
+          <div className="relative h-24 w-full overflow-hidden rounded-md border border-border bg-sidebar">
+            <DitherField mode="dots" />
+          </div>
+          <p className="caption">
+            <code className="code">glyphs</code> prints a character per 12px
+            cell; <code className="code">dots</code> prints 1.5px dots on a 4px
+            grid. Ink is the resolved foreground, so both invert with the theme.
+          </p>
+        </div>
+      </Specimen>
+
+      <Specimen
+        title="Social sign-in"
+        note="Two providers and nothing else — no email field, no divider, no “show other options”. Each of those exists in the references to manage a longer list than Atlas has. Both buttons are `secondary`: neither provider is recommended, and making one of them the single loud element would be a recommendation."
+      >
+        <div className="flex w-full max-w-72 flex-col gap-2">
+          <Button variant="secondary" size="xl" className="w-full">
+            <GoogleMark />
+            Continue with Google
+          </Button>
+          <Button variant="secondary" size="xl" className="w-full">
+            <GitHubMark />
+            Continue with GitHub
+          </Button>
+          <p className="pt-1 caption">
+            Google&apos;s four-colour mark is fixed by their brand guidelines
+            and must not be themed; GitHub&apos;s is authorised in one colour
+            and takes <code className="code">currentColor</code>.
+          </p>
         </div>
       </Specimen>
 

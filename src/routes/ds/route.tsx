@@ -28,7 +28,10 @@ const NAV = [
   },
   {
     group: "Patterns",
-    items: [{ label: "Patterns", to: "/ds/patterns" }],
+    items: [
+      { label: "Patterns", to: "/ds/patterns" },
+      { label: "Sign in", to: "/mock/login" },
+    ],
   },
 ]
 

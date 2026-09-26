@@ -167,6 +167,10 @@
   --animate-slide-in-right: slide-in-right 0.18s var(--ease-drawer);
   --animate-slide-in-left: slide-in-left 0.18s var(--ease-drawer);
   --animate-shimmer-row: shimmer-row 1.6s linear infinite;
+  /* Ambient, not interaction — the one animation in the system that is not
+     on the four-duration ladder. A marquee is furniture: it should be slow
+     enough that the eye never tracks it, which is what 40s buys. */
+  --animate-marquee: marquee 40s linear infinite;
 
   @keyframes fade-in {
     from {
@@ -220,6 +224,18 @@
       transform: translateX(0);
     }
   }
+  /* Translates the track by exactly half its width. The track renders its
+     children twice, so -50% lands the copy precisely where the original
+     started and the loop has no seam. */
+  @keyframes marquee {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
   /* Opacity only. A skeleton that animates background-position repaints a
      whole list on every frame. */
   @keyframes shimmer-row {
@@ -237,6 +253,12 @@
    shadcn preset's `shimmer` is one). Application code should not write
    `dark:` — the token layer already inverts. */
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+/* The `light` variant exists for one job: third-party artwork that the token
+   layer cannot reach. A brand SVG has baked-in fills, so a white-on-dark
+   logo stays white on a white page no matter what the theme does. Everything
+   the system owns inverts through the tokens; do not reach for this. */
+@custom-variant light (&:where([data-theme="light"], [data-theme="light"] *));
 
 @layer base {
   /* Tailwind v4 defaults every border to currentColor. The whole system is

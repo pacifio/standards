@@ -159,6 +159,12 @@
 @utility h-row {
   height: var(--row-height);
 }
+@utility h-nav-row {
+  height: var(--nav-row-height);
+}
+@utility h-nav-row-tall {
+  height: var(--nav-row-height-tall);
+}
 @utility min-h-row {
   min-height: var(--row-height);
 }
@@ -270,6 +276,126 @@
   &::-webkit-scrollbar {
     display: none;
   }
+}
+
+/* Fades a dither field out toward the bottom of its pane so copy laid over
+   it reads against a calm surface. The landing site masks its hero field the
+   same way, for the same reason: the field's radial hollow keeps the MIDDLE
+   quiet, which is exactly where copy is not. The colour here is a mask
+   channel, not ink — only its alpha is used. */
+@utility field-fade-b {
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    #000 0%,
+    #000 40%,
+    transparent 88%
+  );
+  mask-image: linear-gradient(to bottom, #000 0%, #000 40%, transparent 88%);
+}
+
+/* Fades a horizontally-scrolling track out at both ends, so logos enter and
+   leave instead of being clipped by a hard edge. Colour here is a mask
+   channel, not ink — only its alpha is used. */
+@utility marquee-fade-x {
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    #000 12%,
+    #000 88%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    #000 12%,
+    #000 88%,
+    transparent 100%
+  );
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   Progressive blur scroll fade.
+
+   Ported from the landing site's logo rail (`.logos-fade`), rotated to the
+   vertical axis. Three stacked bands per edge, each blurrier and shorter
+   than the last, so content dissolves into the edge instead of being sliced
+   by a hard mask. A single blurred band reads as a smear; three staged ones
+   read as depth of field.
+
+   `backdrop-filter` only samples what is painted BEHIND the element, so the
+   bands must be siblings of the scrolling content, not children of it — and
+   the scroll container itself must not clip them.
+
+   The colour wash on the last band comes from `--scroll-blur-surface`, which
+   the call site sets to whatever it is sitting on.
+   ────────────────────────────────────────────────────────────────────────── */
+
+.scroll-blur {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 48px;
+  pointer-events: none;
+  z-index: var(--z-panel);
+}
+.scroll-blur > i {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+
+.scroll-blur-t {
+  top: 0;
+}
+.scroll-blur-t > i:nth-child(1) {
+  backdrop-filter: blur(1px);
+  -webkit-backdrop-filter: blur(1px);
+  mask-image: linear-gradient(to bottom, #000 30%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, #000 30%, transparent 100%);
+}
+.scroll-blur-t > i:nth-child(2) {
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  mask-image: linear-gradient(to bottom, #000 10%, transparent 70%);
+  -webkit-mask-image: linear-gradient(to bottom, #000 10%, transparent 70%);
+}
+.scroll-blur-t > i:nth-child(3) {
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  mask-image: linear-gradient(to bottom, #000 0%, transparent 40%);
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, transparent 40%);
+  background: linear-gradient(
+    to bottom,
+    var(--scroll-blur-surface, var(--sidebar)) 0%,
+    transparent 70%
+  );
+}
+
+.scroll-blur-b {
+  bottom: 0;
+}
+.scroll-blur-b > i:nth-child(1) {
+  backdrop-filter: blur(1px);
+  -webkit-backdrop-filter: blur(1px);
+  mask-image: linear-gradient(to top, #000 30%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to top, #000 30%, transparent 100%);
+}
+.scroll-blur-b > i:nth-child(2) {
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  mask-image: linear-gradient(to top, #000 10%, transparent 70%);
+  -webkit-mask-image: linear-gradient(to top, #000 10%, transparent 70%);
+}
+.scroll-blur-b > i:nth-child(3) {
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  mask-image: linear-gradient(to top, #000 0%, transparent 40%);
+  -webkit-mask-image: linear-gradient(to top, #000 0%, transparent 40%);
+  background: linear-gradient(
+    to top,
+    var(--scroll-blur-surface, var(--sidebar)) 0%,
+    transparent 70%
+  );
 }
 
 /* A row whose contents can change without reflowing its neighbours. */

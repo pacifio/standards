@@ -37,8 +37,19 @@ function TypeFoundations() {
     <>
       <PageHeader
         title="Type"
-        description="Nine px steps, explicit line-heights, and exactly two weights."
+        description="Geist, nine px steps, explicit line-heights, and exactly two weights."
       />
+
+      <Callout tone="info">
+        The typeface is{" "}
+        <strong className="font-semibold text-foreground">Geist</strong>, loaded
+        as a variable font — one file for the whole weight range — with{" "}
+        <code className="code">Geist Mono</code> for code, numerals and
+        identifiers. An earlier version of this system loaded no web font at all
+        and rode the platform stack, so the app rendered in SF Pro on a Mac and
+        something else everywhere else; a shared typeface across the product is
+        worth more than a shared fallback.
+      </Callout>
 
       <Callout tone="warning">
         Only 500 and 600 exist. 400 disappears against a dense monochrome UI and
