@@ -1,0 +1,140 @@
+/* ==========================================================================
+   Atlas Standards — non-colour scales.
+
+   Lifted from ~/Desktop/atlas/src/styles/tokens.css, with two deliberate
+   changes for the web: the root font-size moves 13px -> 14px, and the control
+   ladder moves 20/24/26/32 -> 22/24/28/32/36. A browser window is read at
+   arm's length on a larger surface than a native app window; everything else
+   (radius, elevation, motion, z-layers, spacing) is identical to the desktop
+   app so the two products stay one design.
+
+   Colour lives in themes.css. Nothing here is a colour.
+   ========================================================================== */
+
+:root {
+  /* --- Typography -------------------------------------------------------
+
+     Nine named steps, px with explicit line-heights. Half-pixel sizes round UP
+     to the next step; there is no tenth step. Only two weights exist anywhere
+     in this system: 500 (font-medium) and 600 (font-semibold). 400 disappears
+     against a dense monochrome UI and 700 shouts. The six named text styles in
+     utilities.css are what components should reach for before size+weight. */
+  --font-sans: -apple-system, "SF Pro Text", system-ui, sans-serif;
+  --font-serif: ui-serif, Georgia, Cambria, "Times New Roman", serif;
+  --font-mono: "SF Mono", "Geist Mono", "JetBrains Mono", "Fira Code", monospace;
+  --tracking-normal: 0em;
+
+  /* --- Spacing ----------------------------------------------------------
+
+     Tailwind v4's multiplier, and nothing else. The desktop app deleted its
+     --space-* ladder after it reached zero references; do not reintroduce one.
+     Write p-1 / gap-1.5 / px-2.5 off this base.
+
+     4px, NOT Tailwind's stock 0.25rem. This is the third web-tuned change and
+     the least obvious one. The root font-size here is 14px, so a rem-based
+     multiplier makes every spacing utility 12.5% smaller than its name
+     implies: p-2 lands on 7px, gap-3 on 10.5px, and size-4 on 14px rather
+     than 16. Fractional pixels put borders and 1px rules on half-pixel
+     boundaries, where they render as two grey lines instead of one crisp one.
+
+     Pinning the multiplier to 4px restores the whole grid: p-1 is 4px, p-2 is
+     8px, gap-1.5 is 6px, and the icon sizes below line up exactly with the
+     ICON_SIZES table in components/ui/icon.tsx. It also means the type scale
+     can move independently of the spacing scale, which is the entire reason
+     both are px in the first place. */
+  --spacing: 4px;
+
+  /* --- Radius -----------------------------------------------------------
+
+     Four steps derived from one theme-owned value, so a theme that wants a
+     rounder or squarer look moves the whole scale at once. sm for controls,
+     md for cards and rows, lg for popovers and menus, xl for dialogs.
+     Deliberately px: this system sets a non-16px root, so a rem-derived radius
+     silently shrinks and `r - 4px` collapses to nothing. */
+  --radius: 8px;
+  --radius-base: var(--radius);
+  --radius-sm: calc(var(--radius-base) - 4px);
+  --radius-md: calc(var(--radius-base) - 2px);
+  --radius-lg: var(--radius-base);
+  --radius-xl: calc(var(--radius-base) + 4px);
+  --radius-full: 9999px;
+
+  /* --- Elevation --------------------------------------------------------
+
+     Three rungs, and they must READ as three: raised, menus/popovers, dialogs.
+     Each is built from the theme's own shadow ramp, so the light theme gets a
+     light shadow for free. globals.css maps shadow-sm / -md / -lg onto these.
+     Do not introduce a fourth level. This system is border-defined, not
+     shadow-defined: a shadow means the surface is floating.
+
+     These names sit outside Tailwind's --shadow-* namespace on purpose. A
+     @theme entry pointing --shadow-sm back at --shadow-sm closes the loop. */
+  --elevation-raised: var(--shadow-sm);
+  --elevation-menu: var(--shadow-2xl);
+  --elevation-dialog: var(--shadow-xl), var(--shadow-2xl);
+
+  /* The 1px top edge on raised glass, composed as Tailwind's --tw-inset-shadow
+     so `inset-highlight shadow-md` stacks correctly. The colour is the
+     element.highlight role, not a hardcoded white — white at 6% is the DARK
+     reading of "this edge catches the light" and is invisible on light. */
+  --inset-highlight: inset 0 1px 0 0 var(--atlas-element-highlight);
+
+  /* --- Control heights (web-tuned) --------------------------------------
+
+     md is the default control. 26 and 30 snap to the nearest step. Anything
+     that is not a control — a titlebar, a rail — is a layout constant below,
+     not a step on this ladder. */
+  --control-xs: 22px;
+  --control-sm: 24px;
+  --control-md: 28px;
+  --control-lg: 32px;
+  --control-xl: 36px;
+
+  /* --- Layout constants -------------------------------------------------
+
+     The Linear measurements. Named, so a screen never writes w-[240px]. */
+  --sidebar-width: 240px;
+  --sidebar-width-collapsed: 48px;
+  --topbar-height: 40px;
+  --list-pane-width: 320px;
+  --properties-width: 260px;
+  /* The detail column beside a wide list. Narrower than the list on
+     purpose: the list is the screen, the detail is its companion. */
+  --companion-width: 440px;
+  --row-height: 32px;
+  --settings-nav-width: 220px;
+  --settings-content-max: 640px;
+
+  /* --- Motion -----------------------------------------------------------
+
+     Four durations. The three easings live in the --ease-* theme namespace in
+     globals.css and are the only curves allowed — no springs, no overshoot.
+     instant is a state flip the user should not read as motion; fast is hover
+     and focus; base is menus, popovers and tabs; slow is a panel travelling a
+     long way. */
+  --duration-instant: 80ms;
+  --duration-fast: 120ms;
+  --duration-base: 180ms;
+  --duration-slow: 260ms;
+
+  /* --- Glass ------------------------------------------------------------
+
+     One blur radius for the whole system. */
+  --blur-glass: 24px;
+
+  /* --- Z-index layers ---------------------------------------------------
+
+     Every floating surface names a layer; nothing writes a number. `popover`
+     sits ABOVE `modal` so a menu opened inside a dialog is not clipped behind
+     it. A drawer's scrim is an earlier SIBLING on the drawer layer, not a
+     layer of its own. */
+  --z-panel: 10;
+  --z-titlebar: 40;
+  --z-drawer: 60;
+  --z-overlay: 100;
+  --z-modal: 110;
+  --z-popover: 200;
+  --z-toast: 300;
+  --z-tooltip: 400;
+  --z-drag: 500;
+}

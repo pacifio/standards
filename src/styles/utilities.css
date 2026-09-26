@@ -1,0 +1,278 @@
+/* ==========================================================================
+   Atlas Standards — named utilities.
+
+   Everything here exists so a component never has to write a measurement.
+   If you find yourself reaching for text-[13px], h-[28px] or z-[60], the
+   utility you want is in this file — and if it genuinely is not, add it here
+   rather than inlining the number. The ratchet test enforces this.
+   ========================================================================== */
+
+/* ──────────────────────────────────────────────────────────────────────────
+   The six named text styles.
+
+   Reach for one of these before composing size + weight + colour by hand.
+   `eyebrow` is a small-caps group label, `label` the text on and beside a
+   control, `body` running prose, `caption` the dimmed line under something,
+   `code` any monospace run, `heading` a panel or dialog title.
+   ────────────────────────────────────────────────────────────────────────── */
+
+@utility eyebrow {
+  font-family: var(--font-sans);
+  font-size: var(--text-2xs);
+  line-height: var(--text-2xs--line-height);
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+}
+
+@utility label {
+  font-family: var(--font-sans);
+  font-size: var(--text-xs);
+  line-height: var(--text-xs--line-height);
+  font-weight: 500;
+  color: var(--foreground);
+}
+
+@utility body {
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  line-height: var(--text-base--line-height);
+  font-weight: 500;
+  color: var(--foreground);
+}
+
+@utility caption {
+  font-family: var(--font-sans);
+  font-size: var(--text-2xs);
+  line-height: var(--text-2xs--line-height);
+  font-weight: 500;
+  color: var(--muted-foreground);
+}
+
+@utility code {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  line-height: var(--text-sm--line-height);
+  font-weight: 500;
+  font-feature-settings: "zero", "ss02";
+}
+
+@utility heading {
+  font-family: var(--font-sans);
+  font-size: var(--text-md);
+  line-height: var(--text-md--line-height);
+  font-weight: 600;
+  color: var(--foreground);
+}
+
+/* Numerals that do not reflow as they tick. Any counter, duration, token
+   count or money figure. */
+@utility tnum {
+  font-variant-numeric: tabular-nums;
+}
+
+@utility mono {
+  font-family: var(--font-mono);
+  font-feature-settings: "zero", "ss02";
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   Control heights.
+   ────────────────────────────────────────────────────────────────────────── */
+
+@utility h-control-xs {
+  height: var(--control-xs);
+}
+@utility h-control-sm {
+  height: var(--control-sm);
+}
+@utility h-control-md {
+  height: var(--control-md);
+}
+@utility h-control-lg {
+  height: var(--control-lg);
+}
+@utility h-control-xl {
+  height: var(--control-xl);
+}
+
+/* A control that must be at least one step wide but may grow — a keycap
+   holding "Esc", a count badge holding "12". */
+@utility min-w-control-xs {
+  min-width: var(--control-xs);
+}
+@utility min-w-control-sm {
+  min-width: var(--control-sm);
+}
+@utility min-w-control-md {
+  min-width: var(--control-md);
+}
+
+/* The square an icon-only control occupies — one control height on both axes. */
+@utility size-control-xs {
+  width: var(--control-xs);
+  height: var(--control-xs);
+}
+@utility size-control-sm {
+  width: var(--control-sm);
+  height: var(--control-sm);
+}
+@utility size-control-md {
+  width: var(--control-md);
+  height: var(--control-md);
+}
+@utility size-control-lg {
+  width: var(--control-lg);
+  height: var(--control-lg);
+}
+@utility size-control-xl {
+  width: var(--control-xl);
+  height: var(--control-xl);
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   Layout constants.
+   ────────────────────────────────────────────────────────────────────────── */
+
+@utility w-sidebar {
+  width: var(--sidebar-width);
+}
+@utility w-sidebar-collapsed {
+  width: var(--sidebar-width-collapsed);
+}
+@utility h-topbar {
+  height: var(--topbar-height);
+}
+@utility min-h-topbar {
+  min-height: var(--topbar-height);
+}
+@utility w-list-pane {
+  width: var(--list-pane-width);
+}
+@utility w-properties {
+  width: var(--properties-width);
+}
+@utility w-companion {
+  width: var(--companion-width);
+}
+@utility h-row {
+  height: var(--row-height);
+}
+@utility min-h-row {
+  min-height: var(--row-height);
+}
+@utility w-settings-nav {
+  width: var(--settings-nav-width);
+}
+@utility max-w-settings {
+  max-width: var(--settings-content-max);
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   Z-layers. Nothing outside this file may write a z-index.
+   ────────────────────────────────────────────────────────────────────────── */
+
+@utility z-panel {
+  z-index: var(--z-panel);
+}
+@utility z-titlebar {
+  z-index: var(--z-titlebar);
+}
+@utility z-drawer {
+  z-index: var(--z-drawer);
+}
+@utility z-overlay {
+  z-index: var(--z-overlay);
+}
+@utility z-modal {
+  z-index: var(--z-modal);
+}
+@utility z-popover {
+  z-index: var(--z-popover);
+}
+@utility z-toast {
+  z-index: var(--z-toast);
+}
+@utility z-tooltip {
+  z-index: var(--z-tooltip);
+}
+@utility z-drag {
+  z-index: var(--z-drag);
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   Surfaces.
+   ────────────────────────────────────────────────────────────────────────── */
+
+/* Frosted HUD chrome: keycap docks, floating toolbars, the command palette.
+   Canonical composition, and it is worth writing all three parts:
+
+     glass-hud backdrop-blur-glass bg-gradient-to-b from-popover/85 to-card/90
+*/
+@utility glass-hud {
+  border: 1px solid var(--border);
+  box-shadow: var(--inset-highlight), var(--elevation-menu);
+}
+
+/* A scrim is deliberately not themed. Its whole job is to push what is behind
+   it away from the reader, and only darkening does that — on a light
+   appearance a light scrim pushes nothing. Also the right fill for a control
+   sitting over arbitrary media, where the theme cannot know what is beneath. */
+@utility scrim {
+  background-color: rgb(0 0 0 / 0.6);
+}
+@utility scrim-soft {
+  background-color: rgb(0 0 0 / 0.2);
+}
+
+@utility inset-highlight {
+  box-shadow: var(--inset-highlight);
+}
+
+/* The vertical sheen that gives a tall panel its top edge without a border.
+   Paint only, so nothing moves and nothing reflows. */
+@utility panel-sheen {
+  background-image: linear-gradient(
+    to bottom,
+    var(--atlas-element-highlight) 0,
+    transparent 180px
+  );
+}
+
+/* The left rail reads as a plane behind the content, not a column beside it. */
+@utility rail-surface {
+  background-color: var(--atlas-panel-background);
+  box-shadow: var(--inset-highlight);
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   States.
+   ────────────────────────────────────────────────────────────────────────── */
+
+/* One disabled treatment everywhere. Used by anything that is not a real
+   form control and so cannot take `:disabled`. */
+@utility disabled-look {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@utility focus-ring-none {
+  &:focus-visible {
+    outline: none;
+  }
+}
+
+/* Keep the scroll, lose the bar. Horizontal strips (tab rails, chip rows)
+   only — a vertical list needs its scrollbar to communicate length. */
+@utility hide-scrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* A row whose contents can change without reflowing its neighbours. */
+@utility contain-row {
+  contain: layout style;
+}

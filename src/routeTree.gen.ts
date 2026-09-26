@@ -8,59 +8,632 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-import { Route as rootRouteImport } from "./routes/__root"
-import { Route as IndexRouteImport } from "./routes/index"
+import { Route as rootRouteImport } from './routes/__root'
+import { Route as IndexRouteImport } from './routes/index'
+import { Route as DsRouteRouteImport } from './routes/ds/route'
+import { Route as MockRouteRouteImport } from './routes/mock/route'
+import { Route as DsIndexRouteImport } from './routes/ds/index'
+import { Route as DsPatternsRouteImport } from './routes/ds/patterns'
+import { Route as MockIndexRouteImport } from './routes/mock/index'
+import { Route as MockAdminRouteImport } from './routes/mock/admin'
+import { Route as MockChatRouteImport } from './routes/mock/chat'
+import { Route as MockInboxRouteImport } from './routes/mock/inbox'
+import { Route as MockProjectsRouteImport } from './routes/mock/projects'
+import { Route as MockSettingsRouteRouteImport } from './routes/mock/settings/route'
+import { Route as MockTimelineRouteImport } from './routes/mock/timeline'
+import { Route as DsComponentsActionsRouteImport } from './routes/ds/components/actions'
+import { Route as DsComponentsDataRouteImport } from './routes/ds/components/data'
+import { Route as DsComponentsFeedbackRouteImport } from './routes/ds/components/feedback'
+import { Route as DsComponentsFormsRouteImport } from './routes/ds/components/forms'
+import { Route as DsComponentsOverlaysRouteImport } from './routes/ds/components/overlays'
+import { Route as DsFoundationsColourRouteImport } from './routes/ds/foundations/colour'
+import { Route as DsFoundationsDensityRouteImport } from './routes/ds/foundations/density'
+import { Route as DsFoundationsMotionRouteImport } from './routes/ds/foundations/motion'
+import { Route as DsFoundationsTypeRouteImport } from './routes/ds/foundations/type'
+import { Route as MockSettingsIndexRouteImport } from './routes/mock/settings/index'
+import { Route as MockSettingsAccountRouteImport } from './routes/mock/settings/account'
+import { Route as MockSettingsAiRouteImport } from './routes/mock/settings/ai'
+import { Route as MockSettingsOrganisationRouteImport } from './routes/mock/settings/organisation'
+import { Route as MockSettingsPrivacyRouteImport } from './routes/mock/settings/privacy'
+import { Route as MockSettingsUsageRouteImport } from './routes/mock/settings/usage'
 
 const IndexRoute = IndexRouteImport.update({
-  id: "/",
-  path: "/",
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const DsRouteRoute = DsRouteRouteImport.update({
+  id: '/ds',
+  path: '/ds',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MockRouteRoute = MockRouteRouteImport.update({
+  id: '/mock',
+  path: '/mock',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DsIndexRoute = DsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => DsRouteRoute,
+} as any)
+const DsPatternsRoute = DsPatternsRouteImport.update({
+  id: '/patterns',
+  path: '/patterns',
+  getParentRoute: () => DsRouteRoute,
+} as any)
+const MockIndexRoute = MockIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => MockRouteRoute,
+} as any)
+const MockAdminRoute = MockAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => MockRouteRoute,
+} as any)
+const MockChatRoute = MockChatRouteImport.update({
+  id: '/chat',
+  path: '/chat',
+  getParentRoute: () => MockRouteRoute,
+} as any)
+const MockInboxRoute = MockInboxRouteImport.update({
+  id: '/inbox',
+  path: '/inbox',
+  getParentRoute: () => MockRouteRoute,
+} as any)
+const MockProjectsRoute = MockProjectsRouteImport.update({
+  id: '/projects',
+  path: '/projects',
+  getParentRoute: () => MockRouteRoute,
+} as any)
+const MockSettingsRouteRoute = MockSettingsRouteRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => MockRouteRoute,
+} as any)
+const MockTimelineRoute = MockTimelineRouteImport.update({
+  id: '/timeline',
+  path: '/timeline',
+  getParentRoute: () => MockRouteRoute,
+} as any)
+const DsComponentsActionsRoute = DsComponentsActionsRouteImport.update({
+  id: '/components/actions',
+  path: '/components/actions',
+  getParentRoute: () => DsRouteRoute,
+} as any)
+const DsComponentsDataRoute = DsComponentsDataRouteImport.update({
+  id: '/components/data',
+  path: '/components/data',
+  getParentRoute: () => DsRouteRoute,
+} as any)
+const DsComponentsFeedbackRoute = DsComponentsFeedbackRouteImport.update({
+  id: '/components/feedback',
+  path: '/components/feedback',
+  getParentRoute: () => DsRouteRoute,
+} as any)
+const DsComponentsFormsRoute = DsComponentsFormsRouteImport.update({
+  id: '/components/forms',
+  path: '/components/forms',
+  getParentRoute: () => DsRouteRoute,
+} as any)
+const DsComponentsOverlaysRoute = DsComponentsOverlaysRouteImport.update({
+  id: '/components/overlays',
+  path: '/components/overlays',
+  getParentRoute: () => DsRouteRoute,
+} as any)
+const DsFoundationsColourRoute = DsFoundationsColourRouteImport.update({
+  id: '/foundations/colour',
+  path: '/foundations/colour',
+  getParentRoute: () => DsRouteRoute,
+} as any)
+const DsFoundationsDensityRoute = DsFoundationsDensityRouteImport.update({
+  id: '/foundations/density',
+  path: '/foundations/density',
+  getParentRoute: () => DsRouteRoute,
+} as any)
+const DsFoundationsMotionRoute = DsFoundationsMotionRouteImport.update({
+  id: '/foundations/motion',
+  path: '/foundations/motion',
+  getParentRoute: () => DsRouteRoute,
+} as any)
+const DsFoundationsTypeRoute = DsFoundationsTypeRouteImport.update({
+  id: '/foundations/type',
+  path: '/foundations/type',
+  getParentRoute: () => DsRouteRoute,
+} as any)
+const MockSettingsIndexRoute = MockSettingsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => MockSettingsRouteRoute,
+} as any)
+const MockSettingsAccountRoute = MockSettingsAccountRouteImport.update({
+  id: '/account',
+  path: '/account',
+  getParentRoute: () => MockSettingsRouteRoute,
+} as any)
+const MockSettingsAiRoute = MockSettingsAiRouteImport.update({
+  id: '/ai',
+  path: '/ai',
+  getParentRoute: () => MockSettingsRouteRoute,
+} as any)
+const MockSettingsOrganisationRoute =
+  MockSettingsOrganisationRouteImport.update({
+    id: '/organisation',
+    path: '/organisation',
+    getParentRoute: () => MockSettingsRouteRoute,
+  } as any)
+const MockSettingsPrivacyRoute = MockSettingsPrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => MockSettingsRouteRoute,
+} as any)
+const MockSettingsUsageRoute = MockSettingsUsageRouteImport.update({
+  id: '/usage',
+  path: '/usage',
+  getParentRoute: () => MockSettingsRouteRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
-  "/": typeof IndexRoute
+  '/': typeof IndexRoute
+  '/ds': typeof DsRouteRouteWithChildren
+  '/mock': typeof MockRouteRouteWithChildren
+  '/mock/settings': typeof MockSettingsRouteRouteWithChildren
+  '/ds/patterns': typeof DsPatternsRoute
+  '/mock/admin': typeof MockAdminRoute
+  '/mock/chat': typeof MockChatRoute
+  '/mock/inbox': typeof MockInboxRoute
+  '/mock/projects': typeof MockProjectsRoute
+  '/mock/timeline': typeof MockTimelineRoute
+  '/ds/': typeof DsIndexRoute
+  '/mock/': typeof MockIndexRoute
+  '/ds/components/actions': typeof DsComponentsActionsRoute
+  '/ds/components/data': typeof DsComponentsDataRoute
+  '/ds/components/feedback': typeof DsComponentsFeedbackRoute
+  '/ds/components/forms': typeof DsComponentsFormsRoute
+  '/ds/components/overlays': typeof DsComponentsOverlaysRoute
+  '/ds/foundations/colour': typeof DsFoundationsColourRoute
+  '/ds/foundations/density': typeof DsFoundationsDensityRoute
+  '/ds/foundations/motion': typeof DsFoundationsMotionRoute
+  '/ds/foundations/type': typeof DsFoundationsTypeRoute
+  '/mock/settings/account': typeof MockSettingsAccountRoute
+  '/mock/settings/ai': typeof MockSettingsAiRoute
+  '/mock/settings/organisation': typeof MockSettingsOrganisationRoute
+  '/mock/settings/privacy': typeof MockSettingsPrivacyRoute
+  '/mock/settings/usage': typeof MockSettingsUsageRoute
+  '/mock/settings/': typeof MockSettingsIndexRoute
 }
 export interface FileRoutesByTo {
-  "/": typeof IndexRoute
+  '/': typeof IndexRoute
+  '/ds/patterns': typeof DsPatternsRoute
+  '/mock/admin': typeof MockAdminRoute
+  '/mock/chat': typeof MockChatRoute
+  '/mock/inbox': typeof MockInboxRoute
+  '/mock/projects': typeof MockProjectsRoute
+  '/mock/timeline': typeof MockTimelineRoute
+  '/ds': typeof DsIndexRoute
+  '/mock': typeof MockIndexRoute
+  '/ds/components/actions': typeof DsComponentsActionsRoute
+  '/ds/components/data': typeof DsComponentsDataRoute
+  '/ds/components/feedback': typeof DsComponentsFeedbackRoute
+  '/ds/components/forms': typeof DsComponentsFormsRoute
+  '/ds/components/overlays': typeof DsComponentsOverlaysRoute
+  '/ds/foundations/colour': typeof DsFoundationsColourRoute
+  '/ds/foundations/density': typeof DsFoundationsDensityRoute
+  '/ds/foundations/motion': typeof DsFoundationsMotionRoute
+  '/ds/foundations/type': typeof DsFoundationsTypeRoute
+  '/mock/settings/account': typeof MockSettingsAccountRoute
+  '/mock/settings/ai': typeof MockSettingsAiRoute
+  '/mock/settings/organisation': typeof MockSettingsOrganisationRoute
+  '/mock/settings/privacy': typeof MockSettingsPrivacyRoute
+  '/mock/settings/usage': typeof MockSettingsUsageRoute
+  '/mock/settings': typeof MockSettingsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  "/": typeof IndexRoute
+  '/': typeof IndexRoute
+  '/ds': typeof DsRouteRouteWithChildren
+  '/mock': typeof MockRouteRouteWithChildren
+  '/mock/settings': typeof MockSettingsRouteRouteWithChildren
+  '/ds/patterns': typeof DsPatternsRoute
+  '/mock/admin': typeof MockAdminRoute
+  '/mock/chat': typeof MockChatRoute
+  '/mock/inbox': typeof MockInboxRoute
+  '/mock/projects': typeof MockProjectsRoute
+  '/mock/timeline': typeof MockTimelineRoute
+  '/ds/': typeof DsIndexRoute
+  '/mock/': typeof MockIndexRoute
+  '/ds/components/actions': typeof DsComponentsActionsRoute
+  '/ds/components/data': typeof DsComponentsDataRoute
+  '/ds/components/feedback': typeof DsComponentsFeedbackRoute
+  '/ds/components/forms': typeof DsComponentsFormsRoute
+  '/ds/components/overlays': typeof DsComponentsOverlaysRoute
+  '/ds/foundations/colour': typeof DsFoundationsColourRoute
+  '/ds/foundations/density': typeof DsFoundationsDensityRoute
+  '/ds/foundations/motion': typeof DsFoundationsMotionRoute
+  '/ds/foundations/type': typeof DsFoundationsTypeRoute
+  '/mock/settings/account': typeof MockSettingsAccountRoute
+  '/mock/settings/ai': typeof MockSettingsAiRoute
+  '/mock/settings/organisation': typeof MockSettingsOrganisationRoute
+  '/mock/settings/privacy': typeof MockSettingsPrivacyRoute
+  '/mock/settings/usage': typeof MockSettingsUsageRoute
+  '/mock/settings/': typeof MockSettingsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: "/"
+  fullPaths:
+    | '/'
+    | '/ds'
+    | '/mock'
+    | '/mock/settings'
+    | '/ds/patterns'
+    | '/mock/admin'
+    | '/mock/chat'
+    | '/mock/inbox'
+    | '/mock/projects'
+    | '/mock/timeline'
+    | '/ds/'
+    | '/mock/'
+    | '/ds/components/actions'
+    | '/ds/components/data'
+    | '/ds/components/feedback'
+    | '/ds/components/forms'
+    | '/ds/components/overlays'
+    | '/ds/foundations/colour'
+    | '/ds/foundations/density'
+    | '/ds/foundations/motion'
+    | '/ds/foundations/type'
+    | '/mock/settings/account'
+    | '/mock/settings/ai'
+    | '/mock/settings/organisation'
+    | '/mock/settings/privacy'
+    | '/mock/settings/usage'
+    | '/mock/settings/'
   fileRoutesByTo: FileRoutesByTo
-  to: "/"
-  id: "__root__" | "/"
+  to:
+    | '/'
+    | '/ds/patterns'
+    | '/mock/admin'
+    | '/mock/chat'
+    | '/mock/inbox'
+    | '/mock/projects'
+    | '/mock/timeline'
+    | '/ds'
+    | '/mock'
+    | '/ds/components/actions'
+    | '/ds/components/data'
+    | '/ds/components/feedback'
+    | '/ds/components/forms'
+    | '/ds/components/overlays'
+    | '/ds/foundations/colour'
+    | '/ds/foundations/density'
+    | '/ds/foundations/motion'
+    | '/ds/foundations/type'
+    | '/mock/settings/account'
+    | '/mock/settings/ai'
+    | '/mock/settings/organisation'
+    | '/mock/settings/privacy'
+    | '/mock/settings/usage'
+    | '/mock/settings'
+  id:
+    | '__root__'
+    | '/'
+    | '/ds'
+    | '/mock'
+    | '/mock/settings'
+    | '/ds/patterns'
+    | '/mock/admin'
+    | '/mock/chat'
+    | '/mock/inbox'
+    | '/mock/projects'
+    | '/mock/timeline'
+    | '/ds/'
+    | '/mock/'
+    | '/ds/components/actions'
+    | '/ds/components/data'
+    | '/ds/components/feedback'
+    | '/ds/components/forms'
+    | '/ds/components/overlays'
+    | '/ds/foundations/colour'
+    | '/ds/foundations/density'
+    | '/ds/foundations/motion'
+    | '/ds/foundations/type'
+    | '/mock/settings/account'
+    | '/mock/settings/ai'
+    | '/mock/settings/organisation'
+    | '/mock/settings/privacy'
+    | '/mock/settings/usage'
+    | '/mock/settings/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  DsRouteRoute: typeof DsRouteRouteWithChildren
+  MockRouteRoute: typeof MockRouteRouteWithChildren
 }
 
-declare module "@tanstack/react-router" {
+declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    "/": {
-      id: "/"
-      path: "/"
-      fullPath: "/"
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/ds': {
+      id: '/ds'
+      path: '/ds'
+      fullPath: '/ds'
+      preLoaderRoute: typeof DsRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mock': {
+      id: '/mock'
+      path: '/mock'
+      fullPath: '/mock'
+      preLoaderRoute: typeof MockRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ds/': {
+      id: '/ds/'
+      path: '/'
+      fullPath: '/ds/'
+      preLoaderRoute: typeof DsIndexRouteImport
+      parentRoute: typeof DsRouteRoute
+    }
+    '/ds/patterns': {
+      id: '/ds/patterns'
+      path: '/patterns'
+      fullPath: '/ds/patterns'
+      preLoaderRoute: typeof DsPatternsRouteImport
+      parentRoute: typeof DsRouteRoute
+    }
+    '/mock/': {
+      id: '/mock/'
+      path: '/'
+      fullPath: '/mock/'
+      preLoaderRoute: typeof MockIndexRouteImport
+      parentRoute: typeof MockRouteRoute
+    }
+    '/mock/admin': {
+      id: '/mock/admin'
+      path: '/admin'
+      fullPath: '/mock/admin'
+      preLoaderRoute: typeof MockAdminRouteImport
+      parentRoute: typeof MockRouteRoute
+    }
+    '/mock/chat': {
+      id: '/mock/chat'
+      path: '/chat'
+      fullPath: '/mock/chat'
+      preLoaderRoute: typeof MockChatRouteImport
+      parentRoute: typeof MockRouteRoute
+    }
+    '/mock/inbox': {
+      id: '/mock/inbox'
+      path: '/inbox'
+      fullPath: '/mock/inbox'
+      preLoaderRoute: typeof MockInboxRouteImport
+      parentRoute: typeof MockRouteRoute
+    }
+    '/mock/projects': {
+      id: '/mock/projects'
+      path: '/projects'
+      fullPath: '/mock/projects'
+      preLoaderRoute: typeof MockProjectsRouteImport
+      parentRoute: typeof MockRouteRoute
+    }
+    '/mock/settings': {
+      id: '/mock/settings'
+      path: '/settings'
+      fullPath: '/mock/settings'
+      preLoaderRoute: typeof MockSettingsRouteRouteImport
+      parentRoute: typeof MockRouteRoute
+    }
+    '/mock/timeline': {
+      id: '/mock/timeline'
+      path: '/timeline'
+      fullPath: '/mock/timeline'
+      preLoaderRoute: typeof MockTimelineRouteImport
+      parentRoute: typeof MockRouteRoute
+    }
+    '/ds/components/actions': {
+      id: '/ds/components/actions'
+      path: '/components/actions'
+      fullPath: '/ds/components/actions'
+      preLoaderRoute: typeof DsComponentsActionsRouteImport
+      parentRoute: typeof DsRouteRoute
+    }
+    '/ds/components/data': {
+      id: '/ds/components/data'
+      path: '/components/data'
+      fullPath: '/ds/components/data'
+      preLoaderRoute: typeof DsComponentsDataRouteImport
+      parentRoute: typeof DsRouteRoute
+    }
+    '/ds/components/feedback': {
+      id: '/ds/components/feedback'
+      path: '/components/feedback'
+      fullPath: '/ds/components/feedback'
+      preLoaderRoute: typeof DsComponentsFeedbackRouteImport
+      parentRoute: typeof DsRouteRoute
+    }
+    '/ds/components/forms': {
+      id: '/ds/components/forms'
+      path: '/components/forms'
+      fullPath: '/ds/components/forms'
+      preLoaderRoute: typeof DsComponentsFormsRouteImport
+      parentRoute: typeof DsRouteRoute
+    }
+    '/ds/components/overlays': {
+      id: '/ds/components/overlays'
+      path: '/components/overlays'
+      fullPath: '/ds/components/overlays'
+      preLoaderRoute: typeof DsComponentsOverlaysRouteImport
+      parentRoute: typeof DsRouteRoute
+    }
+    '/ds/foundations/colour': {
+      id: '/ds/foundations/colour'
+      path: '/foundations/colour'
+      fullPath: '/ds/foundations/colour'
+      preLoaderRoute: typeof DsFoundationsColourRouteImport
+      parentRoute: typeof DsRouteRoute
+    }
+    '/ds/foundations/density': {
+      id: '/ds/foundations/density'
+      path: '/foundations/density'
+      fullPath: '/ds/foundations/density'
+      preLoaderRoute: typeof DsFoundationsDensityRouteImport
+      parentRoute: typeof DsRouteRoute
+    }
+    '/ds/foundations/motion': {
+      id: '/ds/foundations/motion'
+      path: '/foundations/motion'
+      fullPath: '/ds/foundations/motion'
+      preLoaderRoute: typeof DsFoundationsMotionRouteImport
+      parentRoute: typeof DsRouteRoute
+    }
+    '/ds/foundations/type': {
+      id: '/ds/foundations/type'
+      path: '/foundations/type'
+      fullPath: '/ds/foundations/type'
+      preLoaderRoute: typeof DsFoundationsTypeRouteImport
+      parentRoute: typeof DsRouteRoute
+    }
+    '/mock/settings/': {
+      id: '/mock/settings/'
+      path: '/'
+      fullPath: '/mock/settings/'
+      preLoaderRoute: typeof MockSettingsIndexRouteImport
+      parentRoute: typeof MockSettingsRouteRoute
+    }
+    '/mock/settings/account': {
+      id: '/mock/settings/account'
+      path: '/account'
+      fullPath: '/mock/settings/account'
+      preLoaderRoute: typeof MockSettingsAccountRouteImport
+      parentRoute: typeof MockSettingsRouteRoute
+    }
+    '/mock/settings/ai': {
+      id: '/mock/settings/ai'
+      path: '/ai'
+      fullPath: '/mock/settings/ai'
+      preLoaderRoute: typeof MockSettingsAiRouteImport
+      parentRoute: typeof MockSettingsRouteRoute
+    }
+    '/mock/settings/organisation': {
+      id: '/mock/settings/organisation'
+      path: '/organisation'
+      fullPath: '/mock/settings/organisation'
+      preLoaderRoute: typeof MockSettingsOrganisationRouteImport
+      parentRoute: typeof MockSettingsRouteRoute
+    }
+    '/mock/settings/privacy': {
+      id: '/mock/settings/privacy'
+      path: '/privacy'
+      fullPath: '/mock/settings/privacy'
+      preLoaderRoute: typeof MockSettingsPrivacyRouteImport
+      parentRoute: typeof MockSettingsRouteRoute
+    }
+    '/mock/settings/usage': {
+      id: '/mock/settings/usage'
+      path: '/usage'
+      fullPath: '/mock/settings/usage'
+      preLoaderRoute: typeof MockSettingsUsageRouteImport
+      parentRoute: typeof MockSettingsRouteRoute
     }
   }
 }
 
+interface DsRouteRouteChildren {
+  DsPatternsRoute: typeof DsPatternsRoute
+  DsIndexRoute: typeof DsIndexRoute
+  DsComponentsActionsRoute: typeof DsComponentsActionsRoute
+  DsComponentsDataRoute: typeof DsComponentsDataRoute
+  DsComponentsFeedbackRoute: typeof DsComponentsFeedbackRoute
+  DsComponentsFormsRoute: typeof DsComponentsFormsRoute
+  DsComponentsOverlaysRoute: typeof DsComponentsOverlaysRoute
+  DsFoundationsColourRoute: typeof DsFoundationsColourRoute
+  DsFoundationsDensityRoute: typeof DsFoundationsDensityRoute
+  DsFoundationsMotionRoute: typeof DsFoundationsMotionRoute
+  DsFoundationsTypeRoute: typeof DsFoundationsTypeRoute
+}
+
+const DsRouteRouteChildren: DsRouteRouteChildren = {
+  DsPatternsRoute: DsPatternsRoute,
+  DsIndexRoute: DsIndexRoute,
+  DsComponentsActionsRoute: DsComponentsActionsRoute,
+  DsComponentsDataRoute: DsComponentsDataRoute,
+  DsComponentsFeedbackRoute: DsComponentsFeedbackRoute,
+  DsComponentsFormsRoute: DsComponentsFormsRoute,
+  DsComponentsOverlaysRoute: DsComponentsOverlaysRoute,
+  DsFoundationsColourRoute: DsFoundationsColourRoute,
+  DsFoundationsDensityRoute: DsFoundationsDensityRoute,
+  DsFoundationsMotionRoute: DsFoundationsMotionRoute,
+  DsFoundationsTypeRoute: DsFoundationsTypeRoute,
+}
+
+const DsRouteRouteWithChildren =
+  DsRouteRoute._addFileChildren(DsRouteRouteChildren)
+
+interface MockSettingsRouteRouteChildren {
+  MockSettingsAccountRoute: typeof MockSettingsAccountRoute
+  MockSettingsAiRoute: typeof MockSettingsAiRoute
+  MockSettingsOrganisationRoute: typeof MockSettingsOrganisationRoute
+  MockSettingsPrivacyRoute: typeof MockSettingsPrivacyRoute
+  MockSettingsUsageRoute: typeof MockSettingsUsageRoute
+  MockSettingsIndexRoute: typeof MockSettingsIndexRoute
+}
+
+const MockSettingsRouteRouteChildren: MockSettingsRouteRouteChildren = {
+  MockSettingsAccountRoute: MockSettingsAccountRoute,
+  MockSettingsAiRoute: MockSettingsAiRoute,
+  MockSettingsOrganisationRoute: MockSettingsOrganisationRoute,
+  MockSettingsPrivacyRoute: MockSettingsPrivacyRoute,
+  MockSettingsUsageRoute: MockSettingsUsageRoute,
+  MockSettingsIndexRoute: MockSettingsIndexRoute,
+}
+
+const MockSettingsRouteRouteWithChildren =
+  MockSettingsRouteRoute._addFileChildren(MockSettingsRouteRouteChildren)
+
+interface MockRouteRouteChildren {
+  MockSettingsRouteRoute: typeof MockSettingsRouteRouteWithChildren
+  MockAdminRoute: typeof MockAdminRoute
+  MockChatRoute: typeof MockChatRoute
+  MockInboxRoute: typeof MockInboxRoute
+  MockProjectsRoute: typeof MockProjectsRoute
+  MockTimelineRoute: typeof MockTimelineRoute
+  MockIndexRoute: typeof MockIndexRoute
+}
+
+const MockRouteRouteChildren: MockRouteRouteChildren = {
+  MockSettingsRouteRoute: MockSettingsRouteRouteWithChildren,
+  MockAdminRoute: MockAdminRoute,
+  MockChatRoute: MockChatRoute,
+  MockInboxRoute: MockInboxRoute,
+  MockProjectsRoute: MockProjectsRoute,
+  MockTimelineRoute: MockTimelineRoute,
+  MockIndexRoute: MockIndexRoute,
+}
+
+const MockRouteRouteWithChildren = MockRouteRoute._addFileChildren(
+  MockRouteRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  DsRouteRoute: DsRouteRouteWithChildren,
+  MockRouteRoute: MockRouteRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
 
-import type { getRouter } from "./router.tsx"
-import type { createStart } from "@tanstack/react-start"
-declare module "@tanstack/react-start" {
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
   interface Register {
     ssr: true
     router: Awaited<ReturnType<typeof getRouter>>
