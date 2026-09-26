@@ -1,37 +1,68 @@
+"use client"
+
+import { useCallback, useEffect, useRef, useState } from "react"
 import { cn } from "cn"
 
 /**
- * The progressive-blur fade at the edge of a scroll area.
+ * A scroll region whose top and bottom edges dissolve — but only on the side
+ * there is actually more content. Auberge's `sidebar.mp4`.
  *
- * Three stacked bands, each blurrier and shorter than the last, so content
- * dissolves into the edge rather than being sliced by a hard mask. One band
- * reads as a smear; three staged ones read as depth of field. The CSS is in
- * `utilities.css`; this is just the markup, because `backdrop-filter` needs
- * three real elements to stack.
- *
- * These must be SIBLINGS of the scrolling content — `backdrop-filter` only
- * samples what is painted behind an element, so a band nested inside the
- * scroller would scroll away with it and sample nothing.
+ * It is the scroll container, not an overlay: it measures its own
+ * `scrollTop` against `fade` and writes two registered custom properties the
+ * `.scroll-fade` mask reads. Because they are registered (`@property` in
+ * globals.css) the change TRANSITIONS rather than snapping, which is the
+ * whole trick — a fade that pops in on the first pixel of scroll reads as a
+ * glitch, one that eases in reads as depth.
  */
 function ScrollFade({
-  edge,
   className,
+  fade = 28,
+  children,
   ...props
-}: React.ComponentProps<"div"> & { edge: "top" | "bottom" }) {
+}: React.ComponentProps<"div"> & { fade?: number }) {
+  const ref = useRef<HTMLDivElement>(null)
+  const [edges, setEdges] = useState({ top: 0, bottom: 0 })
+
+  const measure = useCallback(() => {
+    const el = ref.current
+    if (!el) return
+    const max = el.scrollHeight - el.clientHeight
+    if (max <= 2) {
+      setEdges({ top: 0, bottom: 0 })
+      return
+    }
+    setEdges({
+      top: Math.min(1, el.scrollTop / fade) * fade,
+      bottom: Math.min(1, (max - el.scrollTop) / fade) * fade,
+    })
+  }, [fade])
+
+  useEffect(() => {
+    measure()
+    const el = ref.current
+    if (!el) return
+    const observer = new ResizeObserver(measure)
+    observer.observe(el)
+    for (const child of Array.from(el.children)) observer.observe(child)
+    return () => observer.disconnect()
+  }, [measure])
+
   return (
     <div
-      aria-hidden="true"
+      ref={ref}
       data-slot="scroll-fade"
-      className={cn(
-        "scroll-blur",
-        edge === "top" ? "scroll-blur-t" : "scroll-blur-b",
-        className
-      )}
+      onScroll={measure}
+      className={cn("scroll-fade overflow-y-auto", className)}
+      style={
+        {
+          "--fade-top": `${edges.top}px`,
+          "--fade-bottom": `${edges.bottom}px`,
+          transition: "--fade-top 150ms linear, --fade-bottom 150ms linear",
+        } as React.CSSProperties
+      }
       {...props}
     >
-      <i />
-      <i />
-      <i />
+      {children}
     </div>
   )
 }

@@ -1,278 +1,189 @@
 /* ==========================================================================
    Atlas Standards — colour.
 
-   Every value in this file was MEASURED from the reference apps, not recalled.
-   The sampling lives in the commit that introduced it; the short version:
+   Achromatic. Every chrome value is OKLCH with chroma 0, and the action
+   colour is a foreground INVERSION: a near-white button on dark, a near-black
+   one on light. There is no brand hue anywhere in the chrome.
 
-     Linear, dark      rail #070707 · canvas #0f0f0f · card #171717
-                       card border #212121 · recessed gutter #0c0c0c
-                       brand indigo #5e6ad2 · status green #009a4d
-                       label purple #7c44ad · label cyan #24b6cf
+   Chroma exists in exactly two places, and both carry meaning rather than
+   decoration: the four status inks, and the eight-hue tag palette that gives
+   an entity — a label, a project, an agent — a stable identity.
 
-     Cursor, light     rail #f3f3f3 · main #f7f7f7 · detail #fdfdfd
-                       border #e4e4e4 · success green #1c7e5d
+   The surface ramp is five named steps that climb monotonically away from
+   the page (natai's floor, Auberge's step logic). Note `--illustration`: a
+   card inside a card, and in dark the BRIGHTEST plane. In light "up"
+   saturates at pure white, so card, illustration and popover coincide and
+   hierarchy is carried by the ring and the two shadow rungs.
 
-   Two structural facts that the first version of this file got backwards and
-   which are worth stating plainly, because they are what makes the app read
-   like the references:
-
-   1. THE RAIL IS DARKER THAN THE CANVAS. #070707 behind #0f0f0f. The content
-      is a lit plane in front of a recessed rail. Inverting this — a lighter
-      rail beside a black canvas — is what made the old build read as a
-      terminal rather than an application.
-
-   2. NEITHER REFERENCE IS AMOLED. Pure #000 appears nowhere in Linear's
-      chrome. The canvas is #0f0f0f and the rail #070707, and the four steps
-      above them are what carry hierarchy. A true-black canvas has nothing
-      below it to recess into, so every surface has to go up, and the ramp
-      runs out after two steps.
-
-   Chroma is not decorative here. In a Linear issue row the status glyph, the
-   priority bars and the label dots carry most of the meaning — rendering that
-   row as monochrome text, as the previous build did, throws away the thing
-   the layout exists to display.
-
-   Light is derived from Cursor's neutrals and keeps the same indigo action
-   colour, so the two appearances are one system rather than two designs.
+   Every name here is the utility name. `--hairline` is `border-hairline`;
+   `--element-hover` is `bg-element-hover`. One word per pixel.
    ========================================================================== */
 
 :root {
   color-scheme: dark;
 
-  /* --- surfaces: the measured Linear ramp --------------------------------
+  /* --- surfaces: page → surface → card → illustration → raised → popover --- */
+  --background: oklch(0.08 0 0);
+  --surface: oklch(0.1 0 0);
+  --card: oklch(0.12 0 0);
+  --illustration: oklch(0.13 0 0);
+  --surface-raised: oklch(0.15 0 0);
+  --popover: oklch(0.17 0 0);
 
-     recessed  #0c0c0c   a board column, an input well
-     rail      #070707   the navigation plane, behind everything
-     canvas    #0f0f0f   the page
-     card      #171717   a raised block: a row card, a settings card
-     popover   #1c1c1c   floating: menus, dialogs, tooltips
-  */
-  --background: #0f0f0f;
-  --foreground: #f7f8f8;
-  --card: #171717;
-  --card-foreground: #f7f8f8;
-  --popover: #1c1c1c;
-  --popover-foreground: #f7f8f8;
+  --foreground: oklch(0.97 0 0);
+  --card-foreground: var(--foreground);
+  --popover-foreground: var(--foreground);
+  --secondary-foreground: oklch(0.8 0 0);
+  --muted-foreground: oklch(0.62 0 0);
+  --text-disabled: oklch(0.4 0 0);
 
-  /* The action colour. Linear's brand indigo, and a real accent — the
-     previous build set --primary to pure white and wrote "there is no brand
-     hue" into the token layer as doctrine, which is the Atlas skill's rule,
-     not either reference's. */
-  --primary: #5e6ad2;
-  --primary-foreground: #ffffff;
+  /* --- the action colour: an inversion, not a hue --- */
+  --primary: oklch(0.97 0 0);
+  --primary-foreground: oklch(0.08 0 0);
+  --primary-hover: oklch(0.9 0 0);
+  --primary-muted: color-mix(in oklch, var(--primary) 8%, transparent);
 
-  --secondary: #171717;
-  --secondary-foreground: #d0d6e0;
-  --muted: #1a1a1a;
-  /* Linear's tertiary text. Cool-tinted, not neutral grey — it is what keeps
-     a dim label from looking like dead pixels against #0f0f0f. */
-  --muted-foreground: #8a8f98;
-  --accent: #1a1a1a;
-  --accent-foreground: #f7f8f8;
-  --destructive: #eb5757;
-  --destructive-foreground: #ffffff;
-  --border: #212121;
-  --input: #212121;
-  /* Focus is the action colour, not the brightest ink available. */
-  --ring: #5e6ad2;
+  --secondary: oklch(0.16 0 0);
+  --muted: var(--surface-raised);
+  --accent: var(--secondary);
+  --accent-foreground: var(--foreground);
 
-  --chart-1: #5e6ad2;
-  --chart-2: #4cb782;
-  --chart-3: #f2c94c;
-  --chart-4: #a074d4;
-  --chart-5: #24b6cf;
+  /* --- edges: two weights, both alpha so they composite on any step --- */
+  --hairline: oklch(1 0 0 / 6%);
+  --border: oklch(1 0 0 / 8%);
+  --border-strong: oklch(1 0 0 / 16%);
+  --border-illustration: var(--border);
+  --input: oklch(1 0 0 / 10%);
+  --ring: oklch(0.97 0 0 / 40%);
 
-  --sidebar: #070707;
-  --sidebar-foreground: #f7f8f8;
-  --sidebar-primary: #5e6ad2;
-  --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #171717;
-  --sidebar-accent-foreground: #f7f8f8;
-  --sidebar-border: #1a1a1a;
-  --sidebar-ring: #5e6ad2;
+  /* --- element states: foreground at an alpha, so they invert for free --- */
+  --element-hover: oklch(1 0 0 / 5%);
+  --element-selected: oklch(1 0 0 / 8%);
+  --element-active: oklch(1 0 0 / 11%);
+  --element-highlight: oklch(1 0 0 / 6%);
+  --element-emphasis: oklch(1 0 0 / 16%);
 
-  /* --- shadow ramp (the source the three elevation rungs derive from) --- */
-  --shadow-2xs: 0 1px 2px rgba(0, 0, 0, 0.35);
-  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.45);
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.55);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.65);
-  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.75);
-  --shadow-xl: 0 12px 36px rgba(0, 0, 0, 0.82);
-  --shadow-2xl: 0 16px 48px rgba(0, 0, 0, 0.9);
+  /* --- status: the first of two places chroma is allowed --- */
+  --success: oklch(0.72 0.16 155);
+  --warning: oklch(0.8 0.15 78);
+  --error: oklch(0.68 0.19 22);
+  --info: oklch(0.7 0.13 232);
+  --destructive: var(--error);
+  --destructive-foreground: oklch(0.99 0 0);
+  --success-muted: color-mix(in oklch, var(--success) 14%, transparent);
+  --warning-muted: color-mix(in oklch, var(--warning) 14%, transparent);
+  --error-muted: color-mix(in oklch, var(--error) 14%, transparent);
+  --info-muted: color-mix(in oklch, var(--info) 14%, transparent);
 
-  /* --- the --atlas-* role layer: what shadcn has no name for --- */
-  --atlas-border-subtle: #1a1a1a;
-  --atlas-border-strong: #3a3a3a;
+  /* --- hues: the second place, for identity --- */
+  --hue-grey: oklch(0.7 0.02 259);
+  --hue-indigo: oklch(0.68 0.18 259);
+  --hue-purple: oklch(0.7 0.18 300);
+  --hue-cyan: oklch(0.76 0.115 196);
+  --hue-green: oklch(0.74 0.145 155);
+  --hue-amber: oklch(0.8 0.14 74);
+  --hue-orange: oklch(0.76 0.16 48);
+  --hue-red: oklch(0.72 0.18 18);
+  --tag-bg-mix: 16%;
+  --tag-border-mix: 28%;
 
-  /* Element overlays are the appearance's own foreground at an alpha, so they
-     invert for free. Over #0f0f0f these land on the measured hover and
-     selected surfaces (#171717, #1a1a1a). */
-  --atlas-element-hover: rgba(255, 255, 255, 0.05);
-  --atlas-element-selected: rgba(255, 255, 255, 0.08);
-  --atlas-element-active: rgba(255, 255, 255, 0.11);
-  --atlas-element-highlight: rgba(255, 255, 255, 0.06);
-  --atlas-element-emphasis: rgba(255, 255, 255, 0.16);
+  /* --- charts: achromatic steps; a categorical chart reaches for the hues --- */
+  --chart-1: oklch(0.97 0 0);
+  --chart-2: oklch(0.78 0 0);
+  --chart-3: oklch(0.6 0 0);
+  --chart-4: oklch(0.42 0 0);
+  --chart-5: oklch(0.28 0 0);
 
-  --atlas-primary-hover: #6e79e0;
-  --atlas-primary-muted: rgba(94, 106, 210, 0.16);
-  --atlas-text-disabled: #4c4f56;
+  /* --- sidebar --- */
+  --sidebar: var(--surface);
+  --sidebar-foreground: var(--foreground);
+  --sidebar-accent: oklch(0.15 0 0);
+  --sidebar-accent-foreground: var(--foreground);
+  --sidebar-border: var(--hairline);
 
-  /* Status. Saturated, because these are glyphs at 12-14px and a desaturated
-     sage green disappears at that size. */
-  --atlas-status-success-foreground: #4cb782;
-  --atlas-status-warning-foreground: #f2c94c;
-  --atlas-status-error-foreground: #eb5757;
-  --atlas-status-info-foreground: #5e6ad2;
-  --atlas-status-success-background: rgba(76, 183, 130, 0.14);
-  --atlas-status-warning-background: rgba(242, 201, 76, 0.14);
-  --atlas-status-error-background: rgba(235, 87, 87, 0.14);
-  --atlas-status-info-background: rgba(94, 106, 210, 0.16);
+  --glass: oklch(0.1 0 0 / 72%);
+  --selection: color-mix(in oklch, var(--foreground) 22%, transparent);
+  --scrollbar-thumb: oklch(1 0 0 / 14%);
 
-  /* --- the label palette -------------------------------------------------
+  /* --- the two shadow rungs, achromatic --- */
+  --shadow-md: 0 4px 12px oklch(0 0 0 / 0.55);
+  --shadow-lg: 0 8px 24px oklch(0 0 0 / 0.65), 0 16px 48px oklch(0 0 0 / 0.6);
 
-     Linear's label dots and project marks. Eight hues that must stay
-     distinguishable at 6px against #0f0f0f, which is why none of them is
-     darker than roughly 45% luminance. A label is an identity, not a status:
-     `indigo` here means "the Design label", not "informational". */
-  --atlas-label-grey: #8a8f98;
-  --atlas-label-indigo: #5e6ad2;
-  --atlas-label-purple: #a074d4;
-  --atlas-label-cyan: #24b6cf;
-  --atlas-label-green: #4cb782;
-  --atlas-label-amber: #f2c94c;
-  --atlas-label-orange: #f2994a;
-  --atlas-label-red: #eb5757;
+  --diff-added: var(--success-muted);
+  --diff-added-foreground: var(--success);
+  --diff-removed: var(--error-muted);
+  --diff-removed-foreground: var(--error);
 
-  --atlas-selection-background: rgba(94, 106, 210, 0.32);
-  --atlas-scrollbar-thumb-background: rgba(255, 255, 255, 0.14);
-  --atlas-scrollbar-thumb-hover: rgba(255, 255, 255, 0.24);
+  --syntax-comment: var(--muted-foreground);
+  --syntax-keyword: var(--hue-purple);
+  --syntax-string: var(--hue-green);
+  --syntax-number: var(--hue-orange);
 
-  /* The rail plane, and the recessed well an input sits in. #0c0c0c is the
-     measured Linear board-column colour: one step BELOW the canvas, which is
-     what reads as "you can type here" without a heavier border. */
-  --atlas-panel-background: #070707;
-  --atlas-panel-input-background: #0c0c0c;
-
-  --atlas-diff-added-background: rgba(76, 183, 130, 0.14);
-  --atlas-diff-added-text: #4cb782;
-  --atlas-diff-removed-background: rgba(235, 87, 87, 0.14);
-  --atlas-diff-removed-text: #eb5757;
-  --atlas-diff-context-background: #0c0c0c;
-
-  --atlas-agent-chip-foreground: #f7f8f8;
-  --atlas-agent-chip-background: rgba(255, 255, 255, 0.08);
-
-  --atlas-syntax-comment: #6f7681;
-  --atlas-syntax-keyword: #a074d4;
-  --atlas-syntax-string: #4cb782;
-  --atlas-syntax-number: #f2994a;
-
-  /* The scrim is deliberately NOT a theme key. A scrim's whole job is to push
-     what is behind it away from the reader, and only darkening does that. */
+  --agent-chip-foreground: var(--foreground);
+  --agent-chip-background: var(--element-selected);
 }
 
 [data-theme="light"] {
   color-scheme: light;
 
-  /* Cursor's measured neutrals. Note the ramp runs the same direction as
-     dark — the rail is the most recessed plane and the detail surface the
-     most raised — so the two appearances share one mental model. */
-  --background: #f7f7f7;
-  --foreground: #0d0d0d;
-  --card: #fdfdfd;
-  --card-foreground: #0d0d0d;
-  --popover: #ffffff;
-  --popover-foreground: #0d0d0d;
+  /* Auberge's off-white page with pure-white cards that lift off it. */
+  --background: oklch(0.985 0 0);
+  --surface: oklch(0.975 0 0);
+  --card: oklch(1 0 0);
+  --illustration: oklch(1 0 0);
+  --surface-raised: oklch(0.962 0 0);
+  --popover: oklch(1 0 0);
 
-  --primary: #5e6ad2;
-  --primary-foreground: #ffffff;
+  --foreground: oklch(0.1 0 0);
+  --secondary-foreground: oklch(0.26 0 0);
+  --muted-foreground: oklch(0.5 0 0);
+  --text-disabled: oklch(0.72 0 0);
 
-  --secondary: #fdfdfd;
-  --secondary-foreground: #3c3c3c;
-  --muted: #f0f0f0;
-  --muted-foreground: #6b6f76;
-  --accent: #f0f0f0;
-  --accent-foreground: #0d0d0d;
-  --destructive: #c62828;
-  --destructive-foreground: #ffffff;
-  --border: #e4e4e4;
-  --input: #e4e4e4;
-  --ring: #5e6ad2;
+  --primary: oklch(0.1 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --primary-hover: oklch(0.24 0 0);
 
-  --chart-1: #5e6ad2;
-  --chart-2: #1c7e5d;
-  --chart-3: #b06000;
-  --chart-4: #7b3fb5;
-  --chart-5: #1f7f99;
+  --secondary: oklch(0.94 0 0);
 
-  --sidebar: #f3f3f3;
-  --sidebar-foreground: #0d0d0d;
-  --sidebar-primary: #5e6ad2;
-  --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #fdfdfd;
-  --sidebar-accent-foreground: #0d0d0d;
-  --sidebar-border: #ededed;
-  --sidebar-ring: #5e6ad2;
+  --hairline: oklch(0 0 0 / 7%);
+  --border: oklch(0 0 0 / 9%);
+  --border-strong: oklch(0 0 0 / 18%);
+  --input: oklch(0 0 0 / 9%);
+  --ring: oklch(0.1 0 0 / 40%);
 
-  --shadow-2xs: 0 1px 2px rgba(0, 0, 0, 0.04);
-  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.06);
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.11);
-  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.14);
-  --shadow-xl: 0 12px 36px rgba(0, 0, 0, 0.18);
-  --shadow-2xl: 0 16px 48px rgba(0, 0, 0, 0.22);
+  --element-hover: oklch(0 0 0 / 4%);
+  --element-selected: oklch(0 0 0 / 6%);
+  --element-active: oklch(0 0 0 / 9%);
+  --element-highlight: oklch(0 0 0 / 5%);
+  --element-emphasis: oklch(0 0 0 / 14%);
 
-  --atlas-border-subtle: #ededed;
-  --atlas-border-strong: #c8c8c8;
+  --success: oklch(0.55 0.15 152);
+  --warning: oklch(0.62 0.15 70);
+  --error: oklch(0.55 0.22 25);
+  --info: oklch(0.55 0.14 232);
 
-  /* Same alphas as dark, over this appearance's foreground. */
-  --atlas-element-hover: rgba(0, 0, 0, 0.04);
-  --atlas-element-selected: rgba(0, 0, 0, 0.06);
-  --atlas-element-active: rgba(0, 0, 0, 0.09);
-  --atlas-element-highlight: rgba(0, 0, 0, 0.05);
-  --atlas-element-emphasis: rgba(0, 0, 0, 0.14);
+  --hue-grey: oklch(0.5 0.025 262);
+  --hue-indigo: oklch(0.55 0.2 262);
+  --hue-purple: oklch(0.55 0.2 300);
+  --hue-cyan: oklch(0.6 0.12 196);
+  --hue-green: oklch(0.58 0.15 152);
+  --hue-amber: oklch(0.66 0.15 70);
+  --hue-orange: oklch(0.62 0.17 45);
+  --hue-red: oklch(0.58 0.2 16);
+  --tag-bg-mix: 11%;
+  --tag-border-mix: 22%;
 
-  --atlas-primary-hover: #4f5bc4;
-  --atlas-primary-muted: rgba(94, 106, 210, 0.12);
-  --atlas-text-disabled: #b4b4b4;
+  --chart-1: oklch(0.15 0 0);
+  --chart-2: oklch(0.35 0 0);
+  --chart-3: oklch(0.55 0 0);
+  --chart-4: oklch(0.7 0 0);
+  --chart-5: oklch(0.85 0 0);
 
-  /* The light palette, not the dark one dimmed: these hold contrast on white. */
-  --atlas-status-success-foreground: #1c7e5d;
-  --atlas-status-warning-foreground: #b06000;
-  --atlas-status-error-foreground: #c62828;
-  --atlas-status-info-foreground: #5e6ad2;
-  --atlas-status-success-background: rgba(28, 126, 93, 0.12);
-  --atlas-status-warning-background: rgba(176, 96, 0, 0.12);
-  --atlas-status-error-background: rgba(198, 40, 40, 0.12);
-  --atlas-status-info-background: rgba(94, 106, 210, 0.12);
+  --sidebar-accent: oklch(0.93 0 0);
 
-  --atlas-label-grey: #6b6f76;
-  --atlas-label-indigo: #5e6ad2;
-  --atlas-label-purple: #7b3fb5;
-  --atlas-label-cyan: #1f7f99;
-  --atlas-label-green: #1c7e5d;
-  --atlas-label-amber: #b06000;
-  --atlas-label-orange: #c2410c;
-  --atlas-label-red: #c62828;
+  --glass: oklch(1 0 0 / 72%);
+  --scrollbar-thumb: oklch(0 0 0 / 16%);
 
-  --atlas-selection-background: rgba(94, 106, 210, 0.22);
-  --atlas-scrollbar-thumb-background: rgba(0, 0, 0, 0.16);
-  --atlas-scrollbar-thumb-hover: rgba(0, 0, 0, 0.26);
-
-  --atlas-panel-background: #f3f3f3;
-  --atlas-panel-input-background: #ffffff;
-
-  --atlas-diff-added-background: rgba(28, 126, 93, 0.12);
-  --atlas-diff-added-text: #1c7e5d;
-  --atlas-diff-removed-background: rgba(198, 40, 40, 0.12);
-  --atlas-diff-removed-text: #c62828;
-  --atlas-diff-context-background: #fafafa;
-
-  --atlas-agent-chip-foreground: #0d0d0d;
-  --atlas-agent-chip-background: rgba(0, 0, 0, 0.06);
-
-  --atlas-syntax-comment: #8a8f98;
-  --atlas-syntax-keyword: #7b3fb5;
-  --atlas-syntax-string: #1c7e5d;
-  --atlas-syntax-number: #c2410c;
+  --shadow-md: 0 4px 12px oklch(0 0 0 / 0.11);
+  --shadow-lg: 0 8px 24px oklch(0 0 0 / 0.14), 0 16px 48px oklch(0 0 0 / 0.1);
 }

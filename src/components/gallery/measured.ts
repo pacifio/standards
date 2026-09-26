@@ -1,4 +1,10 @@
 /**
+ * SUPERSEDED. These are the Linear/Cursor samples the FIRST token layer was
+ * derived from. The current themes.css is achromatic OKLCH built on the
+ * Auberge ramp and natai's palette and no longer references them; the file
+ * is kept as history of where the earlier ramp came from, and nothing
+ * imports it.
+ *
  * The raw measurements, kept in one place.
  *
  * These are the values sampled from screenshots of the reference apps with

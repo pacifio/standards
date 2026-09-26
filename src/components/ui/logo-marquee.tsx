@@ -1,37 +1,21 @@
 import { cn } from "cn"
 
+import { InfiniteSlider } from "@/components/blocks/infinite-slider"
+import { ProgressiveBlur } from "@/components/blocks/progressive-blur"
+
 /**
- * A social-proof logo cloud that scrolls.
+ * A social-proof logo cloud. natai's hero treatment: an `InfiniteSlider`
+ * with a `ProgressiveBlur` at each end, so marks dissolve into the edges
+ * instead of being sliced by a hard mask.
  *
- * The marks are the landing site's own files, copied from
- * `~/Desktop/atlas/landing/logos/` into `public/logos/` so the auth pane and
- * the marketing page show the same companies in the same artwork.
- *
- * The track renders its children twice and translates by exactly -50%, so
- * the second copy lands where the first began and the loop has no seam. That
- * is the whole trick; everything else here is optical correction.
- *
- * Two things are not obvious:
- *
- * 1. PER-MARK HEIGHTS. Logos are not optically equal at a shared height —
- *    an icon-only mark like Netflix reads far smaller than a wordmark like
- *    Cloudflare at the same pixel height. The landing page tunes each one
- *    individually and these are its values.
- *
- * 2. LIGHT MODE. These are the `_dark` assets, with fills baked in: Cisco,
- *    OpenAI and Kilo Code are pure white, and AWS and Cloudflare are colour
- *    with white structural parts. On a light canvas those disappear. There is
- *    no light asset set, so the light theme renders the whole strip
- *    monochrome rather than shipping three invisible logos and two broken
- *    ones. Dark — the primary appearance — gets the full-colour reference.
+ * The marks are the landing site's own files (`public/logos/`). They are
+ * the `_dark` assets with fills baked in — Cisco, OpenAI and Kilo Code are
+ * pure white, AWS and Cloudflare are colour with white structural parts —
+ * so on the light canvas the strip renders monochrome rather than shipping
+ * three invisible logos and two broken ones.
  */
 
-export type Logo = {
-  name: string
-  src: string
-  /** Optical height in px. See note 1. */
-  height: number
-}
+export type Logo = { name: string; src: string; height: number }
 
 const DEFAULT_LOGOS: Array<Logo> = [
   { name: "Netflix", src: "/logos/netflix-icon.svg", height: 30 },
@@ -56,50 +40,35 @@ function LogoMarquee({
 }) {
   return (
     <div className={cn("flex flex-col gap-5", className)}>
-      {label && (
-        // Mono and widely tracked, matching the landing page's own label.
-        <p className="mono text-2xs tracking-[0.14em] text-muted-foreground uppercase">
-          {label}
-        </p>
-      )}
-
-      <div className="group/marquee relative overflow-hidden marquee-fade-x">
-        <div
-          className={cn(
-            "flex w-max animate-marquee items-center gap-14",
-            "group-hover/marquee:[animation-play-state:paused]",
-            "motion-reduce:animate-none"
-          )}
-        >
-          {/* Twice, for the seamless wrap. The duplicate is hidden from the
-              accessibility tree so a screen reader reads nine names, not
-              eighteen. */}
-          {[0, 1].map((copy) => (
-            <div
-              key={copy}
-              aria-hidden={copy === 1 ? "true" : undefined}
-              className="flex shrink-0 items-center gap-14"
-            >
-              {logos.map((logo) => (
-                <img
-                  key={logo.name}
-                  src={logo.src}
-                  alt={copy === 0 ? logo.name : ""}
-                  loading="lazy"
-                  decoding="async"
-                  style={{ height: logo.height }}
-                  className={cn(
-                    "w-auto max-w-36 shrink-0 object-contain",
-                    "duration-base opacity-70 transition-opacity ease-out-strong",
-                    "group-hover/marquee:opacity-100",
-                    // See note 2 at the top of the file.
-                    "light:opacity-45 light:brightness-0"
-                  )}
-                />
-              ))}
-            </div>
+      {label && <p className="micro">{label}</p>}
+      <div className="relative">
+        <InfiniteSlider gap={56} speed={40} speedOnHover={12}>
+          {logos.map((logo) => (
+            <img
+              key={logo.name}
+              src={logo.src}
+              alt={logo.name}
+              loading="lazy"
+              decoding="async"
+              style={{ height: logo.height }}
+              className={cn(
+                "w-auto max-w-36 shrink-0 object-contain",
+                "duration-base opacity-70 transition-opacity ease-out-strong hover:opacity-100",
+                "light:opacity-45 light:brightness-0"
+              )}
+            />
           ))}
-        </div>
+        </InfiniteSlider>
+        <ProgressiveBlur
+          direction="left"
+          blurIntensity={1}
+          className="absolute inset-y-0 left-0 w-20"
+        />
+        <ProgressiveBlur
+          direction="right"
+          blurIntensity={1}
+          className="absolute inset-y-0 right-0 w-20"
+        />
       </div>
     </div>
   )

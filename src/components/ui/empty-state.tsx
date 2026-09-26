@@ -36,11 +36,17 @@ function EmptyState({
       )}
       {...props}
     >
-      {icon && <Icon icon={icon} size="xl" className="text-disabled" />}
+      {icon && (
+        <div className="flex size-9 items-center justify-center rounded-xl bg-muted text-muted-foreground">
+          <Icon icon={icon} size="md" />
+        </div>
+      )}
       <div className="flex flex-col gap-1">
-        <p className="label">{title}</p>
+        <p className="text-xs font-medium">{title}</p>
         {description && (
-          <p className="max-w-xs caption text-balance">{description}</p>
+          <p className="max-w-[34ch] text-2xs text-balance text-muted-foreground">
+            {description}
+          </p>
         )}
       </div>
       {action && <div className="mt-1">{action}</div>}

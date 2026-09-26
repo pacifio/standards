@@ -20,10 +20,15 @@ import { cn } from "cn"
 
 export type SessionStatusKind = "queued" | "live" | "done" | "failed"
 
+/**
+ * Monochrome first. `done` is a filled check in the FOREGROUND ink, not a
+ * colour — a finished session is the resting state and should not glow.
+ * Only the states that need attention carry chroma.
+ */
 const TONE: Record<SessionStatusKind, string> = {
-  queued: "text-label-grey",
-  live: "text-warning",
-  done: "text-info",
+  queued: "text-muted-foreground",
+  live: "text-success",
+  done: "text-foreground",
   failed: "text-error",
 }
 
@@ -135,7 +140,7 @@ function PriorityIcon({
         "shrink-0",
         // Urgent is the one priority that earns colour — it is an exception,
         // and an exception that is always on stops being one.
-        priority === "urgent" ? "text-error" : "text-label-grey",
+        priority === "urgent" ? "text-error" : "text-muted-foreground",
         className
       )}
       {...props}

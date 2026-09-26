@@ -8,22 +8,23 @@ export const Route = createFileRoute("/ds/foundations/type")({
   component: TypeFoundations,
 })
 
+// rem at a 16px root, so px is what you see at scale 1.
 const SCALE = [
-  ["text-3xs", "10 / 13", "a count badge, a keyboard hint"],
-  ["text-2xs", "11 / 14", "captions, eyebrows, metadata"],
-  ["text-xs", "12 / 16", "the workhorse — controls, rows, menus"],
-  ["text-sm", "13 / 18", "a larger control, running prose"],
-  ["text-base", "14 / 20", "body copy, the document default"],
-  ["text-md", "16 / 22", "a panel or dialog title"],
-  ["text-lg", "18 / 26", "a page title"],
-  ["text-xl", "22 / 30", "a section head on a marketing page"],
-  ["text-2xl", "28 / 36", "a hero number"],
+  ["text-4xs", "9 / 12", "a nav count, a kbd inside a pill"],
+  ["text-3xs", "10 / 14", ".micro, .tag, table heads, a delta pill"],
+  ["text-2xs", "11 / 16", "nav rows, crumbs, subtitles, captions"],
+  ["text-xs", "12 / 16", "the BODY DEFAULT — controls, cells, menus"],
+  ["text-sm", "14 / 20", "settings prose, dialog body"],
+  ["text-md", "16 / 22", "a dialog title"],
+  ["text-lg", "18 / 24", "a section title"],
+  ["text-xl", "20 / 26", "a page title"],
+  ["text-2xl", "28 / 32", ".figure — a hero number"],
 ] as const
 
 const STYLES = [
   [
-    "eyebrow",
-    "A group label. The one place uppercase and tracking are allowed.",
+    "micro",
+    "A group label. 10px, uppercase, 0.07em. The one place tracking is allowed.",
   ],
   ["label", "Text on or beside a control."],
   ["body", "Running prose."],
@@ -37,38 +38,56 @@ function TypeFoundations() {
     <>
       <PageHeader
         title="Type"
-        description="Geist, nine px steps, explicit line-heights, and exactly two weights."
+        description="Geist, nine rem steps from 9 to 28px, explicit line-heights, and exactly three weights — one of them for figures only."
       />
 
       <Callout tone="info">
         The typeface is{" "}
-        <strong className="font-semibold text-foreground">Geist</strong>, loaded
-        as a variable font — one file for the whole weight range — with{" "}
-        <code className="code">Geist Mono</code> for code, numerals and
-        identifiers. An earlier version of this system loaded no web font at all
-        and rode the platform stack, so the app rendered in SF Pro on a Mac and
-        something else everywhere else; a shared typeface across the product is
-        worth more than a shared fallback.
+        <strong className="font-medium text-foreground">Geist</strong>, a
+        variable font, with <code className="code">Geist Mono</code> for code,
+        refs and identifiers. The scale is in rem so the whole interface grows
+        with <code className="code">--ui-scale</code>; the pixel figures below
+        are what you get at the default.
       </Callout>
 
       <Callout tone="warning">
-        Only 500 and 600 exist. 400 disappears against a dense monochrome UI and
-        700 shouts; if something needs more emphasis than 600, the answer is a
-        size step or a colour step, not a heavier weight.
+        Weights are 400 for text, 500 for emphasis, and 300 for{" "}
+        <code className="code">.figure</code> only. 600 and above do not exist:
+        if something needs more than 500, the answer is a size step or a colour
+        step, not a heavier weight.
       </Callout>
 
       <Specimen
         title="Scale"
-        note="Root is 14px — one step up from the desktop app's 13px, because a browser window is read further away and on a larger surface. Half-pixel sizes round UP to the next step; there is no tenth step."
+        note="The body default is 12px, not 14 — every control, cell and menu row sits at text-xs and the two steps below it carry the chrome. The root is 16px times --ui-scale, so p-2 is still exactly 8px and h-7 exactly 28px at the default; the root's only job is to be the scale multiplier."
       >
         <div className="w-full">
           {SCALE.map(([cls, size, use]) => (
             <TokenRow key={cls} name={cls} value={use}>
-              <span className={cls}>
-                <span className="caption tnum">{size}</span>
-              </span>
+              <span className={cls}>Ag</span>
+              <span className="pl-2 caption tnum">{size}</span>
             </TokenRow>
           ))}
+        </div>
+      </Specimen>
+
+      <Specimen
+        title="Figure"
+        note="Weight 300 with -0.03em tracking and tabular numerals. Big numbers set light read as measurement rather than headline — the KPI strip is the only place a 28px glyph appears, and it should not shout."
+      >
+        <div className="flex items-end gap-8">
+          <div className="flex flex-col gap-1">
+            <span className="text-2xl leading-none figure">184,200</span>
+            <span className="caption">.figure text-2xl</span>
+          </div>
+          <div className="flex flex-col gap-1">
+            <span className="text-2xl leading-none font-medium">184,200</span>
+            <span className="caption">font-medium — too loud</span>
+          </div>
+          <div className="flex flex-col gap-1">
+            <span className="text-lg leading-none figure">$41,208</span>
+            <span className="caption">.figure text-lg</span>
+          </div>
         </div>
       </Specimen>
 

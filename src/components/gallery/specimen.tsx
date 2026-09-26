@@ -63,7 +63,7 @@ function TokenRow({
   children: React.ReactNode
 }) {
   return (
-    <div className="flex items-center gap-3 border-b border-border-subtle py-2 last:border-0">
+    <div className="flex items-center gap-3 border-b border-hairline py-2 last:border-0">
       <div className="flex w-32 shrink-0 items-center">{children}</div>
       <code className="w-56 shrink-0 code text-secondary-foreground">
         {name}

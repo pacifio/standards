@@ -4,7 +4,7 @@ import { MEMBERS, USAGE_SERIES } from "@/mock/data"
 import { initialsOf } from "@/mock/initials"
 import { ROLE_LABELS } from "@/mock/types"
 import { PageHeader } from "@/components/patterns/section-header"
-import { MetricRow, MetricTile, Sparkline } from "@/components/patterns/metric"
+import { KpiStrip } from "@/components/patterns/kpi-strip"
 import { Sample, Specimen } from "@/components/gallery/specimen"
 import {
   Avatar,
@@ -116,21 +116,32 @@ function DataGallery() {
 
       <Specimen
         title="Metrics"
-        note="The delta is a caption, never a coloured arrow. Green-up on a spend figure implies a judgement the app has no business making about someone's budget."
+        note="A KPI strip: light-weight figures divided by hairlines. A judged figure — sessions, failures — takes a DeltaPill; a spend figure takes a neutral `detail` caption, because green-up on money implies a judgement the app has no business making about someone's budget."
       >
         <div className="w-full">
-          <MetricRow>
-            <MetricTile label="Measured" value="$401.68" detail="billed" />
-            <MetricTile
-              label="Estimated"
-              value="$40.50"
-              detail="not yet billed"
-            />
-            <MetricTile label="Sessions" value="238" detail="last 30 days" />
-            <MetricTile label="Daily spend">
-              <Sparkline values={USAGE_SERIES} className="mt-1" />
-            </MetricTile>
-          </MetricRow>
+          <KpiStrip
+            cells={[
+              {
+                id: "measured",
+                label: "Measured",
+                value: "$401.68",
+                detail: "billed",
+              },
+              {
+                id: "estimated",
+                label: "Estimated",
+                value: "$40.50",
+                detail: "not yet billed",
+              },
+              { id: "sessions", label: "Sessions", value: "238", delta: 12.4 },
+              {
+                id: "daily",
+                label: "Daily spend",
+                value: "$13.39",
+                spark: USAGE_SERIES,
+              },
+            ]}
+          />
         </div>
       </Specimen>
 

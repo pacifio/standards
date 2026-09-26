@@ -3,6 +3,7 @@ import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools"
 import { TanStackDevtools } from "@tanstack/react-devtools"
 
 import { ThemeProvider, themeInitScript } from "@/lib/theme"
+import { UiScaleProvider, uiScaleInitScript } from "@/lib/ui-scale"
 import appCss from "../styles.css?url"
 
 export const Route = createRootRoute({
@@ -38,11 +39,15 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <script
           // Must run before the bundle, or a light-mode user gets a black
           // flash on every navigation.
-          dangerouslySetInnerHTML={{ __html: themeInitScript }}
+          dangerouslySetInnerHTML={{
+            __html: themeInitScript + uiScaleInitScript,
+          }}
         />
       </head>
       <body>
-        <ThemeProvider>{children}</ThemeProvider>
+        <ThemeProvider>
+          <UiScaleProvider>{children}</UiScaleProvider>
+        </ThemeProvider>
         <TanStackDevtools
           config={{ position: "bottom-right" }}
           plugins={[

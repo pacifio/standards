@@ -66,7 +66,7 @@ function TooltipContent({
           data-slot="tooltip-content"
           className={cn(
             "inline-flex w-fit max-w-xs origin-(--transform-origin) items-center gap-1.5",
-            "rounded-md border border-border bg-popover px-2 py-1",
+            "rounded-md bg-popover px-2 py-1 ring-1 ring-foreground/10",
             "text-2xs text-balance text-popover-foreground shadow-md",
             // A keycap inside a tooltip drops its own border — the tooltip
             // already has one, and two hairlines 2px apart read as a smudge.

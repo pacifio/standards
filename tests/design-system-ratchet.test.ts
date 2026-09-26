@@ -49,7 +49,7 @@ const RULES: Array<Rule> = [
   {
     name: "arbitrary-text-size",
     pattern: /text-\[[^\]]*(?:px|rem|em)\]/,
-    why: "Use a step from the nine-step type scale (text-3xs … text-2xl).",
+    why: "Use a step from the type scale (text-4xs … text-2xl).",
   },
   {
     name: "arbitrary-radius",
@@ -77,8 +77,21 @@ const RULES: Array<Rule> = [
   },
   {
     name: "colour-literal",
-    pattern: /#[0-9a-fA-F]{3,8}\b|\brgba?\(|\bhsla?\(/,
+    pattern: /#[0-9a-fA-F]{3,8}\b|\brgba?\(|\bhsla?\(|\boklch\(|\bcolor-mix\(/,
     why: "Colour belongs in src/styles/themes.css. Components name a role.",
+  },
+  {
+    name: "raised-shadow",
+    // Elevation is a ring: `ring-1 ring-foreground/10` on a lighter step of
+    // the surface ramp. Only a menu (shadow-md) and a dialog (shadow-lg)
+    // cast, because they float over content they are not part of.
+    pattern: /\bshadow-(?:2?xs|sm|xl|2xl|black|white)(?:\/\d+)?\b/,
+    why: "Elevation is a ring, not a shadow. Only shadow-md (menus) and shadow-lg (dialogs) cast.",
+  },
+  {
+    name: "arbitrary-var",
+    pattern: /\[var\(--/,
+    why: "Map the variable in globals.css @theme and use the utility (border-hairline, text-success).",
   },
   {
     name: "white-black-utility",

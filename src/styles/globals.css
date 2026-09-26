@@ -1,22 +1,26 @@
 /* ==========================================================================
    Atlas Standards — the Tailwind bridge.
 
-   `@theme inline` is what turns the custom properties in tokens.css and
-   themes.css into utilities. `inline` is load-bearing: it keeps the var()
-   reference in the generated utility instead of resolving it once at build
-   time, which is the only reason a theme swap at runtime works at all.
+   `@theme inline` turns tokens.css and themes.css into utilities. `inline`
+   keeps the var() reference in the generated CSS instead of resolving it at
+   build time, which is the only reason a theme swap at runtime works.
    ========================================================================== */
 
 @theme inline {
-  /* --- shadcn base colour roles --- */
+  /* --- shadcn base roles --- */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
+  --color-illustration: var(--illustration);
   --color-popover: var(--popover);
   --color-popover-foreground: var(--popover-foreground);
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-muted: var(--primary-muted);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);
@@ -25,9 +29,41 @@
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
+  --color-disabled: var(--text-disabled);
+
+  /* --- edges --- */
+  --color-hairline: var(--hairline);
   --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-border-illustration: var(--border-illustration);
   --color-input: var(--input);
   --color-ring: var(--ring);
+
+  /* --- element states --- */
+  --color-element-hover: var(--element-hover);
+  --color-element-selected: var(--element-selected);
+  --color-element-active: var(--element-active);
+  --color-element-emphasis: var(--element-emphasis);
+
+  /* --- status --- */
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-error: var(--error);
+  --color-info: var(--info);
+  --color-success-muted: var(--success-muted);
+  --color-warning-muted: var(--warning-muted);
+  --color-error-muted: var(--error-muted);
+  --color-info-muted: var(--info-muted);
+
+  /* --- hues: identity, not status --- */
+  --color-hue-grey: var(--hue-grey);
+  --color-hue-indigo: var(--hue-indigo);
+  --color-hue-purple: var(--hue-purple);
+  --color-hue-cyan: var(--hue-cyan);
+  --color-hue-green: var(--hue-green);
+  --color-hue-amber: var(--hue-amber);
+  --color-hue-orange: var(--hue-orange);
+  --color-hue-red: var(--hue-red);
 
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
@@ -37,128 +73,66 @@
 
   --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
   --color-sidebar-accent: var(--sidebar-accent);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-ring: var(--sidebar-ring);
 
-  /* --- the roles shadcn has no name for ---
+  --color-diff-added: var(--diff-added);
+  --color-diff-added-foreground: var(--diff-added-foreground);
+  --color-diff-removed: var(--diff-removed);
+  --color-diff-removed-foreground: var(--diff-removed-foreground);
+  --color-syntax-comment: var(--syntax-comment);
+  --color-syntax-keyword: var(--syntax-keyword);
+  --color-syntax-string: var(--syntax-string);
+  --color-syntax-number: var(--syntax-number);
 
-     Each is named after the --atlas-* key it resolves through, so the utility
-     a component writes and the key a theme author sets are the same word.
-
-     Do NOT add a second name for a base token. `bg-base` for background and
-     `text-tertiary` for muted-foreground are exactly the drift that made the
-     server web app's stylesheet unreadable. */
-  --color-primary-hover: var(--atlas-primary-hover);
-  --color-primary-muted: var(--atlas-primary-muted);
-
-  --color-element-hover: var(--atlas-element-hover);
-  --color-element-selected: var(--atlas-element-selected);
-  --color-element-active: var(--atlas-element-active);
-  --color-element-emphasis: var(--atlas-element-emphasis);
-
-  --color-panel: var(--atlas-panel-background);
-  --color-panel-input: var(--atlas-panel-input-background);
-  --color-disabled: var(--atlas-text-disabled);
-
-  --color-border-subtle: var(--atlas-border-subtle);
-  --color-border-strong: var(--atlas-border-strong);
-
-  --color-success: var(--atlas-status-success-foreground);
-  --color-warning: var(--atlas-status-warning-foreground);
-  --color-error: var(--atlas-status-error-foreground);
-  --color-info: var(--atlas-status-info-foreground);
-  /* The tinted fill a status foreground sits on — what a Badge uses. */
-  --color-success-muted: var(--atlas-status-success-background);
-  --color-warning-muted: var(--atlas-status-warning-background);
-  --color-error-muted: var(--atlas-status-error-background);
-  --color-info-muted: var(--atlas-status-info-background);
-
-  --color-diff-added: var(--atlas-diff-added-background);
-  --color-diff-added-foreground: var(--atlas-diff-added-text);
-  --color-diff-removed: var(--atlas-diff-removed-background);
-  --color-diff-removed-foreground: var(--atlas-diff-removed-text);
-
-  --color-syntax-comment: var(--atlas-syntax-comment);
-  --color-syntax-keyword: var(--atlas-syntax-keyword);
-  --color-syntax-string: var(--atlas-syntax-string);
-  --color-syntax-number: var(--atlas-syntax-number);
-
-  /* --- the label palette ---
-
-     Eight hues for identity, not status. `text-label-purple` means "the
-     Design label"; `text-info` means "this is informational". Keeping the two
-     vocabularies apart is what stops a label inheriting a meaning it does not
-     have the moment someone renames it. */
-  --color-label-grey: var(--atlas-label-grey);
-  --color-label-indigo: var(--atlas-label-indigo);
-  --color-label-purple: var(--atlas-label-purple);
-  --color-label-cyan: var(--atlas-label-cyan);
-  --color-label-green: var(--atlas-label-green);
-  --color-label-amber: var(--atlas-label-amber);
-  --color-label-orange: var(--atlas-label-orange);
-  --color-label-red: var(--atlas-label-red);
-
-  /* --- fonts --- */
   --font-sans: var(--font-sans);
   --font-serif: var(--font-serif);
   --font-mono: var(--font-mono);
 
-  /* --- type scale (web-tuned: one step up from the desktop app's 13px) ---
+  /* --- type scale -------------------------------------------------------
 
-     10 / 11 / 12 / 13 / 14 / 16 / 18 / 22 / 28, each with an explicit
-     line-height. Half-pixel sizes round UP to the next step. There is no
-     tenth step; if a design needs one, the design is wrong. */
-  --text-3xs: 10px;
-  --text-3xs--line-height: 13px;
-  --text-2xs: 11px;
-  --text-2xs--line-height: 14px;
-  --text-xs: 12px;
-  --text-xs--line-height: 16px;
-  --text-sm: 13px;
-  --text-sm--line-height: 18px;
-  --text-base: 14px;
-  --text-base--line-height: 20px;
-  --text-md: 16px;
-  --text-md--line-height: 22px;
-  --text-lg: 18px;
-  --text-lg--line-height: 26px;
-  --text-xl: 22px;
-  --text-xl--line-height: 30px;
-  --text-2xl: 28px;
-  --text-2xl--line-height: 36px;
+     Auberge's, made into named steps. 10, 11 and 12px carry ~90% of the UI;
+     the body default is `text-xs`. rem at a 16 base so the scale control
+     grows it. Half-pixel sizes round UP to the next step; no tenth step. */
+  --text-4xs: 0.5625rem;
+  --text-4xs--line-height: 0.75rem;
+  --text-3xs: 0.625rem;
+  --text-3xs--line-height: 0.875rem;
+  --text-2xs: 0.6875rem;
+  --text-2xs--line-height: 1rem;
+  --text-xs: 0.75rem;
+  --text-xs--line-height: 1rem;
+  --text-sm: 0.875rem;
+  --text-sm--line-height: 1.25rem;
+  --text-md: 1rem;
+  --text-md--line-height: 1.375rem;
+  --text-lg: 1.125rem;
+  --text-lg--line-height: 1.5rem;
+  --text-xl: 1.25rem;
+  --text-xl--line-height: 1.625rem;
+  --text-2xl: 1.75rem;
+  --text-2xl--line-height: 1;
 
-  /* --- radius --- */
-  --radius-sm: calc(var(--radius-base) - 4px);
-  --radius-md: calc(var(--radius-base) - 2px);
-  --radius-lg: var(--radius-base);
-  --radius-xl: calc(var(--radius-base) + 4px);
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
+  --radius-2xl: var(--radius-2xl);
   --radius-full: 9999px;
 
-  /* --- elevation ---
-
-     Tailwind rewrites a --shadow-* value at build time to thread
-     --tw-shadow-color through it, so the only way a theme-supplied shadow
-     reaches `shadow-md` is to point the namespace at a variable OUTSIDE it.
-     xl and 2xl point at the dialog rung too: left alone they render
-     Tailwind's 10%-black default, which is invisible on near-black chrome. */
-  --shadow-sm: var(--elevation-raised);
+  /* Two rungs. Tailwind rewrites --shadow-* at build time, so they point at
+     variables outside the namespace. Everything else is a ring. */
   --shadow-md: var(--elevation-menu);
   --shadow-lg: var(--elevation-dialog);
-  --shadow-xl: var(--elevation-dialog);
-  --shadow-2xl: var(--elevation-dialog);
   --inset-shadow-highlight: var(--inset-highlight);
 
-  /* --- blur --- */
   --blur-glass: var(--blur-glass);
 
-  /* --- motion: the only three curves allowed --- */
   --ease-out-strong: cubic-bezier(0.23, 1, 0.32, 1);
   --ease-in-out-strong: cubic-bezier(0.77, 0, 0.175, 1);
   --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+  --ease-panel: cubic-bezier(0.22, 1, 0.36, 1);
 
   --animate-fade-in: fade-in 0.15s var(--ease-out-strong);
   --animate-fade-out: fade-out 0.12s var(--ease-out-strong);
@@ -167,102 +141,46 @@
   --animate-slide-in-right: slide-in-right 0.18s var(--ease-drawer);
   --animate-slide-in-left: slide-in-left 0.18s var(--ease-drawer);
   --animate-shimmer-row: shimmer-row 1.6s linear infinite;
-  /* Ambient, not interaction — the one animation in the system that is not
-     on the four-duration ladder. A marquee is furniture: it should be slow
-     enough that the eye never tracks it, which is what 40s buys. */
-  --animate-marquee: marquee 40s linear infinite;
+  /* The one place chroma is allowed to MOVE: the glow behind an object. */
+  --animate-hue-rotate: hue-rotate 4s linear infinite;
+  --animate-spin-border: spin-border 3s linear infinite;
 
-  @keyframes fade-in {
-    from {
-      opacity: 0;
-    }
-    to {
-      opacity: 1;
-    }
-  }
-  @keyframes fade-out {
-    from {
-      opacity: 1;
-    }
-    to {
-      opacity: 0;
-    }
-  }
-  @keyframes scale-in {
-    from {
-      opacity: 0;
-      transform: scale(0.95);
-    }
-    to {
-      opacity: 1;
-      transform: scale(1);
-    }
-  }
-  @keyframes scale-out {
-    from {
-      opacity: 1;
-      transform: scale(1);
-    }
-    to {
-      opacity: 0;
-      transform: scale(0.95);
-    }
-  }
-  @keyframes slide-in-right {
-    from {
-      transform: translateX(100%);
-    }
-    to {
-      transform: translateX(0);
-    }
-  }
-  @keyframes slide-in-left {
-    from {
-      transform: translateX(-100%);
-    }
-    to {
-      transform: translateX(0);
-    }
-  }
-  /* Translates the track by exactly half its width. The track renders its
-     children twice, so -50% lands the copy precisely where the original
-     started and the loop has no seam. */
-  @keyframes marquee {
-    from {
-      transform: translateX(0);
-    }
-    to {
-      transform: translateX(-50%);
-    }
-  }
-
-  /* Opacity only. A skeleton that animates background-position repaints a
-     whole list on every frame. */
-  @keyframes shimmer-row {
-    0%,
-    100% {
-      opacity: 1;
-    }
-    50% {
-      opacity: 0.4;
-    }
-  }
+  @keyframes fade-in { from { opacity: 0 } to { opacity: 1 } }
+  @keyframes fade-out { from { opacity: 1 } to { opacity: 0 } }
+  @keyframes scale-in { from { opacity: 0; transform: scale(0.95) } to { opacity: 1; transform: scale(1) } }
+  @keyframes scale-out { from { opacity: 1; transform: scale(1) } to { opacity: 0; transform: scale(0.95) } }
+  @keyframes slide-in-right { from { transform: translateX(100%) } to { transform: translateX(0) } }
+  @keyframes slide-in-left { from { transform: translateX(-100%) } to { transform: translateX(0) } }
+  @keyframes shimmer-row { 0%, 100% { opacity: 1 } 50% { opacity: 0.4 } }
+  @keyframes hue-rotate { from { filter: hue-rotate(0deg) } to { filter: hue-rotate(360deg) } }
+  @keyframes spin-border { to { --spin-angle: 360deg } }
 }
 
-/* The `dark` variant, for the rare third-party utility that needs it (the
-   shadcn preset's `shimmer` is one). Application code should not write
-   `dark:` — the token layer already inverts. */
-@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+/* Registered so they can transition. Without this, `transition: --fade-top`
+   in ScrollFade does nothing and the fade snaps — Auberge relies on it
+   silently. */
+@property --fade-top {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+@property --fade-bottom {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+@property --spin-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
 
-/* The `light` variant exists for one job: third-party artwork that the token
-   layer cannot reach. A brand SVG has baked-in fills, so a white-on-dark
-   logo stays white on a white page no matter what the theme does. Everything
-   the system owns inverts through the tokens; do not reach for this. */
+/* `dark`/`light` variants exist for third-party artwork with baked-in fills
+   the token layer cannot reach. Application code should not write them. */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 @custom-variant light (&:where([data-theme="light"], [data-theme="light"] *));
 
 @layer base {
-  /* Tailwind v4 defaults every border to currentColor. The whole system is
-     hairline chrome, so the default has to be the theme's border. */
   *,
   ::after,
   ::before,
@@ -272,62 +190,57 @@
   }
 
   html {
-    /* 14px root. Every px value in tokens.css is relative to this being
-       exactly 14 — that is why the scales are px and not rem. */
-    font-size: 14px;
+    /* The scale multiplier. Every measurement is rem, so this grows all of
+       them together. See tokens.css. */
+    font-size: calc(16px * var(--ui-scale, 1));
     font-family: var(--font-sans);
-  }
-
-  body {
-    background-color: var(--background);
-    color: var(--foreground);
-    font-size: var(--text-base);
-    line-height: var(--text-base--line-height);
-    font-weight: 500;
-    letter-spacing: -0.01em;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
   }
 
-  /* One focus treatment for the whole system. `:focus` is silenced so a mouse
-     click never draws a ring; `:focus-visible` always does, at the strongest
-     ink the appearance has. */
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    /* The density decision, made visible: the document default is 12px. */
+    font-size: var(--text-xs);
+    line-height: var(--text-xs--line-height);
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    /* Global, not per-component: a figure that reflows as it ticks is wrong
+       everywhere, so nowhere should have to remember to ask for this. */
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* One focus treatment. 1px at 1px offset in the action colour — an
+     inverted-ink 2px ring on a 28px control reads as a filled state. */
   :focus {
     outline: none;
   }
-  /* One focus treatment for the whole system, in the action colour rather
-     than the brightest ink. 1px at 1px offset: at 2px an indigo ring on a
-     28px control reads as a filled state rather than a focus state. */
   :focus-visible {
     outline: 1px solid var(--ring);
     outline-offset: 1px;
   }
 
   ::selection {
-    background: var(--atlas-selection-background);
+    background: var(--selection);
     color: var(--foreground);
   }
 
-  /* macOS overlay scrollbars. The track is never painted. */
-  ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+  /* Native-app feel: scrolling works, scrollbars do not show. Edges dissolve
+     instead — see ScrollFade. */
+  * {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
   }
-  ::-webkit-scrollbar-track {
-    background: transparent;
-  }
-  ::-webkit-scrollbar-thumb {
-    background: var(--atlas-scrollbar-thumb-background);
-    border-radius: var(--radius-full);
-  }
-  ::-webkit-scrollbar-thumb:hover {
-    background: var(--atlas-scrollbar-thumb-hover);
+  *::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+    display: none;
   }
 
-  /* Only background-color, and only at the hover duration. Transitioning
-     `color` or `opacity` on a element that contains an icon makes the glyph
-     jitter as it re-rasterises. */
+  /* Only background-color, at the hover duration. Transitioning colour or
+     opacity on an element containing an icon makes the glyph jitter. */
   button,
   a,
   select,
@@ -335,8 +248,6 @@
     transition: background-color var(--duration-fast) var(--ease-out-strong);
   }
 
-  /* Panels contain their own layout so a list re-render never reflows the
-     shell around it. */
   [data-panel] {
     contain: layout style paint;
   }

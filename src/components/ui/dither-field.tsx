@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react"
 import { cn } from "cn"
 
+import { resolveToken, rgbString } from "@/lib/resolved-color"
 import { useTheme } from "@/lib/theme"
 
 /**
@@ -63,27 +64,13 @@ type DitherFieldProps = {
 }
 
 /**
- * The three colour literals below are unavoidable: `ctx.fillStyle` takes a
- * CSS colour STRING and cannot resolve `var(--foreground)`, so the value has
- * to be read off computed style and recomposed by hand. The token is still
- * the source of truth — nothing here picks a colour, it only transports one.
+ * `ctx.fillStyle` takes a colour STRING and cannot read a custom property,
+ * so the ink is resolved off computed style through the canvas probe in
+ * lib/resolved-color — which understands oklch(), unlike a hex regex.
  */
-function resolvedForeground(): string {
-  // SSR has no computed style. White is the dark-appearance ink, which is the
-  // floor the rest of the system also renders at before hydration.
-  if (typeof window === "undefined") return "#ffffff" // ratchet-allow: SSR fallback for a canvas ink that cannot read a CSS custom property
-  const value = getComputedStyle(document.documentElement)
-    .getPropertyValue("--foreground")
-    .trim()
-  return value || "#ffffff" // ratchet-allow: same SSR fallback, for a theme that resolved to an empty string
-}
-
-/** `#rrggbb` plus an alpha, as `rgb(r g b / a)`. Canvas needs a real colour. */
-function withAlpha(hex: string, alpha: number): string {
-  const m = /^#?([0-9a-f]{6})$/i.exec(hex)
-  if (!m) return hex
-  const n = parseInt(m[1], 16)
-  return `rgb(${(n >> 16) & 255} ${(n >> 8) & 255} ${n & 255} / ${alpha})` // ratchet-allow: composes the resolved token into the colour string canvas requires
+function inkAt(alpha: number): string {
+  const rgb = resolveToken("--foreground")
+  return rgb ? rgbString(rgb, alpha) : `rgb(255 255 255 / ${alpha})` // ratchet-allow: SSR fallback before computed style exists on the client
 }
 
 function DitherField({
@@ -154,7 +141,7 @@ function DitherField({
       const maxR = Math.hypot(cx, cy)
 
       const alpha = Math.min(1, (mode === "glyphs" ? 0.3 : 0.16) * ink)
-      ctx.fillStyle = withAlpha(resolvedForeground(), alpha)
+      ctx.fillStyle = inkAt(alpha)
       if (mode === "glyphs") {
         ctx.font = "11px ui-monospace, SFMono-Regular, Menlo, monospace"
         ctx.textBaseline = "top"
@@ -231,6 +218,7 @@ function DitherField({
 
   return (
     <canvas
+      data-slot="dither-field"
       ref={ref}
       aria-hidden="true"
       className={cn(

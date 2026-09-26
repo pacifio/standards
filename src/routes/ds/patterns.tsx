@@ -1,18 +1,36 @@
+import { useState } from "react"
 import { createFileRoute } from "@tanstack/react-router"
-import { ChevronRightIcon, GitBranchIcon, KeyIcon } from "lucide-react"
+import {
+  ChevronDownIcon,
+  ChevronRightIcon,
+  GitBranchIcon,
+  KeyIcon,
+} from "lucide-react"
 
+import { SESSIONS } from "@/mock/data"
+import type { Session } from "@/mock/types"
 import { PageHeader, SectionHeader } from "@/components/patterns/section-header"
 import {
   DrillInRow,
   SettingCard,
   SettingRow,
 } from "@/components/patterns/setting-card"
+import { DataTable, TableSearch } from "@/components/patterns/data-table"
+import type { Column } from "@/components/patterns/data-table"
+import { KpiStrip } from "@/components/patterns/kpi-strip"
+import { Panel } from "@/components/patterns/panel"
+import {
+  CompoundFilter,
+  SegmentedPills,
+  UnderlineTabs,
+} from "@/components/patterns/segmented"
 import { Specimen } from "@/components/gallery/specimen"
 import { DitherField } from "@/components/ui/dither-field"
 import { GitHubMark, GoogleMark } from "@/components/ui/brand-marks"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Callout } from "@/components/ui/callout"
+import { Icon } from "@/components/ui/icon"
 import {
   Select,
   SelectContent,
@@ -20,13 +38,54 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { StatusIcon } from "@/components/ui/status-icon"
 import { Switch } from "@/components/ui/switch"
+import { Tag } from "@/components/ui/tag"
 
 export const Route = createFileRoute("/ds/patterns")({
   component: PatternsGallery,
 })
 
+const COLUMNS: Array<Column<Session>> = [
+  {
+    id: "ref",
+    header: "Ref",
+    cell: (s) => (
+      <span className="mono text-2xs whitespace-nowrap text-muted-foreground">
+        {s.ref}
+      </span>
+    ),
+    sortValue: (s) => Number(s.ref.replace(/\D/g, "")),
+    className: "w-18",
+  },
+  {
+    id: "title",
+    header: "Session",
+    cell: (s) => (
+      <span className="flex min-w-0 items-center gap-2 overflow-hidden">
+        <StatusIcon status={s.status} />
+        <span className="truncate font-medium text-foreground">{s.title}</span>
+        {s.labels[0] && <Tag hue={s.labels[0].tone}>{s.labels[0].name}</Tag>}
+      </span>
+    ),
+    sortValue: (s) => s.title,
+    className: "w-full max-w-0 min-w-56",
+  },
+  {
+    id: "tokens",
+    header: "Tokens",
+    cell: (s) => s.tokens.toLocaleString(),
+    sortValue: (s) => s.tokens,
+    align: "right",
+    className: "w-24",
+  },
+]
+
 function PatternsGallery() {
+  const [pill, setPill] = useState<"all" | "mine" | "agents">("all")
+  const [tab, setTab] = useState<"orgs" | "tiers">("orgs")
+  const [selected, setSelected] = useState<string | undefined>(SESSIONS[0].id)
+
   return (
     <>
       <PageHeader
@@ -38,6 +97,104 @@ function PatternsGallery() {
         A pattern earns a component when the third screen needs it. Before that
         it is a layout; after that it is a source of drift.
       </Callout>
+
+      <Specimen
+        title="Panel"
+        note="The block every dashboard surface is built from: a ringed card with a title, a subtitle, and a circular action cluster — filter in muted, open in primary. It enters with an 8px rise; give it a `delay` from PANEL_STAGGER when there is more than one on the page."
+      >
+        <div className="grid w-full gap-3 sm:grid-cols-2">
+          <Panel
+            title="Sessions this week"
+            subtitle="Across every project"
+            onFilter={() => {}}
+            onExpand={() => {}}
+          >
+            <span className="text-2xl leading-none figure">42</span>
+          </Panel>
+          <Panel title="Without actions" subtitle="Just a ringed card">
+            <span className="caption">The body takes any content.</span>
+          </Panel>
+        </div>
+      </Specimen>
+
+      <Specimen
+        title="KPI strip"
+        note="Cells divided by hairlines, not separate cards. The figure is weight 300; the delta rides beside the label so the number stays clean. `detail` is for a neutral note under a figure nobody should judge — spend, for instance."
+      >
+        <div className="w-full">
+          <KpiStrip
+            cells={[
+              {
+                id: "live",
+                label: "Live",
+                value: 2,
+                spark: [1, 2, 1, 3, 2, 2, 2],
+              },
+              { id: "done", label: "Done", value: 5, delta: 12 },
+              { id: "failed", label: "Failed", value: 1, delta: -50 },
+              {
+                id: "spend",
+                label: "Spend",
+                value: "$401",
+                detail: "measured",
+              },
+            ]}
+          />
+        </div>
+      </Specimen>
+
+      <Specimen
+        title="Segmented controls"
+        note="Three shapes for three jobs. Pills switch a VIEW and the active one slides on SPRING_INDICATOR; underline tabs switch a PANEL inside a page; the compound filter is `grey label │ value ⌄` and opens a menu."
+      >
+        <div className="flex w-full flex-col gap-4">
+          <SegmentedPills
+            value={pill}
+            onChange={setPill}
+            options={[
+              { value: "all", label: "All" },
+              { value: "mine", label: "Mine" },
+              { value: "agents", label: "Agents" },
+            ]}
+          />
+          <UnderlineTabs
+            value={tab}
+            onChange={setTab}
+            options={[
+              { value: "orgs", label: "Organisations", count: 505 },
+              { value: "tiers", label: "Tiers", count: 3 },
+            ]}
+          />
+          <div className="flex items-center gap-2">
+            <CompoundFilter label="Project">
+              All
+              <Icon icon={ChevronDownIcon} size="xs" />
+            </CompoundFilter>
+            <CompoundFilter label="Agent">
+              Claude Code
+              <Icon icon={ChevronDownIcon} size="xs" />
+            </CompoundFilter>
+            <TableSearch placeholder="Search" />
+          </div>
+        </div>
+      </Specimen>
+
+      <Specimen
+        title="Data table"
+        note="A ringed container; a toolbar band; a sticky blurred header in .micro; hairline rows that fade in with a capped stagger; a footer band. Click a header to sort, a row to select. Right-aligned cells are tabular."
+      >
+        <div className="w-full">
+          <DataTable
+            rows={SESSIONS.slice(0, 5)}
+            columns={COLUMNS}
+            rowId={(s) => s.id}
+            selectedId={selected}
+            onRowClick={(s) => setSelected(s.id)}
+            toolbar={<TableSearch placeholder="Search sessions" />}
+            footer={<span className="tnum">5 of {SESSIONS.length}</span>}
+          />
+        </div>
+      </Specimen>
 
       <Specimen
         title="Setting card"
@@ -74,15 +231,6 @@ function PatternsGallery() {
               description="Unlimited reviews on every pull request."
               control={<Badge variant="info">Beta</Badge>}
             />
-            <SettingRow
-              label="GitHub connection"
-              description="Manage connected accounts and repositories."
-              control={
-                <Button variant="outline" size="sm">
-                  Manage
-                </Button>
-              }
-            />
             <DrillInRow
               icon={GitBranchIcon}
               label="Repository rules"
@@ -95,7 +243,7 @@ function PatternsGallery() {
 
       <Specimen
         title="Section header"
-        note="`eyebrow`-cased, because it labels a GROUP. A heading here would compete with the page title for the same job."
+        note="`micro`-cased, because it labels a GROUP. A heading here would compete with the page title for the same job."
       >
         <div className="w-full">
           <SectionHeader
@@ -122,40 +270,22 @@ function PatternsGallery() {
       </Specimen>
 
       <Specimen
-        title="Drill-in row"
-        note="Navigates rather than sets. The whole row is the target — the chevron is decoration and must never be the only clickable thing."
-      >
-        <div className="w-full">
-          <SettingCard>
-            <DrillInRow label="Members" value="12 members" />
-            <DrillInRow label="Access and permissions" />
-            <DrillInRow label="Slack notifications" value="Off" />
-          </SettingCard>
-        </div>
-      </Specimen>
-
-      <Specimen
         title="Dither field"
-        note="The landing site's hero backdrop, ported from the desktop app so the marketing page, the login pane and the app's empty states all print the same texture. A 4×4 Bayer matrix turns two octaves of value noise into glyph density, stepped at ~12fps because ordered dither reads as retro precisely when it snaps. It parks off screen, parks on a hidden tab, and paints exactly one frame under reduced motion — the texture is the design, only the drift is the accessibility problem."
+        note="The canvas-2D fallback for the login aside and empty states: a 4×4 Bayer matrix over value noise, stepped at ~12fps. Ink is the resolved foreground, so it inverts with the theme. The GLSL RevealWaveImage on the Blocks page replaces it wherever WebGL is available."
       >
         <div className="flex w-full flex-col gap-3">
-          <div className="relative h-40 w-full overflow-hidden rounded-md border border-border bg-sidebar">
+          <div className="relative h-32 w-full overflow-hidden rounded-xl bg-surface ring-1 ring-foreground/10">
             <DitherField mode="glyphs" hollow={[0.1, 0.5]} />
           </div>
-          <div className="relative h-24 w-full overflow-hidden rounded-md border border-border bg-sidebar">
+          <div className="relative h-20 w-full overflow-hidden rounded-xl bg-surface ring-1 ring-foreground/10">
             <DitherField mode="dots" />
           </div>
-          <p className="caption">
-            <code className="code">glyphs</code> prints a character per 12px
-            cell; <code className="code">dots</code> prints 1.5px dots on a 4px
-            grid. Ink is the resolved foreground, so both invert with the theme.
-          </p>
         </div>
       </Specimen>
 
       <Specimen
         title="Social sign-in"
-        note="Two providers and nothing else — no email field, no divider, no “show other options”. Each of those exists in the references to manage a longer list than Atlas has. Both buttons are `secondary`: neither provider is recommended, and making one of them the single loud element would be a recommendation."
+        note="Two providers and nothing else. Both buttons are `secondary`: neither provider is recommended, and making one of them the single loud element would be a recommendation."
       >
         <div className="flex w-full max-w-72 flex-col gap-2">
           <Button variant="secondary" size="xl" className="w-full">
@@ -166,20 +296,15 @@ function PatternsGallery() {
             <GitHubMark />
             Continue with GitHub
           </Button>
-          <p className="pt-1 caption">
-            Google&apos;s four-colour mark is fixed by their brand guidelines
-            and must not be themed; GitHub&apos;s is authorised in one colour
-            and takes <code className="code">currentColor</code>.
-          </p>
         </div>
       </Specimen>
 
       <Specimen
         title="Where these came from"
-        note="Cursor for the component language, Linear for the layout. The setting card, the metric strip, the segmented range control and the quiet table are Cursor's settings surfaces; the rail, the org switcher, the three-pane reading layout and the separate settings shell are Linear's."
+        note="The Panel, KPI strip, segmented controls, data table and the sliding-pill sidebar are Auberge's structure; the achromatic ramp, the dashed rails, the cross-hair corners and the illustration blocks are natai's. Neither reference's accent survived — the primary is the foreground, inverted."
       >
         <a
-          href="/mock/settings/organisation"
+          href="/mock/timeline"
           className="flex items-center gap-1.5 text-xs text-secondary-foreground underline-offset-2 hover:underline"
         >
           See them composed in the app mock

@@ -1,33 +1,36 @@
 /* ==========================================================================
    Atlas Standards — named utilities.
 
-   Everything here exists so a component never has to write a measurement.
-   If you find yourself reaching for text-[13px], h-[28px] or z-[60], the
-   utility you want is in this file — and if it genuinely is not, add it here
-   rather than inlining the number. The ratchet test enforces this.
+   Everything here exists so a component never writes a measurement. If you
+   reach for text-[11px], h-[28px] or z-[60], the utility you want is here —
+   and if it genuinely is not, add it here rather than inlining the number.
+   The ratchet enforces this.
    ========================================================================== */
 
 /* ──────────────────────────────────────────────────────────────────────────
-   The six named text styles.
+   Named text styles.
 
-   Reach for one of these before composing size + weight + colour by hand.
-   `eyebrow` is a small-caps group label, `label` the text on and beside a
-   control, `body` running prose, `caption` the dimmed line under something,
-   `code` any monospace run, `heading` a panel or dialog title.
+   `micro` is the small-caps group label — the one place uppercase and
+   tracking are allowed. `figure` is the oversized hero number: LIGHT, never
+   bold, and the only use of weight 300 in the system.
    ────────────────────────────────────────────────────────────────────────── */
 
-@utility eyebrow {
-  font-family: var(--font-sans);
-  font-size: var(--text-2xs);
-  line-height: var(--text-2xs--line-height);
-  font-weight: 600;
-  letter-spacing: 0.05em;
+@utility micro {
+  font-size: var(--text-3xs);
+  line-height: 1;
+  font-weight: 500;
+  letter-spacing: 0.07em;
   text-transform: uppercase;
   color: var(--muted-foreground);
 }
 
+@utility figure {
+  font-weight: 300;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+}
+
 @utility label {
-  font-family: var(--font-sans);
   font-size: var(--text-xs);
   line-height: var(--text-xs--line-height);
   font-weight: 500;
@@ -35,15 +38,13 @@
 }
 
 @utility body {
-  font-family: var(--font-sans);
-  font-size: var(--text-base);
-  line-height: var(--text-base--line-height);
+  font-size: var(--text-sm);
+  line-height: var(--text-sm--line-height);
   font-weight: 500;
   color: var(--foreground);
 }
 
 @utility caption {
-  font-family: var(--font-sans);
   font-size: var(--text-2xs);
   line-height: var(--text-2xs--line-height);
   font-weight: 500;
@@ -52,22 +53,19 @@
 
 @utility code {
   font-family: var(--font-mono);
-  font-size: var(--text-sm);
-  line-height: var(--text-sm--line-height);
+  font-size: var(--text-xs);
+  line-height: var(--text-xs--line-height);
   font-weight: 500;
   font-feature-settings: "zero", "ss02";
 }
 
 @utility heading {
-  font-family: var(--font-sans);
-  font-size: var(--text-md);
-  line-height: var(--text-md--line-height);
+  font-size: var(--text-sm);
+  line-height: var(--text-sm--line-height);
   font-weight: 600;
   color: var(--foreground);
 }
 
-/* Numerals that do not reflow as they tick. Any counter, duration, token
-   count or money figure. */
 @utility tnum {
   font-variant-numeric: tabular-nums;
 }
@@ -81,324 +79,177 @@
    Control heights.
    ────────────────────────────────────────────────────────────────────────── */
 
-@utility h-control-xs {
-  height: var(--control-xs);
-}
-@utility h-control-sm {
-  height: var(--control-sm);
-}
-@utility h-control-md {
-  height: var(--control-md);
-}
-@utility h-control-lg {
-  height: var(--control-lg);
-}
-@utility h-control-xl {
-  height: var(--control-xl);
-}
+@utility h-control-xs { height: var(--control-xs); }
+@utility h-control-sm { height: var(--control-sm); }
+@utility h-control-md { height: var(--control-md); }
+@utility h-control-lg { height: var(--control-lg); }
+@utility h-control-xl { height: var(--control-xl); }
 
-/* A control that must be at least one step wide but may grow — a keycap
-   holding "Esc", a count badge holding "12". */
-@utility min-w-control-xs {
-  min-width: var(--control-xs);
-}
-@utility min-w-control-sm {
-  min-width: var(--control-sm);
-}
-@utility min-w-control-md {
-  min-width: var(--control-md);
-}
+@utility min-w-control-xs { min-width: var(--control-xs); }
+@utility min-w-control-sm { min-width: var(--control-sm); }
+@utility min-w-control-md { min-width: var(--control-md); }
 
-/* The square an icon-only control occupies — one control height on both axes. */
-@utility size-control-xs {
-  width: var(--control-xs);
-  height: var(--control-xs);
-}
-@utility size-control-sm {
-  width: var(--control-sm);
-  height: var(--control-sm);
-}
-@utility size-control-md {
-  width: var(--control-md);
-  height: var(--control-md);
-}
-@utility size-control-lg {
-  width: var(--control-lg);
-  height: var(--control-lg);
-}
-@utility size-control-xl {
-  width: var(--control-xl);
-  height: var(--control-xl);
-}
+@utility size-control-xs { width: var(--control-xs); height: var(--control-xs); }
+@utility size-control-sm { width: var(--control-sm); height: var(--control-sm); }
+@utility size-control-md { width: var(--control-md); height: var(--control-md); }
+@utility size-control-lg { width: var(--control-lg); height: var(--control-lg); }
+@utility size-control-xl { width: var(--control-xl); height: var(--control-xl); }
 
 /* ──────────────────────────────────────────────────────────────────────────
    Layout constants.
    ────────────────────────────────────────────────────────────────────────── */
 
-@utility w-sidebar {
-  width: var(--sidebar-width);
-}
-@utility w-sidebar-collapsed {
-  width: var(--sidebar-width-collapsed);
-}
-@utility h-topbar {
-  height: var(--topbar-height);
-}
-@utility min-h-topbar {
-  min-height: var(--topbar-height);
-}
-@utility w-list-pane {
-  width: var(--list-pane-width);
-}
-@utility w-properties {
-  width: var(--properties-width);
-}
-@utility w-companion {
-  width: var(--companion-width);
-}
-@utility h-row {
-  height: var(--row-height);
-}
-@utility h-nav-row {
-  height: var(--nav-row-height);
-}
-@utility h-nav-row-tall {
-  height: var(--nav-row-height-tall);
-}
-@utility min-h-row {
-  min-height: var(--row-height);
-}
-@utility w-settings-nav {
-  width: var(--settings-nav-width);
-}
-@utility max-w-settings {
-  max-width: var(--settings-content-max);
-}
+@utility w-sidebar { width: var(--sidebar-width); }
+@utility w-sidebar-collapsed { width: var(--sidebar-width-collapsed); }
+@utility h-topbar { height: var(--topbar-height); }
+@utility min-h-topbar { min-height: var(--topbar-height); }
+@utility w-dock { width: var(--dock-width); }
+@utility min-w-dock { min-width: var(--dock-width); }
+@utility w-list-pane { width: var(--list-pane-width); }
+@utility w-properties { width: var(--properties-width); }
+@utility h-row { height: var(--row-height); }
+@utility min-h-row { min-height: var(--row-height); }
+@utility w-settings-nav { width: var(--settings-nav-width); }
+@utility max-w-settings { max-width: var(--settings-content-max); }
 
 /* ──────────────────────────────────────────────────────────────────────────
    Z-layers. Nothing outside this file may write a z-index.
    ────────────────────────────────────────────────────────────────────────── */
 
-@utility z-panel {
-  z-index: var(--z-panel);
-}
-@utility z-titlebar {
-  z-index: var(--z-titlebar);
-}
-@utility z-drawer {
-  z-index: var(--z-drawer);
-}
-@utility z-overlay {
-  z-index: var(--z-overlay);
-}
-@utility z-modal {
-  z-index: var(--z-modal);
-}
-@utility z-popover {
-  z-index: var(--z-popover);
-}
-@utility z-toast {
-  z-index: var(--z-toast);
-}
-@utility z-tooltip {
-  z-index: var(--z-tooltip);
-}
-@utility z-drag {
-  z-index: var(--z-drag);
-}
+@utility z-panel { z-index: var(--z-panel); }
+@utility z-titlebar { z-index: var(--z-titlebar); }
+@utility z-drawer { z-index: var(--z-drawer); }
+@utility z-overlay { z-index: var(--z-overlay); }
+@utility z-modal { z-index: var(--z-modal); }
+@utility z-popover { z-index: var(--z-popover); }
+@utility z-toast { z-index: var(--z-toast); }
+@utility z-tooltip { z-index: var(--z-tooltip); }
+@utility z-drag { z-index: var(--z-drag); }
 
 /* ──────────────────────────────────────────────────────────────────────────
    Surfaces.
    ────────────────────────────────────────────────────────────────────────── */
 
-/* Frosted HUD chrome: keycap docks, floating toolbars, the command palette.
-   Canonical composition, and it is worth writing all three parts:
-
-     glass-hud backdrop-blur-glass bg-gradient-to-b from-popover/85 to-card/90
-*/
-@utility glass-hud {
-  border: 1px solid var(--border);
-  box-shadow: var(--inset-highlight), var(--elevation-menu);
+/* One glass. The topbar, and the command palette. */
+@utility glass {
+  background: var(--glass);
+  backdrop-filter: blur(var(--blur-glass)) saturate(180%);
+  -webkit-backdrop-filter: blur(var(--blur-glass)) saturate(180%);
 }
 
-/* A scrim is deliberately not themed. Its whole job is to push what is behind
-   it away from the reader, and only darkening does that — on a light
-   appearance a light scrim pushes nothing. Also the right fill for a control
-   sitting over arbitrary media, where the theme cannot know what is beneath. */
-@utility scrim {
-  background-color: rgb(0 0 0 / 0.6);
-}
-@utility scrim-soft {
-  background-color: rgb(0 0 0 / 0.2);
+/* Structural rules — a pane seam, a table row — use the WEAKER edge, so
+   rules inside content read lighter than the ring around it. */
+@utility hairline-x { border-bottom: 1px solid var(--hairline); }
+@utility hairline-y { border-right: 1px solid var(--hairline); }
+
+/* natai's section divider. Dashed, never solid, between things on a page. */
+@utility rule-dashed {
+  border-top: 1px dashed color-mix(in oklch, var(--foreground) 10%, transparent);
 }
 
-@utility inset-highlight {
-  box-shadow: var(--inset-highlight);
+/* A blueprint grid from hairlines. */
+@utility grid-lines {
+  background-image:
+    linear-gradient(to right, var(--hairline) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--hairline) 1px, transparent 1px);
 }
 
-/* The vertical sheen that gives a tall panel its top edge without a border.
-   Paint only, so nothing moves and nothing reflows. */
-@utility panel-sheen {
-  background-image: linear-gradient(
+/* A scrim is deliberately NOT themed: its job is to push what is behind it
+   away from the reader, and only darkening does that. */
+@utility scrim { background-color: rgb(0 0 0 / 0.6); }
+@utility scrim-soft { background-color: rgb(0 0 0 / 0.2); }
+
+@utility inset-highlight { box-shadow: var(--inset-highlight); }
+
+/* ──────────────────────────────────────────────────────────────────────────
+   The hue-coded tag. Auberge's `.tag`, verbatim in rem.
+
+   A pill whose fill and edge are the hue mixed at per-theme ratios, so the
+   same tone reads as a tint on light and a glow on dark without two sets of
+   colours. Set the hue with `tag-<tone>`.
+   ────────────────────────────────────────────────────────────────────────── */
+
+@utility tag {
+  --tag: var(--hue-grey);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  border-radius: 9999px;
+  border: 1px solid color-mix(in oklch, var(--tag) var(--tag-border-mix), transparent);
+  background: color-mix(in oklch, var(--tag) var(--tag-bg-mix), transparent);
+  color: var(--tag);
+  padding: 0 0.4375rem;
+  height: 1.125rem;
+  font-size: var(--text-3xs);
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+}
+@utility tag-grey { --tag: var(--hue-grey); }
+@utility tag-indigo { --tag: var(--hue-indigo); }
+@utility tag-purple { --tag: var(--hue-purple); }
+@utility tag-cyan { --tag: var(--hue-cyan); }
+@utility tag-green { --tag: var(--hue-green); }
+@utility tag-amber { --tag: var(--hue-amber); }
+@utility tag-orange { --tag: var(--hue-orange); }
+@utility tag-red { --tag: var(--hue-red); }
+
+/* ──────────────────────────────────────────────────────────────────────────
+   Scroll regions. Auberge's `sidebar.mp4`: edges dissolve, and only on the
+   side there is more content. ScrollFade measures and writes the two vars;
+   they are registered in globals.css so the change animates.
+   ────────────────────────────────────────────────────────────────────────── */
+
+@utility scroll-fade {
+  mask-image: linear-gradient(
     to bottom,
-    var(--atlas-element-highlight) 0,
-    transparent 180px
+    transparent 0,
+    #000 var(--fade-top, 0px),
+    #000 calc(100% - var(--fade-bottom, 0px)),
+    transparent 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    #000 var(--fade-top, 0px),
+    #000 calc(100% - var(--fade-bottom, 0px)),
+    transparent 100%
   );
 }
 
-/* The left rail reads as a plane behind the content, not a column beside it. */
-@utility rail-surface {
-  background-color: var(--atlas-panel-background);
-  box-shadow: var(--inset-highlight);
+/* Keep the scroll, lose the bar — already global; kept for explicitness. */
+@utility hide-scrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar { display: none; }
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   Blocks.
+   ────────────────────────────────────────────────────────────────────────── */
+
+/* natai's spinning gradient border, as a conic ring driven by a registered
+   angle so it can animate. The pill puts this on a `before:`. */
+@utility spin-border {
+  background: conic-gradient(
+    from var(--spin-angle),
+    transparent 0% 70%,
+    var(--foreground) 100%
+  );
 }
 
 /* ──────────────────────────────────────────────────────────────────────────
    States.
    ────────────────────────────────────────────────────────────────────────── */
 
-/* One disabled treatment everywhere. Used by anything that is not a real
-   form control and so cannot take `:disabled`. */
 @utility disabled-look {
   opacity: 0.5;
   cursor: not-allowed;
 }
 
 @utility focus-ring-none {
-  &:focus-visible {
-    outline: none;
-  }
+  &:focus-visible { outline: none; }
 }
 
-/* Keep the scroll, lose the bar. Horizontal strips (tab rails, chip rows)
-   only — a vertical list needs its scrollbar to communicate length. */
-@utility hide-scrollbar {
-  scrollbar-width: none;
-  &::-webkit-scrollbar {
-    display: none;
-  }
-}
-
-/* Fades a dither field out toward the bottom of its pane so copy laid over
-   it reads against a calm surface. The landing site masks its hero field the
-   same way, for the same reason: the field's radial hollow keeps the MIDDLE
-   quiet, which is exactly where copy is not. The colour here is a mask
-   channel, not ink — only its alpha is used. */
-@utility field-fade-b {
-  -webkit-mask-image: linear-gradient(
-    to bottom,
-    #000 0%,
-    #000 40%,
-    transparent 88%
-  );
-  mask-image: linear-gradient(to bottom, #000 0%, #000 40%, transparent 88%);
-}
-
-/* Fades a horizontally-scrolling track out at both ends, so logos enter and
-   leave instead of being clipped by a hard edge. Colour here is a mask
-   channel, not ink — only its alpha is used. */
-@utility marquee-fade-x {
-  -webkit-mask-image: linear-gradient(
-    to right,
-    transparent 0%,
-    #000 12%,
-    #000 88%,
-    transparent 100%
-  );
-  mask-image: linear-gradient(
-    to right,
-    transparent 0%,
-    #000 12%,
-    #000 88%,
-    transparent 100%
-  );
-}
-
-/* ──────────────────────────────────────────────────────────────────────────
-   Progressive blur scroll fade.
-
-   Ported from the landing site's logo rail (`.logos-fade`), rotated to the
-   vertical axis. Three stacked bands per edge, each blurrier and shorter
-   than the last, so content dissolves into the edge instead of being sliced
-   by a hard mask. A single blurred band reads as a smear; three staged ones
-   read as depth of field.
-
-   `backdrop-filter` only samples what is painted BEHIND the element, so the
-   bands must be siblings of the scrolling content, not children of it — and
-   the scroll container itself must not clip them.
-
-   The colour wash on the last band comes from `--scroll-blur-surface`, which
-   the call site sets to whatever it is sitting on.
-   ────────────────────────────────────────────────────────────────────────── */
-
-.scroll-blur {
-  position: absolute;
-  left: 0;
-  right: 0;
-  height: 48px;
-  pointer-events: none;
-  z-index: var(--z-panel);
-}
-.scroll-blur > i {
-  position: absolute;
-  inset: 0;
-  display: block;
-}
-
-.scroll-blur-t {
-  top: 0;
-}
-.scroll-blur-t > i:nth-child(1) {
-  backdrop-filter: blur(1px);
-  -webkit-backdrop-filter: blur(1px);
-  mask-image: linear-gradient(to bottom, #000 30%, transparent 100%);
-  -webkit-mask-image: linear-gradient(to bottom, #000 30%, transparent 100%);
-}
-.scroll-blur-t > i:nth-child(2) {
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-  mask-image: linear-gradient(to bottom, #000 10%, transparent 70%);
-  -webkit-mask-image: linear-gradient(to bottom, #000 10%, transparent 70%);
-}
-.scroll-blur-t > i:nth-child(3) {
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  mask-image: linear-gradient(to bottom, #000 0%, transparent 40%);
-  -webkit-mask-image: linear-gradient(to bottom, #000 0%, transparent 40%);
-  background: linear-gradient(
-    to bottom,
-    var(--scroll-blur-surface, var(--sidebar)) 0%,
-    transparent 70%
-  );
-}
-
-.scroll-blur-b {
-  bottom: 0;
-}
-.scroll-blur-b > i:nth-child(1) {
-  backdrop-filter: blur(1px);
-  -webkit-backdrop-filter: blur(1px);
-  mask-image: linear-gradient(to top, #000 30%, transparent 100%);
-  -webkit-mask-image: linear-gradient(to top, #000 30%, transparent 100%);
-}
-.scroll-blur-b > i:nth-child(2) {
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-  mask-image: linear-gradient(to top, #000 10%, transparent 70%);
-  -webkit-mask-image: linear-gradient(to top, #000 10%, transparent 70%);
-}
-.scroll-blur-b > i:nth-child(3) {
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  mask-image: linear-gradient(to top, #000 0%, transparent 40%);
-  -webkit-mask-image: linear-gradient(to top, #000 0%, transparent 40%);
-  background: linear-gradient(
-    to top,
-    var(--scroll-blur-surface, var(--sidebar)) 0%,
-    transparent 70%
-  );
-}
-
-/* A row whose contents can change without reflowing its neighbours. */
 @utility contain-row {
   contain: layout style;
 }

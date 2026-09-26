@@ -2,57 +2,106 @@ import { createFileRoute } from "@tanstack/react-router"
 
 import { PageHeader } from "@/components/patterns/section-header"
 import { Sample, Specimen, TokenRow } from "@/components/gallery/specimen"
+import { Panel } from "@/components/patterns/panel"
 import { Button } from "@/components/ui/button"
 import { Callout } from "@/components/ui/callout"
 import { Input } from "@/components/ui/input"
+import { Kbd } from "@/components/ui/kbd"
+import { Tag } from "@/components/ui/tag"
+import { UI_SCALE_MAX, UI_SCALE_MIN, useUiScale } from "@/lib/ui-scale"
 
 export const Route = createFileRoute("/ds/foundations/density")({
   component: DensityFoundations,
 })
 
 const CONTROLS = [
-  ["--control-xs", "22px", "a pill, a keycap, an inline chip"],
-  ["--control-sm", "24px", "a control inside a row or a table cell"],
-  ["--control-md", "28px", "the default — toolbars, forms, menu items"],
-  ["--control-lg", "32px", "a form field with its own label"],
-  ["--control-xl", "36px", "a primary action on an empty page"],
+  ["--control-xs", "h-5", "20px", "a pill, a keycap, an inline chip"],
+  ["--control-sm", "h-6", "24px", "a control inside a row or a cell"],
+  ["--control-md", "h-7", "28px", "the default — toolbars, rows, menus"],
+  ["--control-lg", "h-8", "32px", "a form field with its own label"],
+  ["--control-xl", "h-9", "36px", "a primary action on an empty page"],
 ] as const
 
 const RADII = [
-  ["rounded-sm", "4px", "controls: buttons, inputs, badges"],
-  ["rounded-md", "6px", "cards and rows"],
-  ["rounded-lg", "8px", "popovers and menus"],
-  ["rounded-xl", "12px", "dialogs"],
+  ["rounded-sm", "0.25rem", "a kbd, a swatch"],
+  ["rounded-md", "0.375rem", "nav rows, menu items"],
+  ["rounded-lg", "0.5rem", "the target box inside a block"],
+  ["rounded-xl", "0.75rem", "Panel, KpiStrip, DataTable, dialogs"],
+  ["rounded-2xl", "1rem", "an illustration card"],
+  ["rounded-full", "∞", "every button, pill, tag and filter"],
+] as const
+
+const LAYOUT = [
+  ["--sidebar-width", "14rem", "224px"],
+  ["--sidebar-width-collapsed", "3.25rem", "52px"],
+  ["--topbar-height", "2.75rem", "44px"],
+  ["--dock-width", "23.75rem", "380px"],
 ] as const
 
 function DensityFoundations() {
+  const { scale, setScale, reset } = useUiScale()
+
   return (
     <>
       <PageHeader
         title="Density"
-        description="A 4px grid, five control heights, four radii."
+        description="A rem grid on a 16px root, five control heights, six radii — and one multiplier that grows all of it."
       />
 
-      <Callout tone="warning">
-        The spacing multiplier is pinned to <code className="code">4px</code>,
-        not Tailwind&apos;s <code className="code">0.25rem</code>. At a 14px
-        root a rem-based multiplier makes every spacing utility 12.5% smaller
-        than its name implies — <code className="code">p-2</code> lands on 7px
-        and <code className="code">size-4</code> on 14px — which puts hairlines
-        on half-pixel boundaries where they render as two grey lines.
+      <Callout tone="info">
+        The root is <code className="code">calc(16px * var(--ui-scale))</code>{" "}
+        and <code className="code">--spacing</code> is Tailwind&apos;s{" "}
+        <code className="code">0.25rem</code>. At scale 1 every value below is
+        an integer; at 1.15 the layout goes fractional while hairlines stay 1px,
+        which is the same trade the reference ships. The alternative —{" "}
+        <code className="code">zoom</code> on the root — breaks shared-layout
+        measurements and popover positioning.
       </Callout>
 
       <Specimen
+        title="Interface scale"
+        note="This is the answer to 'the rows are too tight'. Drag it and watch every specimen on this page, the sidebar and the topbar grow together. Persisted per browser; ⌘⌥= / ⌘⌥- / ⌘⌥0 from anywhere in the app."
+      >
+        <div className="flex w-full flex-col gap-3">
+          <div className="flex items-center gap-3">
+            <input
+              type="range"
+              min={UI_SCALE_MIN}
+              max={UI_SCALE_MAX}
+              step={0.05}
+              value={scale}
+              onChange={(e) => setScale(Number(e.target.value))}
+              aria-label="Interface scale"
+              className="w-56 accent-foreground"
+            />
+            <span className="w-12 text-xs tnum">
+              {Math.round(scale * 100)}%
+            </span>
+            <Button variant="ghost" size="xs" onClick={reset}>
+              Reset
+            </Button>
+          </div>
+          <Panel
+            title="A panel at the current scale"
+            subtitle="Everything in here is rem"
+            bodyClassName="flex items-center gap-2 pt-2"
+          >
+            <Button size="sm">Action</Button>
+            <Input size="sm" placeholder="Search" className="w-32" />
+            <Tag hue="indigo">Design</Tag>
+            <Kbd>⌘K</Kbd>
+          </Panel>
+        </div>
+      </Specimen>
+
+      <Specimen
         title="Control heights"
-        note="md is the default. Anything that is not a control — a top bar, a rail — is a named layout constant, not a step on this ladder."
+        note="md — 28px — is the default: a nav row, a toolbar pill, a menu item and a table row all share it. Anything that is not a control is a named layout constant, not a step on this ladder."
       >
         <div className="w-full">
-          {CONTROLS.map(([token, px, use]) => (
+          {CONTROLS.map(([token, cls, px, use]) => (
             <TokenRow key={token} name={token} value={use}>
-              <span
-                className="rounded-sm bg-element-emphasis"
-                style={{ height: px, width: "48px" }}
-              />
+              <span className={`w-12 rounded-sm bg-element-emphasis ${cls}`} />
               <span className="pl-2 caption tnum">{px}</span>
             </TokenRow>
           ))}
@@ -60,49 +109,45 @@ function DensityFoundations() {
       </Specimen>
 
       <Specimen title="Buttons at every size">
-        <Sample label="xs">
-          <Button size="xs">Action</Button>
-        </Sample>
-        <Sample label="sm">
-          <Button size="sm">Action</Button>
-        </Sample>
-        <Sample label="md">
-          <Button size="md">Action</Button>
-        </Sample>
-        <Sample label="lg">
-          <Button size="lg">Action</Button>
-        </Sample>
-        <Sample label="xl">
-          <Button size="xl">Action</Button>
-        </Sample>
+        {(["xs", "sm", "md", "lg", "xl"] as const).map((size) => (
+          <Sample key={size} label={size}>
+            <Button size={size}>Action</Button>
+          </Sample>
+        ))}
       </Specimen>
 
       <Specimen title="Inputs at every size">
-        <Sample label="xs">
-          <Input size="xs" placeholder="Search" className="w-32" />
-        </Sample>
-        <Sample label="sm">
-          <Input size="sm" placeholder="Search" className="w-32" />
-        </Sample>
-        <Sample label="md">
-          <Input size="md" placeholder="Search" className="w-32" />
-        </Sample>
-        <Sample label="lg">
-          <Input size="lg" placeholder="Search" className="w-32" />
-        </Sample>
+        {(["xs", "sm", "md", "lg"] as const).map((size) => (
+          <Sample key={size} label={size}>
+            <Input size={size} placeholder="Search" className="w-32" />
+          </Sample>
+        ))}
       </Specimen>
 
       <Specimen
         title="Radius"
-        note="Four steps derived from one theme value, so a theme that wants a rounder look moves all four at once. The rule is size-ordered: the bigger the surface, the rounder its corner."
+        note="Size-ordered: the bigger the surface, the rounder its corner. Controls are the exception — everything you press is a full pill, which is what separates an action from a container at a glance."
       >
         <div className="w-full">
-          {RADII.map(([cls, px, use]) => (
+          {RADII.map(([cls, rem, use]) => (
             <TokenRow key={cls} name={cls} value={use}>
               <span
-                className={`size-8 border border-border-strong bg-card ${cls}`}
+                className={`size-8 bg-card ring-1 ring-foreground/15 ${cls}`}
               />
-              <span className="pl-2 caption tnum">{px}</span>
+              <span className="pl-2 caption tnum">{rem}</span>
+            </TokenRow>
+          ))}
+        </div>
+      </Specimen>
+
+      <Specimen
+        title="Layout constants"
+        note="The four widths the shell is built from. Rem, so the rail and the dock grow with the type they hold."
+      >
+        <div className="w-full">
+          {LAYOUT.map(([token, rem, px]) => (
+            <TokenRow key={token} name={token} value={`${px} at scale 1`}>
+              <span className="mono text-xs tnum">{rem}</span>
             </TokenRow>
           ))}
         </div>

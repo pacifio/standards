@@ -72,27 +72,49 @@ function OrgMark({
   )
 }
 
-function OrgSwitcher({ className }: { className?: string }) {
+function OrgSwitcher({
+  className,
+  collapsed = false,
+}: {
+  className?: string
+  collapsed?: boolean
+}) {
   const { org, orgs, user, setOrg } = useOrg()
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
+        aria-label={collapsed ? org.name : undefined}
         className={cn(
-          "flex h-control-md min-w-0 flex-1 items-center gap-1.5 rounded-md px-1.5",
-          "text-xs font-semibold text-foreground select-none",
+          "flex h-8 w-full min-w-0 items-center gap-2 rounded-md px-1",
+          "text-left select-none",
           "duration-fast transition-colors ease-out-strong",
-          "hover:bg-element-hover data-popup-open:bg-element-active",
+          "hover:bg-sidebar-accent data-popup-open:bg-sidebar-accent",
+          collapsed && "justify-center px-0",
           className
         )}
       >
-        <OrgMark initials={org.initials} />
-        <span className="truncate">{org.name}</span>
-        <Icon
-          icon={ChevronsUpDownIcon}
-          size="xs"
-          className="text-muted-foreground"
+        <OrgMark
+          initials={org.initials}
+          className="size-6 rounded-md text-3xs"
         />
+        {!collapsed && (
+          <>
+            <span className="flex min-w-0 flex-1 flex-col">
+              <span className="truncate text-xs font-medium text-foreground">
+                {org.name}
+              </span>
+              <span className="truncate text-3xs text-muted-foreground">
+                {org.memberCount} members
+              </span>
+            </span>
+            <Icon
+              icon={ChevronsUpDownIcon}
+              size="xs"
+              className="text-muted-foreground"
+            />
+          </>
+        )}
       </DropdownMenuTrigger>
 
       <DropdownMenuContent className="w-60" sideOffset={4}>

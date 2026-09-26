@@ -3,10 +3,11 @@ import { createFileRoute } from "@tanstack/react-router"
 import { PageHeader } from "@/components/patterns/section-header"
 import { Specimen, TokenRow } from "@/components/gallery/specimen"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import { Callout } from "@/components/ui/callout"
-import { LabelChip } from "@/components/ui/label-chip"
-import { CURSOR_LIGHT, LINEAR_DARK } from "@/components/gallery/measured"
+import { HueDot, Tag } from "@/components/ui/tag"
 import { PriorityIcon, StatusIcon } from "@/components/ui/status-icon"
+import { HUES, hueFor } from "@/lib/hue"
 
 export const Route = createFileRoute("/ds/foundations/colour")({
   component: ColourFoundations,
@@ -15,45 +16,40 @@ export const Route = createFileRoute("/ds/foundations/colour")({
 function Swatch({ className }: { className: string }) {
   return (
     <span
-      className={`size-8 rounded-md border border-border-subtle ${className}`}
+      className={`size-8 rounded-md ring-1 ring-foreground/10 ${className}`}
     />
   )
 }
 
+// Dark lightness first, light second. Chroma is 0 on every step.
 const SURFACES = [
-  ["--sidebar", "bg-sidebar", "the navigation plane, behind everything"],
-  ["--background", "bg-background", "the page"],
-  ["--card", "bg-card", "a raised block: a row card, a settings card"],
-  ["--popover", "bg-popover", "floating: menus, dialogs, tooltips"],
-  [
-    "--atlas-panel-input-background",
-    "bg-panel-input",
-    "a recessed well: an input",
-  ],
+  ["--background", "bg-background", "0.08 · 0.985", "the page"],
+  ["--surface", "bg-surface", "0.10 · 0.975", "sidebar, dock, input wells"],
+  ["--card", "bg-card", "0.12 · 1.00", "Panel, KpiStrip, DataTable"],
+  ["--illustration", "bg-illustration", "0.13 · 1.00", "a card inside a card"],
+  ["--muted", "bg-muted", "0.15 · 0.962", "hover on a card, a kbd"],
+  ["--popover", "bg-popover", "0.17 · 1.00", "menus, dialogs, tooltips"],
 ] as const
 
 const OVERLAYS = [
-  ["--atlas-element-hover", "bg-element-hover", "foreground at 5%"],
-  ["--atlas-element-selected", "bg-element-selected", "foreground at 8%"],
-  ["--atlas-element-active", "bg-element-active", "foreground at 11%"],
-  ["--atlas-element-emphasis", "bg-element-emphasis", "foreground at 16%"],
+  ["--element-hover", "bg-element-hover", "foreground at 5%"],
+  ["--element-selected", "bg-element-selected", "foreground at 8%"],
+  ["--element-active", "bg-element-active", "foreground at 11%"],
+  ["--element-emphasis", "bg-element-emphasis", "foreground at 16%"],
 ] as const
 
 const BORDERS = [
-  ["--atlas-border-subtle", "bg-border-subtle", "inside a card"],
-  ["--border", "bg-border", "the edge of a card"],
-  ["--atlas-border-strong", "bg-border-strong", "a focused input"],
+  ["--hairline", "bg-hairline", "6% · 7% — a rule INSIDE content"],
+  ["--border", "bg-border", "8% · 9% — the edge of a thing"],
+  ["--border-strong", "bg-border-strong", "16% · 18% — a focused input"],
+  ["ring-foreground/10", "bg-foreground/10", "the ring on every raised block"],
 ] as const
 
-const LABELS = [
-  ["grey", "bg-label-grey"],
-  ["indigo", "bg-label-indigo"],
-  ["purple", "bg-label-purple"],
-  ["cyan", "bg-label-cyan"],
-  ["green", "bg-label-green"],
-  ["amber", "bg-label-amber"],
-  ["orange", "bg-label-orange"],
-  ["red", "bg-label-red"],
+const STATUS = [
+  ["--success", "bg-success", "bg-success-muted", "live, synced"],
+  ["--warning", "bg-warning", "bg-warning-muted", "restricted, preview rate"],
+  ["--error", "bg-error", "bg-error-muted", "failed, destructive"],
+  ["--info", "bg-info", "bg-info-muted", "a note, nothing more"],
 ] as const
 
 function ColourFoundations() {
@@ -61,37 +57,58 @@ function ColourFoundations() {
     <>
       <PageHeader
         title="Colour"
-        description="Measured from Linear's dark chrome and Cursor's light neutrals."
+        description="Achromatic OKLCH. Six surface steps, one inverted primary, chroma only where something has an identity or a state."
       />
 
       <Callout tone="info">
-        Every value here was sampled from screenshots of the reference apps, not
-        recalled — a colour histogram plus scanlines to find the column edges
-        and hairlines. The raw measurements are listed at the bottom of this
-        page.
+        Every colour is OKLCH with zero chroma unless it is a status or a hue.
+        The token layer is the only place a colour literal may appear — the
+        ratchet fails the build on an OKLCH, a colour-mix or a hex value in a
+        component.
       </Callout>
 
       <Specimen
         title="Surfaces"
-        note="The rail is DARKER than the canvas. The content is a lit plane in front of a recessed rail — inverting that, a lighter rail beside a black canvas, is what makes an app read as a terminal rather than a product. Note also that neither reference uses a true black canvas: with nothing below it to recess into, the ramp runs out after two steps."
+        note="A monotonic ramp: every step 'up' is lighter in dark mode. The sidebar sits one step BELOW the page and the card one step above, so the content is a lit plane between a recessed rail and floating menus. In light the ramp saturates at white after the card, and hierarchy is carried by the ring and the two shadow rungs instead."
       >
         <div className="w-full">
-          {SURFACES.map(([token, cls, note]) => (
+          {SURFACES.map(([token, cls, l, note]) => (
             <TokenRow key={token} name={token} value={note}>
               <Swatch className={cls} />
+              <span className="pl-2 mono text-3xs text-muted-foreground tnum">
+                L {l}
+              </span>
             </TokenRow>
           ))}
         </div>
       </Specimen>
 
       <Specimen
+        title="The primary is the foreground, inverted"
+        note="There is no brand hue in the chrome. The one thing to click is the one thing printed in the opposite colour — white on dark, black on light — which is louder than any accent could be against an achromatic field. Focus is the foreground at 40%; selection at 22%."
+      >
+        <div className="flex flex-wrap items-center gap-3">
+          <Swatch className="bg-primary" />
+          <Button variant="default">Primary</Button>
+          <Button variant="outline">Outline</Button>
+          <Button variant="secondary">Secondary</Button>
+          <span className="rounded-sm px-1 text-xs ring-1 ring-ring">
+            focus
+          </span>
+          <span className="bg-selection rounded-sm px-1 text-xs">
+            selection
+          </span>
+        </div>
+      </Specimen>
+
+      <Specimen
         title="Element states"
-        note="Derived as the appearance's own foreground at an alpha, which is why they invert for free: white at 5% over the dark canvas becomes black at 5% over the light one, with no second set of values to keep in sync."
+        note="The appearance's own foreground at an alpha, so they invert for free and stack correctly on any surface step."
       >
         <div className="w-full">
           {OVERLAYS.map(([token, cls, note]) => (
             <TokenRow key={token} name={token} value={note}>
-              <span className="flex size-8 items-center justify-center rounded-md bg-card">
+              <span className="flex size-8 items-center justify-center rounded-md bg-card ring-1 ring-foreground/10">
                 <span className={`size-6 rounded-sm ${cls}`} />
               </span>
             </TokenRow>
@@ -100,8 +117,8 @@ function ColourFoundations() {
       </Specimen>
 
       <Specimen
-        title="Borders"
-        note="Three strengths, one hairline weight. The system is border-defined: if two things need separating, the answer is almost always a 1px rule, not a shadow and not a gap."
+        title="Rules and rings"
+        note="Two border tokens, because a rule inside a card must read lighter than the edge of the card. Elevation is a ring, never a shadow: only a menu and a dialog cast, because they float over content they are not part of."
       >
         <div className="w-full">
           {BORDERS.map(([token, cls, note]) => (
@@ -113,25 +130,18 @@ function ColourFoundations() {
       </Specimen>
 
       <Specimen
-        title="The action colour"
-        note="A real accent — primary buttons, focus rings, selection and the Done glyph all use it. An earlier version of this system set --primary to pure white and wrote a no-brand-hue rule into the token layer; that is not what either reference does, and it left the app with no way to say which thing to click."
-      >
-        <div className="flex items-center gap-3">
-          <Swatch className="bg-primary" />
-          <div className="flex flex-col gap-0.5">
-            <code className="code">--primary</code>
-            <span className="caption">
-              buttons, focus, selection · hover --atlas-primary-hover
-            </span>
-          </div>
-        </div>
-      </Specimen>
-
-      <Specimen
         title="Status"
-        note="Saturated on purpose. These render as 14px glyphs, and a desaturated sage green simply disappears at that size. Status is a state that changes: queued, running, done, failed."
+        note="The only chroma that means something. Four inks, each with a `-muted` fill mixed into transparent for badges and pills. Done is NOT a status colour — a finished session is an achromatic filled check, because finishing is the normal case and should not glow."
       >
-        <div className="flex w-full flex-col gap-3">
+        <div className="flex w-full flex-col gap-4">
+          <div className="w-full">
+            {STATUS.map(([token, ink, muted, note]) => (
+              <TokenRow key={token} name={token} value={note}>
+                <Swatch className={ink} />
+                <Swatch className={muted} />
+              </TokenRow>
+            ))}
+          </div>
           <div className="flex items-center gap-4">
             {(["queued", "live", "done", "failed"] as const).map((s) => (
               <span key={s} className="flex items-center gap-1.5">
@@ -161,54 +171,40 @@ function ColourFoundations() {
       </Specimen>
 
       <Specimen
-        title="Labels"
-        note="A separate palette from status, because a label is an IDENTITY, not a state. `purple` means 'the Design label', not 'informational'. Keeping the two vocabularies apart is what stops a label inheriting a meaning it does not have the moment someone renames it. Eight hues, each still distinguishable as a 6px dot."
+        title="Hues"
+        note="Eight hues for IDENTITY — labels, projects, agents, roles. `purple` means 'the Design label', never 'informational'. A tag is the hue mixed into transparent at --tag-bg-mix for the fill and --tag-border-mix for the edge, so the same eight numbers produce both themes. `hueFor(id)` hashes any key onto the ring so an entity keeps its colour across screens."
       >
         <div className="flex w-full flex-col gap-3">
           <div className="flex flex-wrap items-center gap-1.5">
-            {LABELS.map(([tone]) => (
-              <LabelChip key={tone} tone={tone}>
-                {tone}
-              </LabelChip>
+            {HUES.map((hue) => (
+              <Tag key={hue} hue={hue}>
+                {hue}
+              </Tag>
+            ))}
+          </div>
+          <div className="flex flex-wrap items-center gap-1.5">
+            {HUES.map((hue) => (
+              <Tag key={hue} hue={hue} dot>
+                {hue}
+              </Tag>
             ))}
           </div>
           <div className="w-full">
-            {LABELS.map(([tone, cls]) => (
-              <TokenRow key={tone} name={`--atlas-label-${tone}`}>
-                <span className={`size-4 rounded-full ${cls}`} />
+            {HUES.map((hue) => (
+              <TokenRow key={hue} name={`--hue-${hue}`} value={`.tag-${hue}`}>
+                <HueDot hue={hue} />
               </TokenRow>
             ))}
           </div>
-        </div>
-      </Specimen>
-
-      <Specimen
-        title="Provenance"
-        note="The sampled values themes.css was derived from. Everything above is a token; this is the evidence behind it."
-      >
-        <div className="grid w-full gap-6 sm:grid-cols-2">
-          {[
-            ["Linear · dark", LINEAR_DARK],
-            ["Cursor · light", CURSOR_LIGHT],
-          ].map(([title, rows]) => (
-            <div key={title as string} className="flex flex-col gap-1">
-              <p className="pb-1 eyebrow">{title as string}</p>
-              {(rows as typeof LINEAR_DARK).map((m) => (
-                <div key={m.role} className="flex items-center gap-2">
-                  <span
-                    aria-hidden="true"
-                    className="size-3.5 shrink-0 rounded-sm border border-border-subtle"
-                    style={{ background: m.value }}
-                  />
-                  <code className="w-20 shrink-0 code">{m.value}</code>
-                  <span className="text-2xs text-secondary-foreground">
-                    {m.role}
-                  </span>
-                  <span className="ml-auto truncate caption">{m.note}</span>
-                </div>
-              ))}
-            </div>
-          ))}
+          <div className="flex flex-wrap items-center gap-1.5">
+            {["atlas", "server", "standards", "atlas-theme", "docs"].map(
+              (k) => (
+                <Tag key={k} hue={hueFor(k)} dot>
+                  hueFor(&quot;{k}&quot;)
+                </Tag>
+              )
+            )}
+          </div>
         </div>
       </Specimen>
 

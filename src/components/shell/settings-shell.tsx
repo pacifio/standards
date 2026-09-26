@@ -14,27 +14,17 @@ import { cn } from "cn"
 
 import { useOrg } from "@/lib/org-context"
 import { Icon } from "@/components/ui/icon"
+import { ScrollFade } from "@/components/ui/scroll-fade"
 import { OrgMark } from "./org-switcher"
 
 /**
- * Settings gets its own chrome.
- *
- * The current app renders all five settings panels as `<Tabs>` on
- * `/dashboard`, with `defaultValue="org"` and no URL binding — so a tab cannot
- * be linked to, bookmarked, or returned to after a reload, and the five panels
- * fight for one page's worth of width.
- *
- * Linear's answer is that settings is a MODE, not a page: you leave the app,
- * with an explicit way back. That buys a grouped nav on the left, real URLs
- * per section, and a narrow measured column for the content — settings is
- * mostly prose and single controls, and prose at 1200px is unreadable.
+ * Settings is a MODE, not a page: you leave the app, with an explicit way
+ * back. Same rail material as the app shell — `bg-sidebar`, hairline seam,
+ * `.micro` group labels, 28px rows — so it reads as the same product with
+ * a different table of contents.
  */
 
-export type SettingsNavItem = {
-  label: string
-  to: string
-  icon: LucideIcon
-}
+export type SettingsNavItem = { label: string; to: string; icon: LucideIcon }
 
 const WORKSPACE_NAV: Array<SettingsNavItem> = [
   {
@@ -51,80 +41,89 @@ const ACCOUNT_NAV: Array<SettingsNavItem> = [
   { label: "Privacy", to: "/mock/settings/privacy", icon: ShieldIcon },
 ]
 
-function NavGroup({
-  title,
+/** A 28px rail row. Shared with the gallery nav. */
+function RailLink({
+  to,
+  icon: Glyph,
+  children,
+}: {
+  to: string
+  icon?: LucideIcon
+  children: React.ReactNode
+}) {
+  return (
+    <Link
+      to={to as never}
+      className={cn(
+        "group/item flex h-7 items-center gap-2 rounded-md px-2 text-2xs",
+        "duration-fast transition-colors ease-out-strong",
+        "text-muted-foreground hover:bg-sidebar-accent hover:text-foreground",
+        "aria-[current=page]:bg-sidebar-accent aria-[current=page]:font-medium aria-[current=page]:text-foreground"
+      )}
+    >
+      {Glyph && <Icon icon={Glyph} size="sm" />}
+      <span className="truncate">{children}</span>
+    </Link>
+  )
+}
+
+function RailGroup({
+  label,
   items,
 }: {
-  title: string
+  label: string
   items: Array<SettingsNavItem>
 }) {
   return (
-    <div className="flex flex-col gap-px pt-4 first:pt-0">
-      <p className="px-2 pb-1 eyebrow">{title}</p>
-      {items.map((item) => (
-        <Link
-          key={item.to}
-          to={item.to as never}
-          className={cn(
-            "group/item flex h-control-md items-center gap-2 rounded-md px-2",
-            "text-xs font-medium text-secondary-foreground",
-            "duration-fast transition-colors ease-out-strong",
-            "hover:bg-element-hover hover:text-foreground",
-            "aria-[current=page]:bg-element-selected aria-[current=page]:text-foreground"
-          )}
-        >
-          <Icon
-            icon={item.icon}
-            size="sm"
-            className="text-muted-foreground group-aria-[current=page]/item:text-foreground"
-          />
-          {item.label}
-        </Link>
-      ))}
+    <div className="mb-3">
+      <div className="px-2 pb-1.5 micro">{label}</div>
+      <ul className="space-y-px">
+        {items.map((item) => (
+          <li key={item.to}>
+            <RailLink to={item.to} icon={item.icon}>
+              {item.label}
+            </RailLink>
+          </li>
+        ))}
+      </ul>
     </div>
   )
 }
 
 function SettingsShell({ children }: { children: React.ReactNode }) {
   const { org } = useOrg()
-
   return (
-    <div className="flex h-svh overflow-hidden bg-sidebar">
+    <div className="flex h-svh w-full overflow-hidden bg-background">
       <nav
         aria-label="Settings"
         data-panel=""
-        className="flex w-settings-nav shrink-0 flex-col gap-1 overflow-y-auto p-2"
+        className="flex w-settings-nav shrink-0 flex-col border-r border-sidebar-border bg-sidebar"
       >
-        {/* The way back. Settings is a mode you are inside of, so leaving it
-            has to be the first thing in the rail, not a browser-back gamble. */}
-        <Link
-          to="/mock/inbox"
-          className={cn(
-            "flex h-control-md items-center gap-2 rounded-md px-2",
-            "text-xs font-medium text-secondary-foreground",
-            "duration-fast transition-colors ease-out-strong hover:bg-element-hover hover:text-foreground"
-          )}
-        >
-          <Icon icon={ArrowLeftIcon} size="sm" />
-          Back to app
-        </Link>
-
-        <div className="flex items-center gap-2 px-2 py-3">
-          <OrgMark initials={org.initials} />
-          <span className="truncate text-xs font-semibold">{org.name}</span>
+        <div className="p-2">
+          <RailLink to="/mock/inbox" icon={ArrowLeftIcon}>
+            Back to app
+          </RailLink>
         </div>
-
-        <NavGroup title="Workspace" items={WORKSPACE_NAV} />
-        <NavGroup title="Account" items={ACCOUNT_NAV} />
+        <div className="flex items-center gap-2 px-3 pb-3">
+          <OrgMark
+            initials={org.initials}
+            className="size-6 rounded-md text-3xs"
+          />
+          <span className="truncate text-xs font-medium">{org.name}</span>
+        </div>
+        <ScrollFade fade={24} className="min-h-0 flex-1 px-2 pb-2">
+          <RailGroup label="Workspace" items={WORKSPACE_NAV} />
+          <RailGroup label="Account" items={ACCOUNT_NAV} />
+        </ScrollFade>
       </nav>
 
-      <main className="m-2 ml-0 flex min-w-0 flex-1 flex-col overflow-y-auto rounded-lg border border-border bg-background">
-        <div className="mx-auto w-full max-w-settings px-6 py-10">
+      <ScrollFade className="min-h-0 flex-1">
+        <div className="mx-auto w-full max-w-settings px-5 py-6">
           {children}
         </div>
-      </main>
+      </ScrollFade>
     </div>
   )
 }
 
-export { SettingsShell }
+export { RailGroup, RailLink, SettingsShell }

@@ -1,7 +1,9 @@
 import { Link, Outlet, createFileRoute } from "@tanstack/react-router"
-import { cn } from "cn"
 
 import { ThemeToggle } from "@/components/shell/app-shell"
+import { RailLink } from "@/components/shell/settings-shell"
+import { UiScaleControl } from "@/components/shell/ui-scale"
+import { ScrollFade } from "@/components/ui/scroll-fade"
 import { TooltipProvider } from "@/components/ui/tooltip"
 
 export const Route = createFileRoute("/ds")({ component: GalleryLayout })
@@ -27,70 +29,62 @@ const NAV = [
     ],
   },
   {
-    group: "Patterns",
+    group: "Compositions",
     items: [
       { label: "Patterns", to: "/ds/patterns" },
+      { label: "Blocks", to: "/ds/blocks" },
       { label: "Sign in", to: "/mock/login" },
     ],
   },
 ]
 
 /**
- * The design-system gallery.
- *
- * Separate from /mock on purpose. The mock proves the system composes into a
- * product; the gallery proves each part is complete — every variant, every
- * size, every state, in both appearances. A component that only exists inside
- * a screen has never had its disabled state looked at.
+ * The gallery. Same rail material as the app so a regression in the rail
+ * shows up in the page that documents it.
  */
 function GalleryLayout() {
   return (
     <TooltipProvider>
-      <div className="flex h-svh overflow-hidden bg-sidebar">
+      <div className="flex h-svh w-full overflow-hidden bg-background">
         <nav
           aria-label="Design system"
-          className="flex w-settings-nav shrink-0 flex-col gap-1 overflow-y-auto p-2"
+          className="flex w-settings-nav shrink-0 flex-col border-r border-sidebar-border bg-sidebar"
         >
-          <div className="flex h-topbar items-center justify-between px-2">
+          <div className="flex h-topbar items-center justify-between px-3">
             <span className="text-xs font-semibold">Atlas Standards</span>
             <ThemeToggle />
           </div>
-
-          <Link
-            to="/mock/inbox"
-            className="duration-fast flex h-control-md items-center rounded-md px-2 text-xs font-medium text-secondary-foreground transition-colors hover:bg-element-hover hover:text-foreground"
-          >
-            Open the app mock →
-          </Link>
-
-          {NAV.map((section) => (
-            <div key={section.group} className="flex flex-col gap-px pt-4">
-              <p className="px-2 pb-1 eyebrow">{section.group}</p>
-              {section.items.map((item) => (
-                <Link
-                  key={item.to}
-                  to={item.to as never}
-                  className={cn(
-                    "flex h-control-md items-center rounded-md px-2",
-                    "text-xs font-medium text-secondary-foreground",
-                    "duration-fast transition-colors ease-out-strong",
-                    "hover:bg-element-hover hover:text-foreground",
-                    "aria-[current=page]:bg-element-selected aria-[current=page]:text-foreground"
-                  )}
-                >
-                  {item.label}
-                </Link>
-              ))}
-            </div>
-          ))}
+          <div className="px-2 pb-2">
+            <RailLink to="/mock/inbox">Open the app mock →</RailLink>
+          </div>
+          <ScrollFade fade={24} className="min-h-0 flex-1 px-2 pb-2">
+            {NAV.map((section) => (
+              <div key={section.group} className="mb-3">
+                <div className="px-2 pb-1.5 micro">{section.group}</div>
+                <ul className="space-y-px">
+                  {section.items.map((item) => (
+                    <li key={item.to}>
+                      <RailLink to={item.to}>{item.label}</RailLink>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </ScrollFade>
+          <div className="flex items-center gap-1 border-t border-sidebar-border p-2">
+            <UiScaleControl />
+          </div>
         </nav>
 
-        <main className="m-2 ml-0 flex min-w-0 flex-1 flex-col overflow-y-auto rounded-lg border border-border bg-background">
-          <div className="mx-auto w-full max-w-3xl px-8 py-10">
+        <ScrollFade className="min-h-0 flex-1">
+          <div className="mx-auto w-full max-w-3xl px-8 py-8">
             <Outlet />
           </div>
-        </main>
+        </ScrollFade>
       </div>
     </TooltipProvider>
   )
 }
+
+// Keep `Link` referenced so the route-tree types stay wired for this file.
+void Link

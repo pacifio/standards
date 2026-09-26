@@ -44,7 +44,7 @@ function ListPane({
       data-panel=""
       data-width={width}
       className={cn(
-        "flex flex-col border-r border-border-subtle",
+        "flex flex-col border-r border-hairline",
         width === "narrow" && "w-list-pane shrink-0",
         width === "wide" && "min-w-0 flex-1",
         // Below lg the detail pane takes the whole width and the list is a
@@ -71,8 +71,7 @@ function DetailPane({
       className={cn(
         "flex flex-col max-lg:hidden",
         width === "fill" && "min-w-0 flex-1",
-        width === "companion" &&
-          "w-companion shrink-0 border-l border-border-subtle",
+        width === "companion" && "w-dock shrink-0 border-l border-hairline",
         className
       )}
       {...props}
@@ -87,7 +86,7 @@ function PropertiesPane({ className, ...props }: React.ComponentProps<"div">) {
       data-slot="properties-pane"
       data-panel=""
       className={cn(
-        "flex w-properties shrink-0 flex-col gap-4 overflow-y-auto border-l border-border-subtle p-3 max-xl:hidden",
+        "flex w-properties shrink-0 flex-col gap-4 overflow-y-auto border-l border-hairline p-3 max-xl:hidden",
         className
       )}
       {...props}

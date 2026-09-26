@@ -10,14 +10,14 @@ import { cn } from "cn"
  * global `:focus-visible` outline is the keyboard affordance, and an input
  * that gains BOTH a ring and a brighter border reads as two states at once.
  *
- * The fill is `bg-panel-input`, one step darker than the surface it sits on in
+ * The fill is `bg-surface`, one step darker than the surface it sits on in
  * dark and one step lighter in light. That inset reading is what says "you can
  * type here" without a heavier border.
  */
 
 const inputVariants = cva(
   [
-    "w-full min-w-0 rounded-sm border border-input bg-panel-input text-foreground",
+    "w-full min-w-0 rounded-md border border-input bg-surface text-foreground",
     "duration-fast transition-colors ease-out-strong",
     "placeholder:text-muted-foreground",
     "focus:border-border-strong",

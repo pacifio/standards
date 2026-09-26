@@ -69,9 +69,9 @@ function OverlaysGallery() {
       />
 
       <Callout tone="info">
-        Every floating surface is the same material: popover fill, 1px border,{" "}
-        <code className="code">shadow-md</code>, and a 150ms scale-in from its
-        own transform origin. Only dialogs step up to{" "}
+        Every floating surface is the same material: popover fill, a
+        foreground/10 ring, <code className="code">shadow-md</code>, and a 150ms
+        scale-in from its own transform origin. Only dialogs step up to{" "}
         <code className="code">shadow-lg</code> and a 12px radius.
       </Callout>
 

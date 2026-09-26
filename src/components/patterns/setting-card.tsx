@@ -25,7 +25,7 @@ function SettingCard({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="setting-card"
       className={cn(
-        "divide-y divide-border-subtle overflow-hidden rounded-md border border-border bg-card",
+        "divide-y divide-hairline overflow-hidden rounded-xl bg-card ring-1 ring-foreground/10",
         className
       )}
       {...props}
@@ -53,10 +53,7 @@ function SettingRow({
   return (
     <div
       data-slot="setting-row"
-      className={cn(
-        "min-h-control-xl flex items-center gap-3 px-3 py-2.5",
-        className
-      )}
+      className={cn("flex min-h-9 items-center gap-3 px-3 py-2", className)}
       {...props}
     >
       {icon && <Icon icon={icon} size="sm" className="text-muted-foreground" />}
@@ -92,7 +89,7 @@ function DrillInRow({
       type="button"
       data-slot="drill-in-row"
       className={cn(
-        "min-h-control-xl flex w-full items-center gap-3 px-3 py-2.5 text-left",
+        "flex min-h-9 w-full items-center gap-3 px-3 py-2 text-left",
         "duration-fast transition-colors ease-out-strong hover:bg-element-hover",
         className
       )}

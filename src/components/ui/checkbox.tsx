@@ -11,7 +11,7 @@ function Checkbox({ className, ...props }: CheckboxPrimitive.Root.Props) {
       data-slot="checkbox"
       className={cn(
         "peer relative flex size-3.5 shrink-0 items-center justify-center",
-        "rounded-sm border border-input bg-panel-input",
+        "rounded-sm border border-input bg-surface",
         "duration-fast transition-colors ease-out-strong",
         // Widen the hit target without widening the box.
         "after:absolute after:-inset-x-2 after:-inset-y-2",

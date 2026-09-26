@@ -1,6 +1,17 @@
+import { lazy, Suspense } from "react"
+import { ClientOnly } from "@tanstack/react-router"
 import { cn } from "cn"
 
+import { DashedRails } from "@/components/blocks/dashed-rails"
+import { PlusCorners } from "@/components/blocks/plus-decorator"
 import { DitherField } from "@/components/ui/dither-field"
+
+// three + fiber load only on the client, only for this screen.
+const RevealWaveImage = lazy(() =>
+  import("@/components/blocks/reveal-wave-image").then((m) => ({
+    default: m.RevealWaveImage,
+  }))
+)
 
 /**
  * The two-pane authentication layout.
@@ -41,11 +52,17 @@ function AuthSplit({
 }) {
   return (
     <div className="flex h-svh overflow-hidden bg-background">
-      <div className="flex min-w-0 flex-1 flex-col px-6 py-8">
+      <div className="relative flex min-w-0 flex-1 flex-col px-6 py-8">
+        <DashedRails fade />
         <div className="flex h-8 shrink-0 items-center">{back}</div>
 
         <div className="flex w-full flex-1 items-center justify-center">
-          <div className="flex w-full max-w-72 flex-col gap-6">{children}</div>
+          {/* The form sits in a dashed drafting box with cross-hair corners:
+              natai's bento frame, at sign-in scale. */}
+          <div className="relative flex w-full max-w-88 flex-col gap-6 border border-dashed border-foreground/10 px-8 py-10">
+            <PlusCorners />
+            {children}
+          </div>
         </div>
 
         {/* Balances the back-link strip so the form sits on the true optical
@@ -53,21 +70,32 @@ function AuthSplit({
         <div aria-hidden="true" className="h-8 shrink-0" />
       </div>
 
-      <aside className="relative hidden w-1/2 shrink-0 overflow-hidden border-l border-border bg-sidebar lg:block">
+      <aside className="relative hidden w-1/2 shrink-0 overflow-hidden border-l border-hairline bg-surface lg:block">
         {/*
-          A tall, narrow pane has a long half-diagonal, so the default hollow
-          — tuned for the landing site's wide hero — pushes almost everything
-          off the edges. Pulling the start in and narrowing the ramp restores
-          the density the reference has.
-
-          The fade keeps the bottom clear: the hollow quiets the MIDDLE, which
-          is exactly where the content is not.
+          The shader forces the image to three grey levels in the theme's own
+          ink and paper; colour only returns inside the cursor. The canvas
+          dither stands in on the server and while three loads.
         */}
-        <DitherField
-          mode="glyphs"
-          hollow={[0.12, 0.42]}
-          className="field-fade-b"
-        />
+        <ClientOnly
+          fallback={<DitherField mode="glyphs" hollow={[0.12, 0.42]} />}
+        >
+          <Suspense
+            fallback={<DitherField mode="glyphs" hollow={[0.12, 0.42]} />}
+          >
+            <RevealWaveImage
+              src="/login/abstract.avif"
+              pixelSize={2}
+              waveSpeed={0.2}
+              waveFrequency={0.7}
+              waveAmplitude={0.5}
+              revealRadius={0.5}
+              revealSoftness={1}
+              mouseRadius={0.4}
+              className="absolute inset-0 h-full w-full"
+            />
+          </Suspense>
+        </ClientOnly>
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-64 bg-linear-to-t from-surface to-transparent" />
 
         <div className="absolute inset-0 flex flex-col justify-end p-10">
           <div className="flex flex-col gap-16">

@@ -57,11 +57,11 @@ function SelectTrigger({
       data-size={size}
       data-variant={variant}
       className={cn(
-        "flex w-fit items-center justify-between gap-1.5 rounded-sm px-2",
+        "flex w-fit items-center justify-between gap-1.5 rounded-md px-2",
         "text-xs whitespace-nowrap select-none",
         "duration-fast transition-colors ease-out-strong",
         "data-[size=lg]:h-control-lg data-[size=md]:h-control-md data-[size=sm]:h-control-sm",
-        "data-[variant=bordered]:border data-[variant=bordered]:border-input data-[variant=bordered]:bg-panel-input",
+        "data-[variant=bordered]:border data-[variant=bordered]:border-input data-[variant=bordered]:bg-surface",
         "data-[variant=bordered]:focus:border-border-strong",
         "data-[variant=ghost]:text-secondary-foreground data-[variant=ghost]:hover:bg-element-hover data-[variant=ghost]:hover:text-foreground",
         "data-popup-open:bg-element-active",

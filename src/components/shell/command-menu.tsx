@@ -84,7 +84,7 @@ function CommandMenu({
             // Sits high rather than centred: the results grow downward, and a
             // vertically-centred palette moves its own input as it filters.
             "fixed top-[18vh] left-1/2 z-modal w-full max-w-xl -translate-x-1/2",
-            "overflow-hidden rounded-xl bg-popover/85 glass-hud backdrop-blur-glass",
+            "glass-hud overflow-hidden rounded-xl bg-popover/85 backdrop-blur-glass",
             "data-open:animate-scale-in data-closed:animate-scale-out"
           )}
         >
@@ -92,7 +92,7 @@ function CommandMenu({
             Command menu
           </DialogPrimitive.Title>
 
-          <div className="flex h-control-xl items-center gap-2 border-b border-border-subtle px-3">
+          <div className="flex h-control-xl items-center gap-2 border-b border-hairline px-3">
             <Icon
               icon={SearchIcon}
               size="sm"
@@ -116,7 +116,7 @@ function CommandMenu({
             )}
             {groups.map(([group, items]) => (
               <div key={group} className="pb-1">
-                <p className="px-2 py-1.5 eyebrow">{group}</p>
+                <p className="px-2 py-1.5 micro">{group}</p>
                 {items.map((action) => (
                   <button
                     key={action.id}

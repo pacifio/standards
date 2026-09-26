@@ -47,7 +47,7 @@ function AlertDialogContent({
         className={cn(
           "fixed top-1/2 left-1/2 z-modal -translate-x-1/2 -translate-y-1/2",
           "flex w-full max-w-[min(26rem,calc(100vw-2rem))] flex-col gap-3 p-4",
-          "rounded-xl border border-border bg-card text-card-foreground shadow-lg outline-none",
+          "rounded-xl bg-popover text-popover-foreground shadow-lg ring-1 ring-foreground/10 outline-none",
           "data-open:animate-scale-in data-closed:animate-scale-out",
           className
         )}

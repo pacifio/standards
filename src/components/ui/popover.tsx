@@ -33,7 +33,7 @@ function PopoverContent({
           data-slot="popover-content"
           className={cn(
             "flex max-h-(--available-height) w-72 origin-(--transform-origin) flex-col gap-3",
-            "rounded-lg border border-border bg-popover p-3",
+            "rounded-lg bg-popover p-3 ring-1 ring-foreground/10",
             "text-xs text-popover-foreground shadow-md outline-none",
             "data-open:animate-scale-in data-closed:animate-scale-out",
             className

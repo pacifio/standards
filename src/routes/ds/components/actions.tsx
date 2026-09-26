@@ -126,7 +126,7 @@ function ActionsGallery() {
 
       <Specimen
         title="Badges"
-        note="Sentence case. Uppercase with tracking belongs to `eyebrow`, which labels a group — a badge that shouts is louder than the row it is describing."
+        note="Sentence case. Uppercase with tracking belongs to `micro`, which labels a group — a badge that shouts is louder than the row it is describing."
       >
         <Sample label="default">
           <Badge>Admin</Badge>

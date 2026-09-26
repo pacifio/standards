@@ -20,9 +20,9 @@ function Code({
       className={cn(
         "code",
         variant === "inline" &&
-          "rounded-sm border border-border-subtle bg-card px-1 py-px text-secondary-foreground",
+          "rounded-sm border border-hairline bg-card px-1 py-px text-secondary-foreground",
         variant === "block" &&
-          "block overflow-x-auto rounded-md border border-border bg-panel p-3 text-secondary-foreground",
+          "block overflow-x-auto rounded-md border border-border bg-surface p-3 text-secondary-foreground",
         className
       )}
       {...props}

@@ -109,7 +109,7 @@ function ComboboxContent({
           data-slot="combobox-content"
           data-chips={!!anchor}
           className={cn(
-            "group/combobox-content relative max-h-(--available-height) w-(--anchor-width) max-w-(--available-width) min-w-[calc(var(--anchor-width)+--spacing(7))] origin-(--transform-origin) overflow-hidden rounded-lg border border-border bg-popover text-popover-foreground shadow-md data-[chips=true]:min-w-(--anchor-width) *:data-[slot=input-group]:m-1 *:data-[slot=input-group]:mb-0 *:data-[slot=input-group]:h-control-md *:data-[slot=input-group]:border-none *:data-[slot=input-group]:bg-panel-input *:data-[slot=input-group]:shadow-none",
+            "group/combobox-content relative max-h-(--available-height) w-(--anchor-width) max-w-(--available-width) min-w-[calc(var(--anchor-width)+--spacing(7))] origin-(--transform-origin) overflow-hidden rounded-lg border border-border bg-popover text-popover-foreground shadow-md data-[chips=true]:min-w-(--anchor-width) *:data-[slot=input-group]:m-1 *:data-[slot=input-group]:mb-0 *:data-[slot=input-group]:h-control-md *:data-[slot=input-group]:border-none *:data-[slot=input-group]:bg-surface *:data-[slot=input-group]:shadow-none",
             className
           )}
           {...props}
@@ -222,7 +222,7 @@ function ComboboxChips({
     <ComboboxPrimitive.Chips
       data-slot="combobox-chips"
       className={cn(
-        "min-h-control-md flex flex-wrap items-center gap-1 rounded-md border border-input bg-panel-input bg-clip-padding px-2 py-0.5 text-xs transition-colors focus-within:border-ring focus-within:ring-2 focus-within:ring-ring has-has-has-data-[slot=combobox-chip]:px-1 has-aria-invalid:border-destructive",
+        "min-h-control-md flex flex-wrap items-center gap-1 rounded-md border border-input bg-surface bg-clip-padding px-2 py-0.5 text-xs transition-colors focus-within:border-ring focus-within:ring-2 focus-within:ring-ring has-has-has-data-[slot=combobox-chip]:px-1 has-aria-invalid:border-destructive",
         className
       )}
       {...props}

@@ -50,10 +50,10 @@ const buttonVariants = cva(
         default: "bg-primary text-primary-foreground hover:bg-primary-hover",
         /** A filled but quiet control — the default for toolbars. */
         secondary:
-          "bg-card text-foreground hover:bg-element-hover aria-expanded:bg-element-active",
+          "bg-secondary text-foreground hover:bg-element-hover aria-expanded:bg-element-active",
         /** Bordered and transparent. Pairs with `default` as the cancel. */
         outline:
-          "border-border bg-transparent text-foreground hover:bg-element-hover aria-expanded:bg-element-active",
+          "bg-card text-foreground ring-1 ring-foreground/15 hover:bg-element-hover aria-expanded:bg-element-active",
         /** No chrome until you touch it. Row actions, icon buttons. */
         ghost:
           "bg-transparent text-secondary-foreground hover:bg-element-hover hover:text-foreground aria-expanded:bg-element-active aria-expanded:text-foreground",

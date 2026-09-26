@@ -43,8 +43,8 @@ const tabsListVariants = cva(
     variants: {
       variant: {
         segmented:
-          "h-control-lg gap-0.5 rounded-md bg-muted p-0.5 text-secondary-foreground",
-        line: "h-control-lg w-full justify-start gap-4 rounded-none border-b border-border-subtle",
+          "h-control-lg gap-0.5 rounded-full bg-muted p-0.5 text-secondary-foreground",
+        line: "h-control-lg w-full justify-start gap-4 rounded-none border-b border-hairline",
       },
     },
     defaultVariants: { variant: "segmented" },
@@ -81,11 +81,11 @@ function TabsTrigger({ className, ...props }: TabsPrimitive.Tab.Props) {
         // segmented: the active tab is a raised pill on the recessed track
         "group-data-[variant=segmented]/tabs-list:h-control-md",
         "group-data-[variant=segmented]/tabs-list:flex-1",
-        "group-data-[variant=segmented]/tabs-list:rounded-sm",
+        "group-data-[variant=segmented]/tabs-list:rounded-full",
         "group-data-[variant=segmented]/tabs-list:px-2.5",
         "group-data-[variant=segmented]/tabs-list:data-selected:bg-background",
         "group-data-[variant=segmented]/tabs-list:data-selected:text-foreground",
-        "group-data-[variant=segmented]/tabs-list:data-selected:shadow-sm",
+        "group-data-[variant=segmented]/tabs-list:data-selected:ring-1 group-data-[variant=segmented]/tabs-list:data-selected:ring-foreground/10",
 
         // line: a 2px rule under the active tab, overlapping the list's border
         "group-data-[variant=line]/tabs-list:h-full",

@@ -16,9 +16,9 @@ import { cn } from "cn"
  *    closes up the counters and the glyph reads as a blob — noticeably
  *    heavier than the 500-weight text beside it.
  *
- * The sizes line up exactly with Tailwind's spacing scale because
- * `--spacing` is pinned to 4px: xs = size-3, sm = size-3.5, md = size-4,
- * lg = size-4.5, xl = size-5.5.
+ * The sizes are Tailwind's spacing steps: xs = size-3, sm = size-3.5,
+ * md = size-4, lg = size-4.5, xl = size-5.5 — rem, so they follow the
+ * interface scale.
  */
 
 export const ICON_SIZES = {
@@ -28,6 +28,19 @@ export const ICON_SIZES = {
   lg: 18,
   xl: 22,
 } as const
+
+/**
+ * Sizes as classes, not as an SVG `size` attribute. A px attribute ignores
+ * the interface scale; a rem class grows with it. The numbers above are
+ * documentation of what each step is at scale 1.
+ */
+const ICON_CLASS: Record<IconSize, string> = {
+  xs: "size-3",
+  sm: "size-3.5",
+  md: "size-4",
+  lg: "size-4.5",
+  xl: "size-5.5",
+}
 
 export type IconSize = keyof typeof ICON_SIZES
 
@@ -44,9 +57,9 @@ function Icon({ icon: Glyph, size = "md", className, ...props }: IconProps) {
     <Glyph
       data-slot="icon"
       aria-hidden="true"
-      size={ICON_SIZES[size]}
+      size={undefined}
       strokeWidth={ICON_STROKE_WIDTH}
-      className={cn("shrink-0", className)}
+      className={cn("shrink-0", ICON_CLASS[size], className)}
       {...props}
     />
   )

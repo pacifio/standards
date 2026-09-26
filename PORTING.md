@@ -14,23 +14,27 @@ is the primitive engine — see step 2.
 ## 1. The token layer — swap `styles.css`, change nothing else
 
 Copy `src/styles/{tokens,themes,utilities,globals}.css` and replace the body of
-`apps/web/src/styles.css` with the four imports. Then add
-`src/lib/theme.tsx`'s `data-theme` contract — the server app already has a
-near-identical theme provider, so this is renaming `.dark`/`[data-theme]`
-selectors, not writing one.
+`apps/web/src/styles.css` with the four imports plus the two `@fontsource-
+variable` imports (Geist, Geist Mono). Then add `src/lib/theme.tsx`'s
+`data-theme` contract and `src/lib/ui-scale.tsx` — both are providers plus an
+inline init script in `__root.tsx` so there is no flash of the wrong theme or
+scale.
 
 Four things will move on their own, and they are the point:
 
-- **The surface ramp inverts.** The server app paints the rail lighter than the
-  canvas. Here the rail is `#070707` behind a `#0f0f0f` canvas, measured from
-  Linear, and the content reads as a lit plane in front of it.
-- **An action colour appears.** `--primary` becomes indigo `#5e6ad2` rather
-  than white, and `--ring` follows it. Every primary button and focus ring on
-  every screen changes.
-- **Root font-size 14px** (the server app inherits the browser's 16px today),
-  so every existing screen gets slightly denser.
-- **`--spacing: 4px`**, not `0.25rem`. At a 14px root the stock multiplier puts
-  every hairline on a half-pixel boundary. See the comment in `tokens.css`.
+- **Everything goes achromatic.** Every colour becomes OKLCH with zero chroma
+  except the four status inks and the eight identity hues. The server app's
+  blue accent disappears; `--primary` becomes the foreground inverted and
+  `--ring` the foreground at 40%. Every primary button and focus ring on every
+  screen changes.
+- **The surface ramp becomes monotonic.** Page `0.08` → surface `0.10` → card
+  `0.12` → popover `0.17` in dark. The sidebar sits one step *below* the page
+  and every raised block one step above it, ringed rather than shadowed.
+- **Root font-size becomes `calc(16px * var(--ui-scale))`** and the body
+  default becomes 12px. Every existing screen gets denser; the scale control
+  is what gives it back to people who want it.
+- **`--spacing` is Tailwind's `0.25rem`** again — the earlier 4px pin only
+  existed to fight a 14px root. At scale 1 every value is an integer.
 
 Expect a visual diff on every screen. That is the migration, not a regression.
 
@@ -55,20 +59,30 @@ Two options, and the second is almost certainly right:
 Either way the class strings, the tokens and the patterns port unchanged —
 they are where the design lives.
 
+Two Base UI rules worth knowing before the first file: a `<Button
+render={<Link/>}>` gets `role="button"` stamped on the anchor, so navigation
+styled as a button is `<Link className={buttonVariants(...)}>`; and a
+`PopoverTrigger`/`DropdownMenuTrigger` must `render` the button itself, not a
+wrapper around one, or Base UI warns about a non-native button.
+
 ## 3. Components the server app is missing
 
-It vendors 16. This repo has 36. The gaps that matter, roughly in order of how
-much they are costing today:
+It vendors 16. This repo has 36 primitives, five patterns and ten blocks. The
+gaps that matter, roughly in order of how much they are costing today:
 
 | Component | Why it matters |
 |---|---|
 | `select` | **Every choice in the app is a raw `<select>`** — the org picker, the project filter, the role picker, the facet bar. They render differently on macOS, Windows and Linux and cannot be styled into the system. |
+| `patterns/data-table`, `kpi-strip`, `segmented` | The timeline board, admin, usage and members are all the same three shapes. Today each screen hand-rolls its own table and its own filter row. |
+| `patterns/panel` | The ringed, staggered card that every dashboard surface is made of. |
+| `ui/tag` + `lib/hue.ts` | Labels, projects and roles get a stable identity hue via `hueFor(id)` instead of ad-hoc badge variants. |
 | `icon-button` | `label` is required, so the toolbar of unlabelled glyphs becomes a type error. |
 | `popover`, `command-menu` | There is no ⌘K and no lightweight floating panel. |
+| `scroll-fade` | Scrollbars are hidden system-wide; this is what tells you a region scrolls. |
 | `switch`, `checkbox`, `radio-group`, `slider` | No form controls beyond input and textarea. |
-| `scroll-area`, `resizable` | Panes are fixed or native-scrolled. |
+| `resizable` | Panes are fixed or native-scrolled. |
 | `empty-state`, `callout`, `spinner`, `progress` | Each screen invents its own. |
-| `breadcrumb`, `accordion`, `collapsible`, `toggle-group`, `combobox`, `kbd` | Needed by the shell below. |
+| `blocks/*` | `SessionPipeline` and `SessionTimeline` are the session view; `RevealWaveImage` is the login aside (client-only — it pulls `three`, so keep it behind `ClientOnly` + `React.lazy` as here). |
 
 ## 4. One org context, replacing four
 
@@ -100,11 +114,12 @@ becomes its only writer. The existing API surface in `apps/web/src/lib/api.ts`
 four links. `/inbox` and `/admin` are not in it, and it is `hidden sm:flex`, so
 below 640px the signed-in app has no navigation at all.
 
-`src/components/shell/` replaces it: `AppShell`, `Sidebar` + `SidebarSection` +
-`SidebarItem`, `OrgSwitcher`, `TopBar`, `ListDetail`, `CommandMenu`, and
-`SettingsShell`. The rail gives vertical space, which is what lets Inbox,
-recent timelines, per-project entries and an admin group all exist without
-competing.
+`src/components/shell/` replaces it: `AppShell` (sidebar · topbar + main ·
+optional `dock`), `Sidebar` + `SidebarGroup` + `SidebarItem` (with nested
+children on an animated rail), `OrgSwitcher`, `TopBar` + `TopBarCluster`,
+`CommandMenu`, `UiScaleControl` and `SettingsShell`. The `dock` prop is how a
+screen shows a selected record beside the page — the timeline uses it for the
+session view — without a second layout system.
 
 ## 6. Screens, in dependency order
 
@@ -112,14 +127,15 @@ competing.
    behind `SettingsShell`. `defaultValue="org"` is not URL-backed, so a
    settings tab currently cannot be linked, bookmarked or returned to after a
    reload. Map: `org` → `/settings/organisation`, `account`, `ai`, `usage`,
-   `privacy`.
+   `privacy`. Members and usage become `DataTable`s.
 2. **`/inbox`** — put it in the rail. It is a complete route that is only
-   reachable from a button on `/timeline`.
-3. **`/timeline`** — 747 lines. The filter bar, the board and the detail pane
-   are all shell components now; the route's job shrinks to supplying rows.
-4. **`/projects`** — 970 lines, becomes a card grid.
+   reachable from a button on `/timeline`. Two resizable panes.
+3. **`/timeline`** — 747 lines. Becomes `PageHeader` → `KpiStrip` →
+   `DataTable` of sessions, with the selected session in the shell dock; the
+   route's job shrinks to supplying rows and the `?view` filter.
+4. **`/projects`** — 970 lines, becomes a grid of `Panel`s with `hueFor`.
 5. **`/chat`** — 967 lines, loses its bespoke grid and its own org `<select>`.
-6. **`/admin`** — same shell, behind the admin nav group.
+6. **`/admin`** — `UnderlineTabs` + `DataTable`, behind the admin nav group.
 
 Out of scope here and unchanged: the marketing page, the auth and onboarding
 routes, `/call/$callId`, `/space/$convId`, and the public `/s/$slug` and
@@ -128,11 +144,18 @@ routes, `/call/$callId`, `/space/$convId`, and the public `/s/$slug` and
 ## 7. Bring the ratchet
 
 Copy `tests/design-system-ratchet.test.ts`. It is the only thing that stops
-the new token layer decaying back into the old one — it holds ten rules at
-zero, including raw hex, stock Tailwind ramps, arbitrary type sizes and bare
-z-indexes. It found eight real violations in this repo's own components on the
-first run.
+the new token layer decaying back into the old one — it holds thirteen rules
+at zero, including raw hex, OKLCH and `color-mix` literals outside the token
+layer, raised shadows, `[var(--…)]` escapes, stock Tailwind ramps, arbitrary
+type sizes and bare z-indexes.
 
 The escape hatch is deliberate friction: `ratchet-allow: <20+ characters of
 reason>` on the line. Writing the sentence is usually what makes you notice
 the token you actually wanted.
+
+## 8. Vite
+
+Set `server: { forwardConsole: false }` if the TanStack devtools plugin is
+installed. Vite 8 forwards the browser console to the terminal and devtools
+forwards the terminal back to the browser; one warning from `three` then
+echoes forever and floods the page.
