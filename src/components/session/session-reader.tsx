@@ -1,31 +1,23 @@
 "use client"
 
-import { useMemo, useState } from "react"
-import {
-  GitBranchIcon,
-  ListFilterIcon,
-  MessageSquareIcon,
-  SearchIcon,
-  XIcon,
-} from "lucide-react"
-import { cn } from "cn"
+import { useMemo, useRef, useState } from "react"
+import { CheckIcon, GitBranchIcon, XIcon } from "lucide-react"
 
 import { estCost } from "@/mock/sessions-api"
-import type {
-  ApiTimelineEntry,
-  EntryKind,
-  SessionDetailApi,
-} from "@/mock/sessions-api"
+import type { SessionDetailApi } from "@/mock/sessions-api"
 import { ago, formatDuration, formatTokens, hm } from "@/mock/time"
 import { Icon } from "@/components/ui/icon"
 import { IconButton } from "@/components/ui/icon-button"
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover"
 import { StatusIcon } from "@/components/ui/status-icon"
-import { Switch } from "@/components/ui/switch"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
+import { MessageSquareMoreIcon } from "@/components/ui/message-square-more-icon"
+import type { MessageSquareMoreIconHandle } from "@/components/ui/message-square-more-icon"
+import { UploadIcon } from "@/components/ui/upload-icon"
+import type { UploadIconHandle } from "@/components/ui/upload-icon"
 import { CommentButton, CommentsProvider, useComments } from "./comments"
 import { EntryRail, groupEntries } from "./entry-rail"
 
@@ -34,8 +26,7 @@ import { EntryRail, groupEntries } from "./entry-rail"
  * detail, on this system's tokens.
  *
  * Masthead (title, chips, four stats), then the entries on a rail, then a
- * floating bar: filters on the left, "Search this session…" in the middle,
- * the comment count on the right. The reader fills whatever it is given —
+ * floating bar: share on the left, the comment count on the right. The reader fills whatever it is given —
  * the dock at any of its three sizes — and tightens at compact width via
  * its container.
  */
@@ -46,26 +37,6 @@ const STATUS_LABEL = {
   failed: "Failed",
   done: "Done",
 } as const
-
-type Filters = {
-  kinds: Record<EntryKind, boolean>
-  failedOnly: boolean
-  expandCalls: boolean
-}
-
-const DEFAULT_FILTERS: Filters = {
-  // Thinking is off by default, as in the product: it is the agent talking
-  // to itself, and it doubles the length of a session.
-  kinds: {
-    prompt: true,
-    response: true,
-    thinking: false,
-    tool_call: true,
-    checkpoint: true,
-  },
-  failedOnly: false,
-  expandCalls: false,
-}
 
 function SessionReader({
   detail,
@@ -102,33 +73,13 @@ function Reader({
   onClose: () => void
 }) {
   const { summary: s, entries } = detail
-  const [query, setQuery] = useState("")
-  const [filters, setFilters] = useState(DEFAULT_FILTERS)
 
-  const groups = useMemo(() => {
-    const q = query.trim().toLowerCase()
-    const hit = (e: ApiTimelineEntry) =>
-      !q ||
-      [
-        e.text,
-        e.toolTitle,
-        e.toolName,
-        e.result,
-        e.commitSubject,
-        ...(e.paths ?? []),
-      ]
-        .filter(Boolean)
-        .some((t) => t!.toLowerCase().includes(q))
-    const kept = entries.filter(
-      (e) =>
-        filters.kinds[e.kind] &&
-        (!filters.failedOnly ||
-          e.kind !== "tool_call" ||
-          e.toolStatus === "failed") &&
-        hit(e)
-    )
-    return groupEntries(kept)
-  }, [entries, filters, query])
+  // Thinking stays out, as in the product: it is the agent talking to
+  // itself, and it doubles the length of a session.
+  const groups = useMemo(
+    () => groupEntries(entries.filter((e) => e.kind !== "thinking")),
+    [entries]
+  )
 
   return (
     <div
@@ -148,13 +99,7 @@ function Reader({
         <div className="mx-auto w-full max-w-230 px-5 pt-8 pb-32 @3xl:px-14 @3xl:pt-12">
           <Masthead detail={detail} />
           <div className="mt-10">
-            {groups.length ? (
-              <EntryRail groups={groups} expandCalls={filters.expandCalls} />
-            ) : (
-              <p className="py-12 text-center text-xs text-muted-foreground">
-                Nothing in this session matches.
-              </p>
-            )}
+            <EntryRail groups={groups} />
           </div>
         </div>
       </div>
@@ -163,12 +108,7 @@ function Reader({
         aria-hidden="true"
         className="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-linear-to-b from-transparent to-card"
       />
-      <BottomBar
-        query={query}
-        onQuery={setQuery}
-        filters={filters}
-        onFilters={setFilters}
-      />
+      <BottomBar sessionId={s.id} />
     </div>
   )
 }
@@ -291,56 +231,25 @@ function Stat({
   )
 }
 
-function BottomBar({
-  query,
-  onQuery,
-  filters,
-  onFilters,
-}: {
-  query: string
-  onQuery: (q: string) => void
-  filters: Filters
-  onFilters: (f: Filters) => void
-}) {
+function BottomBar({ sessionId }: { sessionId: string }) {
   const { comments } = useComments()
   const count = comments.filter((c) => !c.deletedAt).length
-  const changed = JSON.stringify(filters) !== JSON.stringify(DEFAULT_FILTERS)
+  const message = useRef<MessageSquareMoreIconHandle>(null)
 
   return (
-    <div className="absolute inset-x-0 bottom-0 flex items-center gap-3 px-4 pb-3.5">
-      <FilterPopover
-        filters={filters}
-        onFilters={onFilters}
-        changed={changed}
-      />
-
-      <label className="mx-auto flex h-10 max-w-155 min-w-0 flex-1 items-center gap-2.5 rounded-full border border-border bg-card/80 px-4 shadow-md backdrop-blur-xl">
-        <Icon icon={SearchIcon} size="sm" className="text-muted-foreground" />
-        <input
-          value={query}
-          onChange={(e) => onQuery(e.target.value)}
-          placeholder="Search this session…"
-          aria-label="Search this session"
-          className="min-w-0 flex-1 bg-transparent text-sm text-foreground outline-none placeholder:text-disabled"
-        />
-        {query && (
-          <IconButton
-            icon={XIcon}
-            label="Clear search"
-            size="xs"
-            onClick={() => onQuery("")}
-          />
-        )}
-      </label>
+    <div className="absolute inset-x-0 bottom-0 flex items-center justify-between gap-3 px-4 pb-3.5">
+      <ShareButton sessionId={sessionId} />
 
       <span
-        className="relative flex size-8 shrink-0 items-center justify-center rounded-full border border-border bg-card/80 text-muted-foreground shadow-md backdrop-blur-xl"
+        className="duration-fast relative flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-full border border-border bg-card/80 text-muted-foreground shadow-md backdrop-blur-xl transition-colors hover:text-foreground"
         aria-label={`${count} comments`}
         role="img"
+        onMouseEnter={() => message.current?.startAnimation()}
+        onMouseLeave={() => message.current?.stopAnimation()}
       >
-        <Icon icon={MessageSquareIcon} size="sm" />
+        <MessageSquareMoreIcon ref={message} controlled />
         {count > 0 && (
-          <span className="absolute -top-0.5 -right-0.5 flex h-3.5 min-w-3.5 items-center justify-center rounded-full bg-primary px-0.5 text-4xs font-medium text-primary-foreground tnum">
+          <span className="absolute -top-1.5 -right-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-destructive px-1 text-3xs font-semibold text-destructive-foreground tnum ring-2 ring-card">
             {count}
           </span>
         )}
@@ -349,99 +258,51 @@ function BottomBar({
   )
 }
 
-const KIND_LABELS: Array<[EntryKind, string]> = [
-  ["prompt", "Prompts"],
-  ["response", "Responses"],
-  ["thinking", "Thinking"],
-  ["tool_call", "Tool calls"],
-  ["checkpoint", "Checkpoints"],
-]
+/**
+ * Copies a link to this session. The arrow lifts out of its tray while the
+ * button is hovered; after a press the glyph turns to a check for a moment,
+ * and the tooltip says what happened.
+ */
+function ShareButton({ sessionId }: { sessionId: string }) {
+  const upload = useRef<UploadIconHandle>(null)
+  const [copied, setCopied] = useState(false)
 
-function FilterPopover({
-  filters,
-  onFilters,
-  changed,
-}: {
-  filters: Filters
-  onFilters: (f: Filters) => void
-  changed: boolean
-}) {
+  async function share() {
+    const url = new URL(window.location.href)
+    url.searchParams.set("session", sessionId)
+    try {
+      await navigator.clipboard.writeText(url.toString())
+    } catch {
+      // Clipboard can be refused; the button still acknowledges the press.
+    }
+    setCopied(true)
+    window.setTimeout(() => setCopied(false), 1600)
+  }
+
   return (
-    <Popover>
-      <PopoverTrigger
+    <Tooltip>
+      <TooltipTrigger
         render={
           <button
             type="button"
-            aria-label="Filter entries"
-            className={cn(
-              "duration-fast relative flex size-8 shrink-0 items-center justify-center rounded-full border border-border bg-card/80 text-muted-foreground shadow-md backdrop-blur-xl transition-colors hover:text-foreground",
-              changed && "text-foreground"
-            )}
+            aria-label={copied ? "Link copied" : "Share session"}
+            onClick={share}
+            onMouseEnter={() => upload.current?.startAnimation()}
+            onMouseLeave={() => upload.current?.stopAnimation()}
+            className="duration-fast relative flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-full border border-border bg-card/80 text-muted-foreground shadow-md backdrop-blur-xl transition-colors hover:text-foreground"
           >
-            <Icon icon={ListFilterIcon} size="sm" />
-            {changed && (
-              <span className="absolute -top-0.5 -right-0.5 size-2 rounded-full bg-foreground ring-2 ring-card" />
+            {copied ? (
+              <Icon icon={CheckIcon} size="sm" className="text-success" />
+            ) : (
+              <UploadIcon ref={upload} controlled />
             )}
           </button>
         }
       />
-      <PopoverContent side="top" align="start" className="w-64 gap-3">
-        <div className="flex flex-col gap-2">
-          <span className="micro">Show</span>
-          {KIND_LABELS.map(([kind, label]) => (
-            <Toggle
-              key={kind}
-              label={label}
-              checked={filters.kinds[kind]}
-              onChange={(v) =>
-                onFilters({
-                  ...filters,
-                  kinds: { ...filters.kinds, [kind]: v },
-                })
-              }
-            />
-          ))}
-        </div>
-        <div className="flex flex-col gap-2 border-t border-hairline pt-3">
-          <Toggle
-            label="Failed tool calls only"
-            checked={filters.failedOnly}
-            onChange={(v) => onFilters({ ...filters, failedOnly: v })}
-          />
-          <Toggle
-            label="Expand tool calls"
-            checked={filters.expandCalls}
-            onChange={(v) => onFilters({ ...filters, expandCalls: v })}
-          />
-        </div>
-        {changed && (
-          <button
-            type="button"
-            onClick={() => onFilters(DEFAULT_FILTERS)}
-            className="self-start text-2xs text-muted-foreground underline-offset-2 hover:text-foreground hover:underline"
-          >
-            Reset filters
-          </button>
-        )}
-      </PopoverContent>
-    </Popover>
-  )
-}
-
-function Toggle({
-  label,
-  checked,
-  onChange,
-}: {
-  label: string
-  checked: boolean
-  onChange: (v: boolean) => void
-}) {
-  return (
-    <label className="flex cursor-pointer items-center justify-between gap-3 text-xs text-secondary-foreground">
-      {label}
-      <Switch size="sm" checked={checked} onCheckedChange={onChange} />
-    </label>
+      <TooltipContent side="top">
+        {copied ? "Link copied" : "Share"}
+      </TooltipContent>
+    </Tooltip>
   )
 }
 

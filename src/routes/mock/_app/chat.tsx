@@ -76,7 +76,7 @@ function ChatScreen() {
                   <span className="truncate caption">{c.lastMessage}</span>
                 </span>
                 {c.unread > 0 && (
-                  <span className="shrink-0 rounded-full bg-primary px-1.5 text-3xs font-medium text-primary-foreground tnum">
+                  <span className="flex h-4 min-w-4 shrink-0 items-center justify-center rounded-full bg-destructive px-1 text-3xs font-semibold text-destructive-foreground tnum">
                     {c.unread}
                   </span>
                 )}
