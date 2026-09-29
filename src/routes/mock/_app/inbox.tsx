@@ -16,7 +16,6 @@ import { NOTIFICATIONS } from "@/mock/data"
 import type { NotificationKind } from "@/mock/types"
 import { Crumb, TopBar } from "@/components/shell/top-bar"
 import { SegmentedPills } from "@/components/patterns/segmented"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { EmptyState } from "@/components/ui/empty-state"
 import { Icon } from "@/components/ui/icon"
@@ -30,6 +29,7 @@ import { ScrollFade } from "@/components/ui/scroll-fade"
 import { Tag } from "@/components/ui/tag"
 import { Textarea } from "@/components/ui/textarea"
 import { hueFor } from "@/lib/hue"
+import { PersonAvatar } from "@/components/patterns/person-avatar"
 
 export const Route = createFileRoute("/mock/_app/inbox")({
   component: InboxScreen,
@@ -143,9 +143,12 @@ function InboxScreen() {
                         />
                       )}
                     </span>
-                    <Avatar size="sm" className="mt-px">
-                      <AvatarFallback>{n.actorInitials}</AvatarFallback>
-                    </Avatar>
+                    <PersonAvatar
+                      size="sm"
+                      className="mt-px"
+                      name={n.actor}
+                      initials={n.actorInitials}
+                    />
                     <span className="flex min-w-0 flex-1 flex-col gap-0.5">
                       <span
                         className={cn(
@@ -211,9 +214,11 @@ function InboxScreen() {
                   </div>
 
                   <div className="flex gap-2.5 rounded-xl bg-card p-4 ring-1 ring-foreground/10">
-                    <Avatar size="md">
-                      <AvatarFallback>{selected.actorInitials}</AvatarFallback>
-                    </Avatar>
+                    <PersonAvatar
+                      size="md"
+                      name={selected.actor}
+                      initials={selected.actorInitials}
+                    />
                     <div className="flex min-w-0 flex-1 flex-col gap-1">
                       <p className="flex items-baseline gap-2">
                         <span className="text-xs font-medium">

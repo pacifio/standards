@@ -49,4 +49,37 @@ function HueDot({
   )
 }
 
-export { HueDot, Tag }
+/**
+ * A label as it appears inside a dense row: a hue dot and the name, no pill.
+ * In a table the pill was the loudest shape in the row and the one most
+ * obviously lifted from Linear; here identity is carried by the dot alone.
+ * Use `<Tag>` where a label stands on its own — a header, a detail panel —
+ * and this where it is one cell among many.
+ */
+function LabelMark({
+  hue,
+  className,
+  children,
+  ...props
+}: React.ComponentProps<"span"> & { hue: LabelTone }) {
+  return (
+    <span
+      data-slot="label-mark"
+      data-hue={hue}
+      className={cn(
+        "inline-flex items-center gap-1.5 text-2xs whitespace-nowrap text-secondary-foreground",
+        className
+      )}
+      {...props}
+    >
+      <span
+        aria-hidden="true"
+        className="size-1.5 shrink-0 rounded-full"
+        style={{ background: HUE_VAR[hue] }}
+      />
+      {children}
+    </span>
+  )
+}
+
+export { HueDot, LabelMark, Tag }

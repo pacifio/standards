@@ -22,7 +22,7 @@ import { useTheme } from "@/lib/theme"
  * A marker with a `status` carries a LIVE tag above it: what is happening
  * there right now, with a count that drifts a few percent either side of its
  * base so the globe reads as realtime rather than as a map. Live is the
- * `success` ink, as it is on `StatusIcon` — in this system red means failed,
+ * `success` ink, as on the sidebar's live badge — in this system red means failed,
  * so a red LIVE would announce an outage. The count is `tabular-nums` so the
  * tag does not change width as the number ticks.
  *

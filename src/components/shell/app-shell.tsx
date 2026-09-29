@@ -8,6 +8,7 @@ import {
   FolderGitIcon,
   GaugeIcon,
   InboxIcon,
+  LayoutDashboardIcon,
   LayersIcon,
   MessageSquareIcon,
   MoonIcon,
@@ -158,6 +159,14 @@ function AppShell({ children }: { children: React.ReactNode }) {
 
   const actions: Array<CommandAction> = [
     {
+      id: "dashboard",
+      label: "Go to Dashboard",
+      group: "Navigation",
+      icon: LayoutDashboardIcon,
+      to: "/mock/dashboard",
+      shortcut: "G D",
+    },
+    {
       id: "inbox",
       label: "Go to Inbox",
       group: "Navigation",
@@ -258,6 +267,11 @@ function AppShell({ children }: { children: React.ReactNode }) {
         */}
           <SidebarBody onClickCapture={() => setDrawerOpen(false)}>
             <SidebarGroup>
+              <SidebarItem
+                icon={LayoutDashboardIcon}
+                label="Dashboard"
+                to="/mock/dashboard"
+              />
               <SidebarItem
                 icon={InboxIcon}
                 label="Inbox"

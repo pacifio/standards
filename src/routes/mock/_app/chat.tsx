@@ -13,11 +13,11 @@ import { cn } from "cn"
 
 import { CONVERSATIONS, MESSAGES } from "@/mock/data"
 import { Crumb, TopBar } from "@/components/shell/top-bar"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Icon } from "@/components/ui/icon"
 import { IconButton } from "@/components/ui/icon-button"
 import { ScrollFade } from "@/components/ui/scroll-fade"
 import { Textarea } from "@/components/ui/textarea"
+import { PersonAvatar } from "@/components/patterns/person-avatar"
 
 export const Route = createFileRoute("/mock/_app/chat")({
   component: ChatScreen,
@@ -78,9 +78,7 @@ function ChatScreen() {
                     <Icon icon={HashIcon} size="xs" />
                   </span>
                 ) : (
-                  <Avatar size="xs">
-                    <AvatarFallback>{c.initials}</AvatarFallback>
-                  </Avatar>
+                  <PersonAvatar size="xs" name={c.name} initials={c.initials} />
                 )}
                 <span className="flex min-w-0 flex-1 flex-col">
                   <span
@@ -121,9 +119,12 @@ function ChatScreen() {
             <div className="flex flex-col gap-4 px-5 py-4">
               {MESSAGES.map((m) => (
                 <div key={m.id} className="flex gap-2.5">
-                  <Avatar size="md" className="mt-px">
-                    <AvatarFallback>{m.authorInitials}</AvatarFallback>
-                  </Avatar>
+                  <PersonAvatar
+                    size="md"
+                    className="mt-px"
+                    name={m.author}
+                    initials={m.authorInitials}
+                  />
                   <div className="flex min-w-0 flex-1 flex-col gap-1">
                     <p className="flex items-baseline gap-2">
                       <span className="text-xs font-medium">{m.author}</span>

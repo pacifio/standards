@@ -1,17 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router"
 
 import { MEMBERS, USAGE_SERIES } from "@/mock/data"
-import { initialsOf } from "@/mock/initials"
 import { ROLE_LABELS } from "@/mock/types"
 import { PageHeader } from "@/components/patterns/section-header"
 import { KpiStrip } from "@/components/patterns/kpi-strip"
 import { Sample, Specimen } from "@/components/gallery/specimen"
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarGroup,
-  AvatarGroupCount,
-} from "@/components/ui/avatar"
+import { PersonAvatar } from "@/components/patterns/person-avatar"
+import { AvatarGroup, AvatarGroupCount } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Code, DiffStat } from "@/components/ui/code-block"
 import {
@@ -53,11 +48,12 @@ function DataGallery() {
                 <TableRow key={m.id}>
                   <TableCell>
                     <span className="flex items-center gap-2">
-                      <Avatar size="sm">
-                        <AvatarFallback>
-                          {initialsOf(m.name, m.email)}
-                        </AvatarFallback>
-                      </Avatar>
+                      <PersonAvatar
+                        size="sm"
+                        name={m.name}
+                        email={m.email}
+                        image={m.image}
+                      />
                       {m.name}
                     </span>
                   </TableCell>
@@ -76,39 +72,28 @@ function DataGallery() {
 
       <Specimen
         title="Avatars"
-        note="Initials are first-and-last, so 'Azraf Al Monzim' is AM rather than AZ. The fill is always `muted` — a generated hue per person turns a members table into eight colour-coded categories that mean nothing."
+        note="A person is their photo wherever they appear — `PersonAvatar` resolves it once, so the same face is on every screen. Without one it falls back to initials, first-and-last, so 'Azraf Al Monzim' is AM rather than AZ, on a `muted` fill — a generated hue per person turns a members table into eight colour-coded categories that mean nothing."
       >
         <Sample label="xs">
-          <Avatar size="xs">
-            <AvatarFallback>AM</AvatarFallback>
-          </Avatar>
+          <PersonAvatar size="xs" name="Adib Mohsin" />
         </Sample>
         <Sample label="sm">
-          <Avatar size="sm">
-            <AvatarFallback>AM</AvatarFallback>
-          </Avatar>
+          <PersonAvatar size="sm" name="Adib Mohsin" />
         </Sample>
         <Sample label="md">
-          <Avatar size="md">
-            <AvatarFallback>AM</AvatarFallback>
-          </Avatar>
+          <PersonAvatar size="md" name="Adib Mohsin" />
         </Sample>
         <Sample label="lg">
-          <Avatar size="lg">
-            <AvatarFallback>AM</AvatarFallback>
-          </Avatar>
+          <PersonAvatar size="lg" name="Adib Mohsin" />
+        </Sample>
+        <Sample label="initials">
+          <PersonAvatar size="md" name="Antarys AI" />
         </Sample>
         <Sample label="group">
           <AvatarGroup>
-            <Avatar size="md">
-              <AvatarFallback>UM</AvatarFallback>
-            </Avatar>
-            <Avatar size="md">
-              <AvatarFallback>TR</AvatarFallback>
-            </Avatar>
-            <Avatar size="md">
-              <AvatarFallback>AN</AvatarFallback>
-            </Avatar>
+            <PersonAvatar size="md" name="Uzayer Masud" />
+            <PersonAvatar size="md" name="Talha Razz" />
+            <PersonAvatar size="md" name="Ahammad Nafiz" />
             <AvatarGroupCount>+4</AvatarGroupCount>
           </AvatarGroup>
         </Sample>

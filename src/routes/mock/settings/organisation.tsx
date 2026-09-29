@@ -8,12 +8,10 @@ import {
 
 import { useOrg } from "@/lib/org-context"
 import { INVITE_LINKS, MEMBERS } from "@/mock/data"
-import { initialsOf } from "@/mock/initials"
 import { ROLE_LABELS } from "@/mock/types"
 import type { LabelTone, Member, Role } from "@/mock/types"
 import { PageHeader, SectionHeader } from "@/components/patterns/section-header"
 import { SettingCard, SettingRow } from "@/components/patterns/setting-card"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { cn } from "cn"
 import { Button } from "@/components/ui/button"
 import {
@@ -46,6 +44,7 @@ import {
 import { DataTable } from "@/components/patterns/data-table"
 import type { Column } from "@/components/patterns/data-table"
 import { Tag } from "@/components/ui/tag"
+import { PersonAvatar } from "@/components/patterns/person-avatar"
 
 export const Route = createFileRoute("/mock/settings/organisation")({
   component: OrganisationSettings,
@@ -70,9 +69,7 @@ const MEMBER_COLUMNS: Array<Column<Member>> = [
           m.status === "former" && "opacity-50"
         )}
       >
-        <Avatar size="sm">
-          <AvatarFallback>{initialsOf(m.name, m.email)}</AvatarFallback>
-        </Avatar>
+        <PersonAvatar size="sm" name={m.name} email={m.email} image={m.image} />
         <div className="flex min-w-0 flex-col">
           <span className="flex items-center gap-1.5 truncate font-medium text-foreground">
             {m.name || m.email}

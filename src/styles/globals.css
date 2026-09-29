@@ -141,9 +141,6 @@
   --animate-slide-in-right: slide-in-right 0.18s var(--ease-drawer);
   --animate-slide-in-left: slide-in-left 0.18s var(--ease-drawer);
   --animate-shimmer-row: shimmer-row 1.6s linear infinite;
-  /* The one place chroma is allowed to MOVE: the glow behind an object. */
-  --animate-hue-rotate: hue-rotate 4s linear infinite;
-  --animate-spin-border: spin-border 3s linear infinite;
   /* A ring expanding out of a globe marker. Delay per ring is inline. */
   --animate-pulse-ring: pulse-ring 2s var(--ease-out-strong) infinite;
 
@@ -155,8 +152,6 @@
   @keyframes slide-in-right { from { transform: translateX(100%) } to { transform: translateX(0) } }
   @keyframes slide-in-left { from { transform: translateX(-100%) } to { transform: translateX(0) } }
   @keyframes shimmer-row { 0%, 100% { opacity: 1 } 50% { opacity: 0.4 } }
-  @keyframes hue-rotate { from { filter: hue-rotate(0deg) } to { filter: hue-rotate(360deg) } }
-  @keyframes spin-border { to { --spin-angle: 360deg } }
 }
 
 /* Registered so they can transition. Without this, `transition: --fade-top`
@@ -171,11 +166,6 @@
   syntax: "<length>";
   inherits: false;
   initial-value: 0px;
-}
-@property --spin-angle {
-  syntax: "<angle>";
-  inherits: false;
-  initial-value: 0deg;
 }
 
 /* `dark`/`light` variants exist for third-party artwork with baked-in fills

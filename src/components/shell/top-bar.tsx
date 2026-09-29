@@ -11,7 +11,6 @@ import { cn } from "cn"
 
 import { useOrg } from "@/lib/org-context"
 import { NOTIFICATIONS } from "@/mock/data"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -30,6 +29,7 @@ import {
 } from "@/components/ui/popover"
 import { ScrollFade } from "@/components/ui/scroll-fade"
 import { UiScaleControl } from "./ui-scale"
+import { PersonAvatar } from "@/components/patterns/person-avatar"
 
 /**
  * The 44px glass bar above a page.
@@ -135,9 +135,12 @@ function TopBarCluster() {
               aria-label="Account"
               className="rounded-full outline-none focus-visible:outline-1"
             >
-              <Avatar size="sm">
-                <AvatarFallback>{user.initials}</AvatarFallback>
-              </Avatar>
+              <PersonAvatar
+                size="sm"
+                name={user.name}
+                email={user.email}
+                initials={user.initials}
+              />
             </button>
           }
         />

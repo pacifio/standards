@@ -223,18 +223,19 @@
   &::-webkit-scrollbar { display: none; }
 }
 
-/* ──────────────────────────────────────────────────────────────────────────
-   Blocks.
-   ────────────────────────────────────────────────────────────────────────── */
+/* One face in an AvatarStack. `--shift` and `--scale-active` are written
+   per item by the component on hover; translate comes before scale so the
+   scale does not amplify the lift. */
+@utility avatar-spring {
+  transform-origin: center;
+  transform: translateY(var(--shift, 0px)) scale(var(--scale-active, 1));
+  transition: transform var(--avatar-dur) var(--avatar-ease-in);
+  will-change: transform;
 
-/* natai's spinning gradient border, as a conic ring driven by a registered
-   angle so it can animate. The pill puts this on a `before:`. */
-@utility spin-border {
-  background: conic-gradient(
-    from var(--spin-angle),
-    transparent 0% 70%,
-    var(--foreground) 100%
-  );
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+    transform: none;
+  }
 }
 
 /* ──────────────────────────────────────────────────────────────────────────

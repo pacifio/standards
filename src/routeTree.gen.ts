@@ -30,6 +30,7 @@ import { Route as DsFoundationsMotionRouteImport } from './routes/ds/foundations
 import { Route as DsFoundationsTypeRouteImport } from './routes/ds/foundations/type'
 import { Route as MockAppAdminRouteImport } from './routes/mock/_app/admin'
 import { Route as MockAppChatRouteImport } from './routes/mock/_app/chat'
+import { Route as MockAppDashboardRouteImport } from './routes/mock/_app/dashboard'
 import { Route as MockAppInboxRouteImport } from './routes/mock/_app/inbox'
 import { Route as MockAppProjectsRouteImport } from './routes/mock/_app/projects'
 import { Route as MockAppTimelineRouteImport } from './routes/mock/_app/timeline'
@@ -144,6 +145,11 @@ const MockAppChatRoute = MockAppChatRouteImport.update({
   path: '/chat',
   getParentRoute: () => MockAppRoute,
 } as any)
+const MockAppDashboardRoute = MockAppDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => MockAppRoute,
+} as any)
 const MockAppInboxRoute = MockAppInboxRouteImport.update({
   id: '/inbox',
   path: '/inbox',
@@ -212,6 +218,7 @@ export interface FileRoutesByFullPath {
   '/ds/foundations/type': typeof DsFoundationsTypeRoute
   '/mock/admin': typeof MockAppAdminRoute
   '/mock/chat': typeof MockAppChatRoute
+  '/mock/dashboard': typeof MockAppDashboardRoute
   '/mock/inbox': typeof MockAppInboxRoute
   '/mock/projects': typeof MockAppProjectsRoute
   '/mock/timeline': typeof MockAppTimelineRoute
@@ -240,6 +247,7 @@ export interface FileRoutesByTo {
   '/ds/foundations/type': typeof DsFoundationsTypeRoute
   '/mock/admin': typeof MockAppAdminRoute
   '/mock/chat': typeof MockAppChatRoute
+  '/mock/dashboard': typeof MockAppDashboardRoute
   '/mock/inbox': typeof MockAppInboxRoute
   '/mock/projects': typeof MockAppProjectsRoute
   '/mock/timeline': typeof MockAppTimelineRoute
@@ -273,6 +281,7 @@ export interface FileRoutesById {
   '/ds/foundations/type': typeof DsFoundationsTypeRoute
   '/mock/_app/admin': typeof MockAppAdminRoute
   '/mock/_app/chat': typeof MockAppChatRoute
+  '/mock/_app/dashboard': typeof MockAppDashboardRoute
   '/mock/_app/inbox': typeof MockAppInboxRoute
   '/mock/_app/projects': typeof MockAppProjectsRoute
   '/mock/_app/timeline': typeof MockAppTimelineRoute
@@ -306,6 +315,7 @@ export interface FileRouteTypes {
     | '/ds/foundations/type'
     | '/mock/admin'
     | '/mock/chat'
+    | '/mock/dashboard'
     | '/mock/inbox'
     | '/mock/projects'
     | '/mock/timeline'
@@ -334,6 +344,7 @@ export interface FileRouteTypes {
     | '/ds/foundations/type'
     | '/mock/admin'
     | '/mock/chat'
+    | '/mock/dashboard'
     | '/mock/inbox'
     | '/mock/projects'
     | '/mock/timeline'
@@ -366,6 +377,7 @@ export interface FileRouteTypes {
     | '/ds/foundations/type'
     | '/mock/_app/admin'
     | '/mock/_app/chat'
+    | '/mock/_app/dashboard'
     | '/mock/_app/inbox'
     | '/mock/_app/projects'
     | '/mock/_app/timeline'
@@ -532,6 +544,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MockAppChatRouteImport
       parentRoute: typeof MockAppRoute
     }
+    '/mock/_app/dashboard': {
+      id: '/mock/_app/dashboard'
+      path: '/dashboard'
+      fullPath: '/mock/dashboard'
+      preLoaderRoute: typeof MockAppDashboardRouteImport
+      parentRoute: typeof MockAppRoute
+    }
     '/mock/_app/inbox': {
       id: '/mock/_app/inbox'
       path: '/inbox'
@@ -655,6 +674,7 @@ const MockSettingsRouteRouteWithChildren =
 interface MockAppRouteChildren {
   MockAppAdminRoute: typeof MockAppAdminRoute
   MockAppChatRoute: typeof MockAppChatRoute
+  MockAppDashboardRoute: typeof MockAppDashboardRoute
   MockAppInboxRoute: typeof MockAppInboxRoute
   MockAppProjectsRoute: typeof MockAppProjectsRoute
   MockAppTimelineRoute: typeof MockAppTimelineRoute
@@ -663,6 +683,7 @@ interface MockAppRouteChildren {
 const MockAppRouteChildren: MockAppRouteChildren = {
   MockAppAdminRoute: MockAppAdminRoute,
   MockAppChatRoute: MockAppChatRoute,
+  MockAppDashboardRoute: MockAppDashboardRoute,
   MockAppInboxRoute: MockAppInboxRoute,
   MockAppProjectsRoute: MockAppProjectsRoute,
   MockAppTimelineRoute: MockAppTimelineRoute,

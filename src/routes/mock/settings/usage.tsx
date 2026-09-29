@@ -5,11 +5,11 @@ import { USAGE_BY_MEMBER, USAGE_SERIES } from "@/mock/data"
 import { PageHeader, SectionHeader } from "@/components/patterns/section-header"
 import { SettingCard, SettingRow } from "@/components/patterns/setting-card"
 import { KpiStrip } from "@/components/patterns/kpi-strip"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Progress } from "@/components/ui/progress"
 import { DataTable } from "@/components/patterns/data-table"
 import type { Column } from "@/components/patterns/data-table"
 import { SegmentedPills } from "@/components/patterns/segmented"
+import { PersonAvatar } from "@/components/patterns/person-avatar"
 
 export const Route = createFileRoute("/mock/settings/usage")({
   component: UsageSettings,
@@ -29,9 +29,7 @@ const COLUMNS: Array<Column<MemberUsage>> = [
     header: "Member",
     cell: (m) => (
       <div className="flex items-center gap-2">
-        <Avatar size="xs">
-          <AvatarFallback>{m.initials}</AvatarFallback>
-        </Avatar>
+        <PersonAvatar size="xs" name={m.member} initials={m.initials} />
         <span className="text-foreground">{m.member}</span>
         {/* A bar in the row, not a separate chart: the comparison people
             want is between these rows. Width is a percentage of a fixed

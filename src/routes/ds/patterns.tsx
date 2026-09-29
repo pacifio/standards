@@ -271,7 +271,7 @@ function PatternsGallery() {
 
       <Specimen
         title="Dither field"
-        note="The canvas-2D fallback for the login aside and empty states: a 4×4 Bayer matrix over value noise, stepped at ~12fps. Ink is the resolved foreground, so it inverts with the theme. The GLSL RevealWaveImage on the Blocks page replaces it wherever WebGL is available."
+        note="A canvas-2D texture for empty states and marketing surfaces: a 4×4 Bayer matrix over value noise, stepped at ~12fps. Ink is the resolved foreground, so it inverts with the theme."
       >
         <div className="flex w-full flex-col gap-3">
           <div className="relative h-32 w-full overflow-hidden rounded-xl bg-surface ring-1 ring-foreground/10">

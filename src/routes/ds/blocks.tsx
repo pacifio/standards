@@ -1,5 +1,4 @@
-import { ClientOnly, createFileRoute } from "@tanstack/react-router"
-import { lazy, Suspense } from "react"
+import { createFileRoute } from "@tanstack/react-router"
 
 import { SESSIONS, TIMELINE_ENTRIES } from "@/mock/data"
 import { PageHeader } from "@/components/patterns/section-header"
@@ -7,26 +6,16 @@ import { Specimen } from "@/components/gallery/specimen"
 import { DashedRails } from "@/components/blocks/dashed-rails"
 import { GhostCards } from "@/components/blocks/ghost-cards"
 import { Globe } from "@/components/blocks/globe"
-import { Glow } from "@/components/blocks/glow"
 import { InfiniteSlider } from "@/components/blocks/infinite-slider"
 import { PlusCorners } from "@/components/blocks/plus-decorator"
 import { ProgressiveBlur } from "@/components/blocks/progressive-blur"
 import { SessionPipeline } from "@/components/blocks/session-pipeline"
 import { SessionTimeline } from "@/components/blocks/session-timeline"
-import { SpinningBorderPill } from "@/components/blocks/spinning-border-pill"
 import { Callout } from "@/components/ui/callout"
-import { DitherField } from "@/components/ui/dither-field"
 import { ScrollFade } from "@/components/ui/scroll-fade"
 import { StatusIcon } from "@/components/ui/status-icon"
 
 export const Route = createFileRoute("/ds/blocks")({ component: BlocksGallery })
-
-// three + fiber only load for whoever opens this page or the login screen.
-const RevealWaveImage = lazy(() =>
-  import("@/components/blocks/reveal-wave-image").then((m) => ({
-    default: m.RevealWaveImage,
-  }))
-)
 
 const LIVE = SESSIONS.find((s) => s.status === "live") ?? SESSIONS[0]
 const PIPELINE_ENTRIES = TIMELINE_ENTRIES.map((e, i) =>
@@ -55,28 +44,6 @@ function BlocksGallery() {
       >
         <div className="relative h-64 w-full overflow-hidden rounded-xl bg-surface ring-1 ring-foreground/10">
           <Globe className="absolute -top-1/4 left-1/2 w-96 -translate-x-1/2" />
-        </div>
-      </Specimen>
-
-      <Specimen
-        title="Reveal wave image"
-        note="A GLSL shader: sine-wave UV distortion, greyscale, a 4×4 Bayer ordered dither quantised to three levels in the theme's own ink and paper — and a cursor spotlight that mixes the full-colour texture back in. Move the pointer over it."
-      >
-        <div className="h-64 w-full overflow-hidden rounded-xl ring-1 ring-foreground/10">
-          <ClientOnly fallback={<DitherField mode="glyphs" />}>
-            <Suspense fallback={<DitherField mode="glyphs" />}>
-              <RevealWaveImage
-                src="/login/abstract.avif"
-                pixelSize={2}
-                waveSpeed={0.2}
-                waveFrequency={0.7}
-                waveAmplitude={0.5}
-                revealRadius={0.5}
-                revealSoftness={1}
-                mouseRadius={0.4}
-              />
-            </Suspense>
-          </ClientOnly>
         </div>
       </Specimen>
 
@@ -188,28 +155,6 @@ function BlocksGallery() {
             </div>
           </GhostCards>
         </div>
-      </Specimen>
-
-      <Specimen
-        title="Glow and spinning border"
-        note="A blurred duplicate behind an object; achromatic by default, and the one place chroma is allowed to move when `hue animated`. The spinning border is a conic ring on a registered angle — a live indicator that says 'something is happening' without a spinner in the content."
-      >
-        <div className="relative">
-          <Glow />
-          <div className="relative rounded-xl bg-card px-4 py-3 text-xs ring-1 ring-foreground/10">
-            Quiet glow
-          </div>
-        </div>
-        <div className="relative">
-          <Glow hue animated />
-          <div className="relative rounded-xl bg-card px-4 py-3 text-xs ring-1 ring-foreground/10">
-            Hue glow
-          </div>
-        </div>
-        <SpinningBorderPill>
-          <StatusIcon status="live" className="size-3" />
-          Live session
-        </SpinningBorderPill>
       </Specimen>
     </>
   )

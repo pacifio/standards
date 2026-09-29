@@ -1,34 +1,32 @@
+import { ThinkingOrb } from "thinking-orbs"
 import { cn } from "cn"
 
 /**
  * The session status glyph.
  *
- * This is the single most load-bearing 14px in a Linear issue row, and the
- * previous build of this system did not have it at all — status was rendered
- * as a grey text label, which is why a board of 200 rows read as undifferen-
- * tiated prose. The glyph is scannable at a glance in a way a word is not:
- * you read the ring, not the label.
+ * Circles, because a status dot is a circle everywhere else a person has
+ * seen one — and one thing that is not a circle: a running session is a
+ * ThinkingOrb, a dotted sphere in constant motion. "Running" is the only
+ * state where something is actually happening, so it is the only one that
+ * moves; everything at rest is a still dot.
  *
- * Drawn rather than pulled from Lucide because the states are a progression —
- * empty ring, partial wedge, full check — and Lucide has no set where those
- * three share a silhouette. A circle that fills is a progress bar you can read
- * peripherally.
+ *   queued   a hollow ring in muted ink — nothing has happened yet
+ *   live     the `composing` ThinkingOrb — work in progress
+ *   done     a solid dot in muted ink — history, and it should recede
+ *   failed   a solid dot in the error ink
  *
- * `queued` is deliberately the same grey as tertiary text. Nothing is
- * happening, so nothing should catch the eye.
+ * The orb is monochrome and follows `data-theme` on its own; it renders a
+ * still frame under `prefers-reduced-motion`. It is drawn at its 20px inline
+ * preset and fitted to the glyph box, so it sits on the same 14px footprint
+ * as the dots (or whatever `size-*` the caller passes).
  */
 
 export type SessionStatusKind = "queued" | "live" | "done" | "failed"
 
-/**
- * Monochrome first. `done` is a filled check in the FOREGROUND ink, not a
- * colour — a finished session is the resting state and should not glow.
- * Only the states that need attention carry chroma.
- */
 const TONE: Record<SessionStatusKind, string> = {
   queued: "text-muted-foreground",
-  live: "text-success",
-  done: "text-foreground",
+  live: "text-foreground",
+  done: "text-muted-foreground",
   failed: "text-error",
 }
 
@@ -42,8 +40,32 @@ const LABEL: Record<SessionStatusKind, string> = {
 function StatusIcon({
   status,
   className,
-  ...props
-}: Omit<React.ComponentProps<"svg">, "ref"> & { status: SessionStatusKind }) {
+}: {
+  status: SessionStatusKind
+  className?: string
+}) {
+  if (status === "live") {
+    return (
+      <span
+        data-slot="status-icon"
+        data-status={status}
+        role="img"
+        aria-label={LABEL[status]}
+        className={cn("inline-block size-3.5 shrink-0", className)}
+      >
+        <ThinkingOrb
+          state="composing"
+          size={20}
+          // Drawn at the 20px preset and scaled down to 14, so the dots
+          // are thickened to keep the same weight as the solid dots.
+          dotSize={1.4}
+          aria-hidden="true"
+          style={{ width: "100%", height: "100%" }}
+        />
+      </span>
+    )
+  }
+
   return (
     <svg
       data-slot="status-icon"
@@ -54,50 +76,18 @@ function StatusIcon({
       fill="none"
       role="img"
       aria-label={LABEL[status]}
-      className={cn("shrink-0", TONE[status], className)}
-      {...props}
+      className={cn("size-3.5 shrink-0", TONE[status], className)}
     >
-      {/* The ring is common to every state, so the glyph keeps one
-          silhouette and only its fill changes. */}
-      <circle
-        cx="7"
-        cy="7"
-        r="5.5"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeDasharray={status === "queued" ? "1.6 1.8" : undefined}
-        opacity={status === "queued" ? 0.9 : 1}
-      />
-
-      {/* Running: a wedge, not a spinner. A session that has been going for
-          forty minutes should not animate forever in the corner of the eye. */}
-      {status === "live" && (
-        <path d="M7 7 V 2.4 A 4.6 4.6 0 0 1 11.6 7 Z" fill="currentColor" />
-      )}
-
-      {status === "done" && (
-        <>
-          <circle cx="7" cy="7" r="5.5" fill="currentColor" />
-          <path
-            d="M4.6 7.1 L6.3 8.8 L9.5 5.4"
-            stroke="var(--background)"
-            strokeWidth="1.6"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </>
-      )}
-
-      {status === "failed" && (
-        <>
-          <circle cx="7" cy="7" r="5.5" fill="currentColor" />
-          <path
-            d="M5.1 5.1 L8.9 8.9 M8.9 5.1 L5.1 8.9"
-            stroke="var(--background)"
-            strokeWidth="1.6"
-            strokeLinecap="round"
-          />
-        </>
+      {status === "queued" ? (
+        <circle
+          cx="7"
+          cy="7"
+          r="3.75"
+          stroke="currentColor"
+          strokeWidth="1.5"
+        />
+      ) : (
+        <circle cx="7" cy="7" r="4.25" fill="currentColor" />
       )}
     </svg>
   )

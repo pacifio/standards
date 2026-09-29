@@ -40,6 +40,8 @@ export type Member = {
   role: Role
   /** A departed member is never deleted — their sessions still reference them. */
   status: "active" | "invited" | "former"
+  /** Profile photo URL — better-auth's `user.image`. Absent means initials. */
+  image?: string
   lastSeen?: string
 }
 

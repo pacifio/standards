@@ -4,7 +4,6 @@ import { CopyIcon, MonitorIcon } from "lucide-react"
 import { useOrg } from "@/lib/org-context"
 import { PageHeader, SectionHeader } from "@/components/patterns/section-header"
 import { SettingCard, SettingRow } from "@/components/patterns/setting-card"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Code } from "@/components/ui/code-block"
@@ -17,6 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { PersonAvatar } from "@/components/patterns/person-avatar"
 
 export const Route = createFileRoute("/mock/settings/account")({
   component: AccountSettings,
@@ -60,9 +60,12 @@ function AccountSettings() {
               description="Shown on sessions, comments and messages."
               control={
                 <div className="flex items-center gap-2">
-                  <Avatar size="lg">
-                    <AvatarFallback>{user.initials}</AvatarFallback>
-                  </Avatar>
+                  <PersonAvatar
+                    size="lg"
+                    name={user.name}
+                    email={user.email}
+                    initials={user.initials}
+                  />
                   <Button variant="outline" size="sm">
                     Change
                   </Button>

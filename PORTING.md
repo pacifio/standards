@@ -82,7 +82,7 @@ gaps that matter, roughly in order of how much they are costing today:
 | `switch`, `checkbox`, `radio-group`, `slider` | No form controls beyond input and textarea. |
 | `resizable` | Panes are fixed or native-scrolled. |
 | `empty-state`, `callout`, `spinner`, `progress` | Each screen invents its own. |
-| `blocks/*` | `SessionPipeline` and `SessionTimeline` are the session view; `RevealWaveImage` is the login aside (client-only — it pulls `three`, so keep it behind `ClientOnly` + `React.lazy` as here). |
+| `blocks/*` | `SessionPipeline` and `SessionTimeline` are the session view; `Globe` is the login aside (cobe, ~5kb, WebGL — it builds itself in an effect, so it is SSR-safe without `ClientOnly`). |
 
 ## 4. One org context, replacing four
 

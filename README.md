@@ -28,8 +28,8 @@ bun run check    # prettier
 | `/ds/foundations/*` | Colour, type, density, motion & depth — every token with its value and the reason it exists |
 | `/ds/components/*` | 36 components: actions, forms, overlays, data, feedback. Every variant, size and state |
 | `/ds/patterns` | Panel, KPI strip, segmented controls, data table, setting card — the compositions that appear on more than one screen |
-| `/ds/blocks` | The illustration and effect primitives, including the GLSL reveal-wave image |
-| `/mock/*` | The Atlas web app: Inbox, Timeline, Projects, Chat, Settings, Admin, Sign in |
+| `/ds/blocks` | The illustration and effect primitives, including the draggable status globe |
+| `/mock/*` | The Atlas web app: Dashboard, Inbox, Timeline, Projects, Chat, Settings, Admin, Sign in |
 
 Both themes are fully designed; dark is the default. Toggle from the sidebar
 footer or the gallery nav. The interface scale (`T 100%`) lives beside it.
@@ -44,8 +44,7 @@ src/styles/     tokens.css    non-colour scales: rem type, control ladder, radiu
 src/components/ ui/           36 primitives on @base-ui/react, shadcn base-mira shape
                 patterns/     Panel, KpiStrip, Segmented, DataTable, SettingCard, headers
                 blocks/       ProgressiveBlur, InfiniteSlider, DashedRails, PlusDecorator,
-                              GhostCards, Glow, SpinningBorderPill, SessionPipeline,
-                              SessionTimeline, RevealWaveImage, Globe
+                              GhostCards, SessionPipeline, SessionTimeline, Globe
                 shell/        AppShell, Sidebar, TopBar, OrgSwitcher, CommandMenu,
                               SettingsShell, AuthSplit, UiScaleControl
                 gallery/      the gallery's own furniture

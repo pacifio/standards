@@ -9,6 +9,7 @@ import {
 } from "lucide-react"
 
 import { SESSIONS, TIMELINE_ENTRIES } from "@/mock/data"
+import { ageMinutes } from "@/mock/age"
 import type { Session, SessionStatus } from "@/mock/types"
 import { Dock } from "@/components/shell/app-shell"
 import { Crumb, TopBar } from "@/components/shell/top-bar"
@@ -20,14 +21,14 @@ import type { Column } from "@/components/patterns/data-table"
 import { KpiStrip } from "@/components/patterns/kpi-strip"
 import { PageHeader } from "@/components/patterns/section-header"
 import { CompoundFilter, SegmentedPills } from "@/components/patterns/segmented"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Code, DiffStat } from "@/components/ui/code-block"
 import { Icon } from "@/components/ui/icon"
 import { IconButton } from "@/components/ui/icon-button"
 import { ScrollFade } from "@/components/ui/scroll-fade"
-import { Tag } from "@/components/ui/tag"
+import { LabelMark, Tag } from "@/components/ui/tag"
 import { PriorityIcon, StatusIcon } from "@/components/ui/status-icon"
+import { PersonAvatar } from "@/components/patterns/person-avatar"
 
 type BoardView = "all" | "mine" | "agents"
 
@@ -101,7 +102,11 @@ function TimelineScreen() {
       s.ref.toLowerCase().includes(q) ||
       s.labels.some((l) => l.name.toLowerCase().includes(q))
     )
-  }).sort((a, b) => STATUS_ORDER[a.status] - STATUS_ORDER[b.status])
+  }).sort(
+    (a, b) =>
+      STATUS_ORDER[a.status] - STATUS_ORDER[b.status] ||
+      ageMinutes(a.startedAt) - ageMinutes(b.startedAt)
+  )
 
   const count = (status: SessionStatus) =>
     SESSIONS.filter((s) => s.status === status).length
@@ -130,7 +135,9 @@ function TimelineScreen() {
       cell: (s) => (
         <span className="flex items-center gap-1.5">
           <StatusIcon status={s.status} />
-          <span className="text-2xs">{STATUS_LABEL[s.status]}</span>
+          <span className="mono text-3xs tracking-wide text-secondary-foreground uppercase">
+            {STATUS_LABEL[s.status]}
+          </span>
         </span>
       ),
       sortValue: (s) => STATUS_ORDER[s.status],
@@ -146,11 +153,11 @@ function TimelineScreen() {
           </span>
           {/* Labels drop out before the title truncates; identity is worth
               less than the name of the thing. */}
-          <span className="hidden shrink-0 items-center gap-1 @4xl:flex">
+          <span className="hidden shrink-0 items-center gap-2.5 @4xl:flex">
             {s.labels.map((l) => (
-              <Tag key={l.name} hue={l.tone}>
+              <LabelMark key={l.name} hue={l.tone}>
                 {l.name}
-              </Tag>
+              </LabelMark>
             ))}
           </span>
         </span>
@@ -193,9 +200,7 @@ function TimelineScreen() {
       id: "author",
       header: <span className="sr-only">Author</span>,
       cell: (s) => (
-        <Avatar size="xs">
-          <AvatarFallback>{s.authorInitials}</AvatarFallback>
-        </Avatar>
+        <PersonAvatar size="xs" name={s.author} initials={s.authorInitials} />
       ),
       className: "w-10",
     },
@@ -227,7 +232,7 @@ function TimelineScreen() {
           <PageHeader
             className="pb-0"
             title={VIEW_TITLE[view]}
-            description={`${count("live")} live · ${count("queued")} queued · ${SESSIONS.length} this week`}
+            description={`${count("live")} live · ${count("queued")} queued · ${SESSIONS.length} sessions`}
             action={
               <div className="flex flex-wrap items-center gap-2">
                 <SegmentedPills<BoardView>
@@ -335,9 +340,11 @@ function SessionDock({
             </h2>
             <div className="flex flex-wrap items-center gap-1.5">
               <span className="flex items-center gap-1.5 text-2xs text-secondary-foreground">
-                <Avatar size="xs">
-                  <AvatarFallback>{session.authorInitials}</AvatarFallback>
-                </Avatar>
+                <PersonAvatar
+                  size="xs"
+                  name={session.author}
+                  initials={session.authorInitials}
+                />
                 {session.author}
               </span>
               {session.labels.map((l) => (
