@@ -1,10 +1,8 @@
 import { useState } from "react"
 import { createFileRoute } from "@tanstack/react-router"
-import { ShieldIcon } from "lucide-react"
 
 import { ORGANISATIONS } from "@/mock/data"
 import type { Organisation } from "@/mock/types"
-import { Crumb, TopBar } from "@/components/shell/top-bar"
 import { DataTable, TableSearch } from "@/components/patterns/data-table"
 import type { Column } from "@/components/patterns/data-table"
 import { KpiStrip } from "@/components/patterns/kpi-strip"
@@ -12,7 +10,6 @@ import { PageHeader } from "@/components/patterns/section-header"
 import { UnderlineTabs } from "@/components/patterns/segmented"
 import { Button } from "@/components/ui/button"
 import { Callout } from "@/components/ui/callout"
-import { Icon } from "@/components/ui/icon"
 import { ScrollFade } from "@/components/ui/scroll-fade"
 import { Tag } from "@/components/ui/tag"
 
@@ -120,12 +117,6 @@ function AdminScreen() {
 
   return (
     <>
-      <TopBar>
-        <Icon icon={ShieldIcon} size="sm" className="text-muted-foreground" />
-        <Crumb>Administration</Crumb>
-        <Crumb current>Platform</Crumb>
-      </TopBar>
-
       <ScrollFade className="min-h-0 flex-1">
         <div className="flex flex-col gap-4 px-5 pt-4 pb-6">
           <PageHeader

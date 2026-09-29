@@ -12,7 +12,6 @@ import {
 import { cn } from "cn"
 
 import { CONVERSATIONS, MESSAGES } from "@/mock/data"
-import { Crumb, TopBar } from "@/components/shell/top-bar"
 import { Icon } from "@/components/ui/icon"
 import { IconButton } from "@/components/ui/icon-button"
 import { ScrollFade } from "@/components/ui/scroll-fade"
@@ -40,23 +39,6 @@ function ChatScreen() {
 
   return (
     <>
-      <TopBar
-        actions={
-          <>
-            <IconButton icon={PinIcon} label="Pinned messages" size="sm" />
-            <IconButton icon={PhoneIcon} label="Start a call" size="sm" />
-            <IconButton icon={UsersIcon} label="Members" size="sm" />
-          </>
-        }
-      >
-        <Icon
-          icon={selected.kind === "channel" ? HashIcon : MessageSquareIcon}
-          size="sm"
-          className="text-muted-foreground"
-        />
-        <Crumb current>{selected.name}</Crumb>
-      </TopBar>
-
       <div className="flex min-h-0 flex-1">
         <ScrollFade className="w-60 shrink-0 border-r border-hairline bg-surface">
           <div className="flex flex-col gap-px p-1.5">
@@ -104,6 +86,23 @@ function ChatScreen() {
         </ScrollFade>
 
         <div className="flex min-w-0 flex-1 flex-col">
+          {/* The conversation's own header: what you are in and what you
+              can do in it. There is no page bar above the panel. */}
+          <div className="flex h-11 shrink-0 items-center gap-2 border-b border-hairline px-4">
+            <Icon
+              icon={selected.kind === "channel" ? HashIcon : MessageSquareIcon}
+              size="sm"
+              className="text-muted-foreground"
+            />
+            <span className="truncate text-xs font-medium">
+              {selected.name}
+            </span>
+            <div className="ml-auto flex items-center gap-0.5">
+              <IconButton icon={PinIcon} label="Pinned messages" size="sm" />
+              <IconButton icon={PhoneIcon} label="Start a call" size="sm" />
+              <IconButton icon={UsersIcon} label="Members" size="sm" />
+            </div>
+          </div>
           {pinned.length > 0 && (
             <div className="flex h-8 shrink-0 items-center gap-2 border-b border-hairline px-4">
               <Icon

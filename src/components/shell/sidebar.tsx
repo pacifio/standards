@@ -70,7 +70,7 @@ function Sidebar({
         animate={{ width: collapsed ? RAIL_WIDTH_COLLAPSED : RAIL_WIDTH }}
         transition={SPRING_RAIL}
         className={cn(
-          "relative z-panel flex h-svh shrink-0 flex-col border-r border-sidebar-border bg-sidebar",
+          "relative z-panel flex h-full shrink-0 flex-col",
           className
         )}
         {...props}
@@ -81,11 +81,36 @@ function Sidebar({
   )
 }
 
+/**
+ * The workspace row. It sits on the shell's canvas ABOVE the curved panel,
+ * as the Atlas desktop app does — the switcher is the frame's, the panel
+ * below is the navigation's.
+ */
 function SidebarHeader({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="sidebar-header"
-      className={cn("flex items-center gap-1 p-2", className)}
+      className={cn("flex h-10 shrink-0 items-center gap-1 pb-2", className)}
+      {...props}
+    />
+  )
+}
+
+/**
+ * The curved segment the navigation lives in: search, groups and footer
+ * inside one ringed panel on the page's own background, so the rail reads as
+ * a surface with depth rather than a strip of links along the window edge.
+ */
+function SidebarPanel({ className, ...props }: React.ComponentProps<"div">) {
+  return (
+    <div
+      data-slot="sidebar-panel"
+      className={cn(
+        // The same panel expanded and collapsed: it only changes width, so
+        // the rail's spring animates one shape rather than swapping two.
+        "flex min-h-0 flex-1 flex-col overflow-hidden rounded-xl border border-shell-edge bg-background pt-2",
+        className
+      )}
       {...props}
     />
   )
@@ -373,6 +398,7 @@ export {
   SidebarGroup,
   SidebarHeader,
   SidebarItem,
+  SidebarPanel,
   SidebarSearch,
   useSidebar,
 }

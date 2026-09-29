@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { Link, createFileRoute, useNavigate } from "@tanstack/react-router"
-import { ArrowRightIcon, LayoutDashboardIcon } from "lucide-react"
+import { ArrowRightIcon } from "lucide-react"
 
 import { SESSIONS } from "@/mock/data"
 import { ageMinutes } from "@/mock/age"
@@ -8,7 +8,6 @@ import { RANGE_LABEL, statFigures, tokenParts } from "@/mock/dashboard"
 import type { DashboardRange } from "@/mock/dashboard"
 import type { Session, SessionStatus } from "@/mock/types"
 import { useOrg } from "@/lib/org-context"
-import { Crumb, TopBar } from "@/components/shell/top-bar"
 import { ActivityFeed } from "@/components/dashboard/activity-feed"
 import { MemberQuickManage } from "@/components/dashboard/member-quick-manage"
 import { DataTable } from "@/components/patterns/data-table"
@@ -156,15 +155,6 @@ function DashboardScreen() {
 
   return (
     <>
-      <TopBar>
-        <Icon
-          icon={LayoutDashboardIcon}
-          size="sm"
-          className="text-muted-foreground"
-        />
-        <Crumb current>Dashboard</Crumb>
-      </TopBar>
-
       <ScrollFade className="min-h-0 flex-1">
         <div className="@container flex flex-col gap-6 px-5 pt-4 pb-8">
           {/* A greeting rather than a page title — the sidebar already says

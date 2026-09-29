@@ -2,7 +2,6 @@ import { useState } from "react"
 import { createFileRoute, useNavigate } from "@tanstack/react-router"
 import {
   ChevronDownIcon,
-  LayersIcon,
   MessageSquareIcon,
   SlidersHorizontalIcon,
   XIcon,
@@ -12,7 +11,6 @@ import { SESSIONS, TIMELINE_ENTRIES } from "@/mock/data"
 import { ageMinutes } from "@/mock/age"
 import type { Session, SessionStatus } from "@/mock/types"
 import { Dock } from "@/components/shell/app-shell"
-import { Crumb, TopBar } from "@/components/shell/top-bar"
 import { PropertyRow } from "@/components/shell/list-detail"
 import { SessionPipeline } from "@/components/blocks/session-pipeline"
 import { SessionTimeline } from "@/components/blocks/session-timeline"
@@ -214,19 +212,6 @@ function TimelineScreen() {
         )}
       </Dock>
 
-      <TopBar
-        actions={
-          <IconButton
-            icon={SlidersHorizontalIcon}
-            label="Display options"
-            size="sm"
-          />
-        }
-      >
-        <Icon icon={LayersIcon} size="sm" className="text-muted-foreground" />
-        <Crumb current>{VIEW_TITLE[view]}</Crumb>
-      </TopBar>
-
       <ScrollFade className="min-h-0 flex-1">
         <div className="flex flex-col gap-4 px-5 pt-4 pb-6">
           <PageHeader
@@ -256,6 +241,11 @@ function TimelineScreen() {
                   placeholder="Search sessions"
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
+                />
+                <IconButton
+                  icon={SlidersHorizontalIcon}
+                  label="Display options"
+                  size="sm"
                 />
               </div>
             }

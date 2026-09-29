@@ -2,7 +2,6 @@ import { useState } from "react"
 import { createFileRoute } from "@tanstack/react-router"
 import {
   ChevronDownIcon,
-  FolderGitIcon,
   Link2Icon,
   MoreHorizontalIcon,
   PlusIcon,
@@ -12,7 +11,6 @@ import {
 
 import { PROJECTS } from "@/mock/data"
 import { hueFor } from "@/lib/hue"
-import { Crumb, TopBar } from "@/components/shell/top-bar"
 import { Panel } from "@/components/patterns/panel"
 import { PageHeader } from "@/components/patterns/section-header"
 import { CompoundFilter, SegmentedPills } from "@/components/patterns/segmented"
@@ -59,15 +57,6 @@ function ProjectsScreen() {
 
   return (
     <>
-      <TopBar>
-        <Icon
-          icon={FolderGitIcon}
-          size="sm"
-          className="text-muted-foreground"
-        />
-        <Crumb current>Projects</Crumb>
-      </TopBar>
-
       <ScrollFade className="min-h-0 flex-1">
         <div className="flex flex-col gap-4 px-5 pt-4 pb-6">
           <PageHeader

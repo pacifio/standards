@@ -14,7 +14,6 @@ import { cn } from "cn"
 
 import { NOTIFICATIONS } from "@/mock/data"
 import type { NotificationKind } from "@/mock/types"
-import { Crumb, TopBar } from "@/components/shell/top-bar"
 import { SegmentedPills } from "@/components/patterns/segmented"
 import { Button } from "@/components/ui/button"
 import { EmptyState } from "@/components/ui/empty-state"
@@ -72,45 +71,36 @@ function InboxScreen() {
 
   return (
     <>
-      <TopBar
-        actions={
-          <>
-            <IconButton
-              icon={CheckCheckIcon}
-              label="Mark all as read"
-              size="sm"
-            />
-            <IconButton
-              icon={SlidersHorizontalIcon}
-              label="Display options"
-              size="sm"
-            />
-          </>
-        }
-      >
-        <Icon icon={InboxIcon} size="sm" className="text-muted-foreground" />
-        <Crumb current>Inbox</Crumb>
-        {unread > 0 && (
-          <span className="rounded-full bg-muted px-1.5 text-3xs text-muted-foreground tnum">
-            {unread}
-          </span>
-        )}
-      </TopBar>
-
       <ResizableGroup orientation="horizontal" className="min-h-0 flex-1">
         <ResizablePanel defaultSize="38%" minSize="28%" maxSize="55%">
           <div className="flex h-full flex-col">
-            <div className="flex h-10 shrink-0 items-center border-b border-hairline px-3">
+            <div className="flex h-11 shrink-0 items-center gap-1 border-b border-hairline px-3">
               <SegmentedPills<Filter>
                 size="sm"
                 value={filter}
                 onChange={setFilter}
                 options={[
                   { value: "all", label: "All" },
-                  { value: "unread", label: "Unread" },
+                  {
+                    value: "unread",
+                    label: "Unread",
+                    count: unread || undefined,
+                  },
                   { value: "mentions", label: "Mentions" },
                 ]}
               />
+              <div className="ml-auto flex items-center gap-0.5">
+                <IconButton
+                  icon={CheckCheckIcon}
+                  label="Mark all as read"
+                  size="sm"
+                />
+                <IconButton
+                  icon={SlidersHorizontalIcon}
+                  label="Display options"
+                  size="sm"
+                />
+              </div>
             </div>
             <ScrollFade className="min-h-0 flex-1">
               {visible.length === 0 ? (

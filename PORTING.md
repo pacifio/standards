@@ -114,10 +114,13 @@ becomes its only writer. The existing API surface in `apps/web/src/lib/api.ts`
 four links. `/inbox` and `/admin` are not in it, and it is `hidden sm:flex`, so
 below 640px the signed-in app has no navigation at all.
 
-`src/components/shell/` replaces it: `AppShell` (sidebar · topbar + main ·
-optional `dock`), `Sidebar` + `SidebarGroup` + `SidebarItem` (with nested
-children on an animated rail), `OrgSwitcher`, `TopBar` + `TopBarCluster`,
-`CommandMenu`, `UiScaleControl` and `SettingsShell`. The `dock` prop is how a
+`src/components/shell/` replaces it: `AppShell` — curved, ringed panels
+(nav · page · optional `dock`) set into a darker canvas, with no page
+header bar — plus `Sidebar` +
+`SidebarPanel` + `SidebarGroup` + `SidebarItem` (with nested children on an
+animated rail), `OrgSwitcher`, `CommandMenu`, `UiScaleControl` and
+`SettingsShell`. Each screen puts its own title and actions at the top of its
+panel. The `dock` prop is how a
 screen shows a selected record beside the page — the timeline uses it for the
 session view — without a second layout system.
 

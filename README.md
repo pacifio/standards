@@ -4,8 +4,8 @@ The UI design system for the Atlas web app — and a mock of that app built on
 it.
 
 **Achromatic surfaces, hairline rules, rings instead of shadows, and hue only
-where something has an identity.** The structure — a glass topbar, a
-spring-collapsing sidebar whose active pill slides between rows, ringed
+where something has an identity.** The structure — curved panels set into a
+canvas frame, a spring-collapsing sidebar whose active pill slides between rows, ringed
 panels, a KPI strip, hue-coded tags, an interface-scale control — comes from
 the Auberge dashboard. The palette and the illustration blocks — a monochrome
 OKLCH ramp, dashed rails, cross-hair corners, the Bayer-dither shader — come
@@ -45,7 +45,7 @@ src/components/ ui/           36 primitives on @base-ui/react, shadcn base-mira 
                 patterns/     Panel, KpiStrip, Segmented, DataTable, SettingCard, headers
                 blocks/       ProgressiveBlur, InfiniteSlider, DashedRails, PlusDecorator,
                               GhostCards, SessionPipeline, SessionTimeline, Globe
-                shell/        AppShell, Sidebar, TopBar, OrgSwitcher, CommandMenu,
+                shell/        AppShell, Sidebar, OrgSwitcher, CommandMenu,
                               SettingsShell, AuthSplit, UiScaleControl
                 gallery/      the gallery's own furniture
 src/lib/        theme.tsx, ui-scale.tsx, org-context.tsx, hue.ts, motion.ts,

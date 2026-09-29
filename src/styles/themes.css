@@ -57,6 +57,12 @@
      inside it. The thumb is always a step LIGHTER than the track — which
      in dark means a lighter grey, and in light means white on grey. */
   --segment-track: oklch(0.13 0 0);
+  /* The app frame. Panels are the page `background`; the canvas they are
+     set into is a step DARKER, and their edge is an opaque rule — an alpha
+     ring over two near-identical greys disappears. Used as a `border`, not
+     a `ring`: a ring paints outside the box, and the rail clips it. */
+  --shell-canvas: oklch(0.045 0 0);
+  --shell-edge: oklch(0.23 0 0);
   --segment-thumb: oklch(0.26 0 0);
   --input: oklch(1 0 0 / 10%);
   --ring: oklch(0.97 0 0 / 40%);
@@ -154,6 +160,8 @@
   --border: oklch(0 0 0 / 9%);
   --border-strong: oklch(0 0 0 / 18%);
   --segment-track: oklch(0.955 0 0);
+  --shell-canvas: oklch(0.935 0 0);
+  --shell-edge: oklch(0.85 0 0);
   --segment-thumb: oklch(1 0 0);
   --input: oklch(0 0 0 / 9%);
   --ring: oklch(0.1 0 0 / 40%);

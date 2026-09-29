@@ -37,6 +37,8 @@
   --color-border-strong: var(--border-strong);
   --color-border-illustration: var(--border-illustration);
   --color-segment-track: var(--segment-track);
+  --color-shell-canvas: var(--shell-canvas);
+  --color-shell-edge: var(--shell-edge);
   --color-segment-thumb: var(--segment-thumb);
   --color-input: var(--input);
   --color-ring: var(--ring);
