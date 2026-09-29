@@ -19,7 +19,11 @@
    `--element-hover` is `bg-element-hover`. One word per pixel.
    ========================================================================== */
 
-:root {
+/* `[data-theme="dark"]` as well as `:root`, so a surface can flip to the
+   other theme's tokens by setting the attribute on itself — the session
+   comments popover is dark on a light page and light on a dark one. */
+:root,
+[data-theme="dark"] {
   color-scheme: dark;
 
   /* --- surfaces: page → surface → card → illustration → raised → popover --- */

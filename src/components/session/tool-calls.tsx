@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import {
   BookOpenIcon,
   ChevronRightIcon,
@@ -17,7 +17,7 @@ import { cn } from "cn"
 
 import type { ApiTimelineEntry } from "@/mock/sessions-api"
 import { Icon } from "@/components/ui/icon"
-import { useCommentCount } from "./comments"
+import { CommentButton, useCommentCount, useComments } from "./comments"
 
 /**
  * A run of tool calls — the Atlas desktop app's `Calls`.
@@ -69,6 +69,15 @@ function ToolCalls({
 }) {
   const [open, setOpen] = useState(defaultOpen)
   const [expanded, setExpanded] = useState<string | null>(null)
+  const { focus } = useComments()
+
+  // A jump to a comment on one of these calls unfolds the group and opens
+  // that call, so the reader has something to scroll to.
+  useEffect(() => {
+    if (!focus || !calls.some((c) => c.id === focus.anchorId)) return
+    setOpen(true)
+    setExpanded(focus.anchorId)
+  }, [focus, calls])
   const failed = calls.filter((c) => c.toolStatus === "failed").length
 
   return (
@@ -129,48 +138,53 @@ function CallRow({
   const name = call.toolName ?? "Tool"
   const comments = useCommentCount(call.id)
   return (
-    <li>
-      <button
-        type="button"
-        aria-expanded={open}
-        onClick={onToggle}
-        className="group/call duration-fast flex h-8 w-full items-center gap-2 bg-card px-3 text-left transition-colors hover:bg-element-hover"
-      >
-        <Icon
-          icon={GLYPH[name] ?? WrenchIcon}
-          size="sm"
-          className={failed ? "text-error" : "text-muted-foreground"}
-        />
-        <span
-          className={cn(
-            "min-w-0 flex-1 truncate text-xs",
-            failed ? "text-error" : "text-secondary-foreground"
-          )}
+    <li data-entry={call.id} className="rounded-md">
+      <div className="duration-fast flex items-center bg-card transition-colors hover:bg-element-hover">
+        <button
+          type="button"
+          aria-expanded={open}
+          onClick={onToggle}
+          className="group/call flex h-8 min-w-0 flex-1 items-center gap-2 px-3 text-left"
         >
-          {VERB[name] ?? name}{" "}
+          <Icon
+            icon={GLYPH[name] ?? WrenchIcon}
+            size="sm"
+            className={failed ? "text-error" : "text-muted-foreground"}
+          />
           <span
             className={cn(
-              "mono text-2xs",
-              failed ? "text-error/80" : "text-disabled"
+              "min-w-0 flex-1 truncate text-xs",
+              failed ? "text-error" : "text-secondary-foreground"
             )}
           >
-            {call.toolTitle}
+            {VERB[name] ?? name}{" "}
+            <span
+              className={cn(
+                "mono text-2xs",
+                failed ? "text-error/80" : "text-disabled"
+              )}
+            >
+              {call.toolTitle}
+            </span>
           </span>
-        </span>
+          <Icon
+            icon={ChevronRightIcon}
+            size="xs"
+            className={cn(
+              "duration-fast text-disabled transition-transform",
+              open && "rotate-90"
+            )}
+          />
+        </button>
+        {/* Beside the toggle, not in it: a button cannot hold a button. */}
         {comments > 0 && (
-          <span className="flex h-4.5 items-center gap-1 rounded-full border border-border px-1.5 text-3xs text-muted-foreground tnum">
-            {comments}
-          </span>
+          <CommentButton
+            anchorKind="tool_call"
+            anchorId={call.id}
+            className="mr-2 shrink-0"
+          />
         )}
-        <Icon
-          icon={ChevronRightIcon}
-          size="xs"
-          className={cn(
-            "duration-fast text-disabled transition-transform",
-            open && "rotate-90"
-          )}
-        />
-      </button>
+      </div>
       {open && (
         <div className="flex flex-col gap-2.5 border-t border-hairline bg-background px-3 py-3">
           {call.paths && call.paths.length > 0 && (

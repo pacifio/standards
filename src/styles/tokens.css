@@ -115,6 +115,22 @@
   --learn-out: 350ms;
   --learn-ease: cubic-bezier(0.22, 1, 0.36, 1);
 
+  /* The button-to-panel morph (Transitions.dev "plus to menu morph"): the
+     trigger's own box grows into the panel and relaxes its corners; the
+     glyph fades and slides out as the content slides in. The open uses a
+     bouncier ease than the close. */
+  --morph-open-dur: 350ms;
+  --morph-close-dur: 250ms;
+  --morph-ease: cubic-bezier(0.34, 1.25, 0.64, 1);
+  --morph-close-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --morph-r-closed: 1rem;
+  --morph-r-open: 1.5rem;
+  --morph-fade-dur: 200ms;
+  --morph-slide: 2.5rem;
+  --morph-rotate: 45deg;
+  --morph-scale: 0.97;
+  --morph-blur: 2px;
+
   /* --- Glass ------------------------------------------------------------ */
   --blur-glass: 20px;
 

@@ -1,6 +1,6 @@
 "use client"
 
-import { createContext, useContext, useMemo, useState } from "react"
+import { createContext, useContext, useEffect, useMemo, useState } from "react"
 import { CheckIcon, CornerDownLeftIcon, MessageSquareIcon } from "lucide-react"
 import { cn } from "cn"
 
@@ -48,7 +48,16 @@ type CommentsContextValue = {
   resolve: (id: string, resolved: boolean) => void
   /** A comment to open and mark, from an inbox deep link. */
   highlight?: string
+  /**
+   * The last "jump to this comment" request: the anchor to scroll to and
+   * open, and the comment to mark. `n` changes on every request, so asking
+   * for the same anchor twice still fires.
+   */
+  focus: CommentFocus | null
+  focusComment: (anchorId: string, commentId: string) => void
 }
+
+export type CommentFocus = { anchorId: string; commentId: string; n: number }
 
 const CommentsContext = createContext<CommentsContextValue | null>(null)
 
@@ -70,10 +79,14 @@ function CommentsProvider({
   children: React.ReactNode
 }) {
   const [comments, setComments] = useState(initial)
+  const [focus, setFocus] = useState<CommentFocus | null>(null)
   const value = useMemo<CommentsContextValue>(
     () => ({
       comments,
-      highlight,
+      highlight: focus?.commentId ?? highlight,
+      focus,
+      focusComment: (anchorId, commentId) =>
+        setFocus((prev) => ({ anchorId, commentId, n: (prev?.n ?? 0) + 1 })),
       post: (anchorKind, anchorId, body, parentId) =>
         setComments((prev) => [
           ...prev,
@@ -107,7 +120,7 @@ function CommentsProvider({
           )
         ),
     }),
-    [comments, highlight, sessionId]
+    [comments, focus, highlight, sessionId]
   )
   return (
     <CommentsContext.Provider value={value}>
@@ -147,10 +160,18 @@ function CommentButton({
   anchorId: string
   className?: string
 }) {
-  const { highlight } = useComments()
+  const { highlight, focus } = useComments()
   const list = useAnchor(anchorId)
   const hasHighlight = !!highlight && list.some((c) => c.id === highlight)
   const [open, setOpen] = useState(hasHighlight)
+
+  // A jump from the comments popover: open once the reader has scrolled
+  // this anchor into view, so the popover positions against where it lands.
+  useEffect(() => {
+    if (focus?.anchorId !== anchorId) return
+    const t = window.setTimeout(() => setOpen(true), 420)
+    return () => window.clearTimeout(t)
+  }, [focus, anchorId])
   const faces = [...new Set(list.map((c) => c.authorId))].slice(0, 3)
   const count = list.length
 

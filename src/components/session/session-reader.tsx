@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo, useRef, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { CheckIcon, GitBranchIcon, XIcon } from "lucide-react"
 
 import { estCost } from "@/mock/sessions-api"
@@ -14,11 +14,10 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { MessageSquareMoreIcon } from "@/components/ui/message-square-more-icon"
-import type { MessageSquareMoreIconHandle } from "@/components/ui/message-square-more-icon"
 import { UploadIcon } from "@/components/ui/upload-icon"
 import type { UploadIconHandle } from "@/components/ui/upload-icon"
 import { CommentButton, CommentsProvider, useComments } from "./comments"
+import { CommentsMorph } from "./comments-morph"
 import { EntryRail, groupEntries } from "./entry-rail"
 
 /**
@@ -76,6 +75,36 @@ function Reader({
 
   // Thinking stays out, as in the product: it is the agent talking to
   // itself, and it doubles the length of a session.
+  const scroller = useRef<HTMLDivElement>(null)
+  const { focus } = useComments()
+
+  // A jump from the comments panel: bring the entry the comment lives on to
+  // the middle of the reader and mark it for a moment. A folded tool-call
+  // group has to open before its row exists, so look for a few frames.
+  useEffect(() => {
+    if (!focus) return
+    let tries = 0
+    let clear = 0
+    let raf = 0
+    const find = () => {
+      const el = scroller.current?.querySelector<HTMLElement>(
+        `[data-entry="${CSS.escape(focus.anchorId)}"]`
+      )
+      if (!el) {
+        if (++tries < 10) raf = requestAnimationFrame(find)
+        return
+      }
+      el.scrollIntoView({ behavior: "smooth", block: "center" })
+      el.dataset.focus = ""
+      clear = window.setTimeout(() => delete el.dataset.focus, 1800)
+    }
+    raf = requestAnimationFrame(find)
+    return () => {
+      cancelAnimationFrame(raf)
+      window.clearTimeout(clear)
+    }
+  }, [focus])
+
   const groups = useMemo(
     () => groupEntries(entries.filter((e) => e.kind !== "thinking")),
     [entries]
@@ -95,7 +124,7 @@ function Reader({
         <IconButton icon={XIcon} label="Close" size="sm" onClick={onClose} />
       </header>
 
-      <div className="min-h-0 flex-1 overflow-y-auto">
+      <div ref={scroller} className="min-h-0 flex-1 overflow-y-auto">
         <div className="mx-auto w-full max-w-230 px-5 pt-8 pb-32 @3xl:px-14 @3xl:pt-12">
           <Masthead detail={detail} />
           <div className="mt-10">
@@ -108,7 +137,7 @@ function Reader({
         aria-hidden="true"
         className="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-linear-to-b from-transparent to-card"
       />
-      <BottomBar sessionId={s.id} />
+      <BottomBar sessionId={s.id} entries={entries} />
     </div>
   )
 }
@@ -129,7 +158,7 @@ function Masthead({ detail }: { detail: SessionDetailApi }) {
     .filter((m) => m.n > 0)
 
   return (
-    <div data-slot="session-masthead">
+    <div data-slot="session-masthead" data-entry={s.id}>
       <div className="flex items-start gap-3">
         <h1 className="min-w-0 flex-1 text-xl leading-tight font-medium tracking-tight text-balance">
           {s.title ?? "Untitled session"}
@@ -231,29 +260,19 @@ function Stat({
   )
 }
 
-function BottomBar({ sessionId }: { sessionId: string }) {
-  const { comments } = useComments()
-  const count = comments.filter((c) => !c.deletedAt).length
-  const message = useRef<MessageSquareMoreIconHandle>(null)
-
+function BottomBar({
+  sessionId,
+  entries,
+}: {
+  sessionId: string
+  entries: SessionDetailApi["entries"]
+}) {
+  // `items-end`: the comments button grows up and left into its panel, so
+  // the bar must hold its items to the bottom edge while it does.
   return (
-    <div className="absolute inset-x-0 bottom-0 flex items-center justify-between gap-3 px-4 pb-3.5">
+    <div className="pointer-events-none absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 px-4 pb-3.5 *:pointer-events-auto">
       <ShareButton sessionId={sessionId} />
-
-      <span
-        className="duration-fast relative flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-full border border-border bg-card/80 text-muted-foreground shadow-md backdrop-blur-xl transition-colors hover:text-foreground"
-        aria-label={`${count} comments`}
-        role="img"
-        onMouseEnter={() => message.current?.startAnimation()}
-        onMouseLeave={() => message.current?.stopAnimation()}
-      >
-        <MessageSquareMoreIcon ref={message} controlled />
-        {count > 0 && (
-          <span className="absolute -top-1.5 -right-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-destructive px-1 text-3xs font-semibold text-destructive-foreground tnum ring-2 ring-card">
-            {count}
-          </span>
-        )}
-      </span>
+      <CommentsMorph entries={entries} />
     </div>
   )
 }
