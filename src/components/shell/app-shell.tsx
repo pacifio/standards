@@ -17,7 +17,6 @@ import {
   InboxIcon,
   Columns2Icon,
   LayoutDashboardIcon,
-  Maximize2Icon,
   PanelRightIcon,
   LayersIcon,
   MessageSquareIcon,
@@ -115,17 +114,16 @@ function ThemeToggle() {
  * portal rather than a prop because the shell lives in the layout route and
  * the dock's contents are the screen's own state.
  *
- * Three sizes, owned by the shell so they persist across screens:
+ * Two sizes, owned by the shell so they persist across screens:
  *
  *   compact  the reading width (`--dock-width`) beside the page
  *   half     half the work area — the page and the dock share it
- *   full     the whole work area; the page is covered, only the rail stays
  *
  * Widths are measured, not percentages: the work area is the space right of
  * the sidebar, which changes as the rail collapses, so a ResizeObserver
  * feeds the spring its target in pixels.
  */
-export type DockMode = "compact" | "half" | "full"
+export type DockMode = "compact" | "half"
 
 const DOCK_MODE_KEY = "atlas-dock"
 /** The gap between the page and the dock — the shell's `ml-2`. */
@@ -137,8 +135,6 @@ type DockContextValue = {
   setMode: (mode: DockMode) => void
   /** Width of the work area (page + dock), in px. */
   work: number
-  /** Whether a screen currently has the dock open. */
-  setOpen: (open: boolean) => void
 }
 
 const DockContext = createContext<DockContextValue>({
@@ -146,27 +142,16 @@ const DockContext = createContext<DockContextValue>({
   mode: "compact",
   setMode: () => {},
   work: 0,
-  setOpen: () => {},
 })
 
 const useDock = () => useContext(DockContext)
 
 function Dock({ children }: { children?: React.ReactNode }) {
-  const { slot, mode, work, setOpen } = useDock()
-  const open = Boolean(children)
-
-  useEffect(() => {
-    setOpen(open)
-    return () => setOpen(false)
-  }, [open, setOpen])
+  const { slot, mode, work } = useDock()
 
   if (!slot) return null
   const width =
-    mode === "full"
-      ? work
-      : mode === "half"
-        ? Math.round((work - DOCK_GAP) / 2)
-        : "var(--dock-width)"
+    mode === "half" ? Math.round((work - DOCK_GAP) / 2) : "var(--dock-width)"
 
   return createPortal(
     <AnimatePresence initial={false}>
@@ -179,7 +164,7 @@ function Dock({ children }: { children?: React.ReactNode }) {
           initial={{ width: 0, opacity: 0 }}
           animate={{
             width: work ? width : "var(--dock-width)",
-            marginLeft: mode === "full" ? 0 : DOCK_GAP,
+            marginLeft: DOCK_GAP,
             opacity: 1,
           }}
           exit={{ width: 0, opacity: 0 }}
@@ -199,7 +184,6 @@ function Dock({ children }: { children?: React.ReactNode }) {
 const DOCK_SIZES: Array<{ mode: DockMode; icon: LucideIcon; label: string }> = [
   { mode: "compact", icon: PanelRightIcon, label: "Compact panel" },
   { mode: "half", icon: Columns2Icon, label: "Half-width panel" },
-  { mode: "full", icon: Maximize2Icon, label: "Full-width panel" },
 ]
 
 /** The three dock sizes as one segmented control, for a dock's header. */
@@ -225,14 +209,13 @@ function DockSizeToggle({ className }: { className?: string }) {
 function AppShell({ children }: { children: React.ReactNode }) {
   const [dockSlot, setDockSlot] = useState<HTMLElement | null>(null)
   const [dockMode, setDockModeState] = useState<DockMode>("compact")
-  const [dockOpen, setDockOpen] = useState(false)
   const [work, setWork] = useState(0)
   const workRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     try {
       const saved = localStorage.getItem(DOCK_MODE_KEY)
-      if (saved === "half" || saved === "full") setDockModeState(saved)
+      if (saved === "half") setDockModeState(saved)
     } catch {
       // ignore
     }
@@ -247,7 +230,7 @@ function AppShell({ children }: { children: React.ReactNode }) {
     }
   }, [])
 
-  // The work area is the page + dock row; the dock's half and full widths
+  // The work area is the page + dock row; the dock's half width
   // are fractions of it.
   useEffect(() => {
     const el = workRef.current
@@ -259,7 +242,6 @@ function AppShell({ children }: { children: React.ReactNode }) {
     return () => ro.disconnect()
   }, [])
 
-  const covered = dockOpen && dockMode === "full"
   const { org } = useOrg()
   const { open, setOpen } = useCommandMenu()
   const [railCollapsed, setRailCollapsed] = useState(false)
@@ -369,7 +351,6 @@ function AppShell({ children }: { children: React.ReactNode }) {
         mode: dockMode,
         setMode: setDockMode,
         work,
-        setOpen: setDockOpen,
       }}
     >
       <div className="flex h-svh w-full flex-col overflow-hidden bg-shell-canvas">
@@ -537,17 +518,9 @@ function AppShell({ children }: { children: React.ReactNode }) {
             </SidebarPanel>
           </Sidebar>
 
-          {/* The work area: the page and the dock share it. In full mode
-              the dock covers it, and the page steps out of the tab order. */}
+          {/* The work area: the page and the dock share it. */}
           <div ref={workRef} className="flex min-h-0 min-w-0 flex-1">
-            <main
-              inert={covered}
-              aria-hidden={covered || undefined}
-              className={cn(
-                "flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden rounded-xl border border-shell-edge bg-background",
-                covered && "border-0"
-              )}
-            >
+            <main className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden rounded-xl border border-shell-edge bg-background">
               {children}
             </main>
 
