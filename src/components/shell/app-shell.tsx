@@ -14,9 +14,9 @@ import {
   MoonIcon,
   PanelLeftIcon,
   ShieldIcon,
-  SparklesIcon,
   SunIcon,
   UserIcon,
+  UsersIcon,
   WavesIcon,
 } from "lucide-react"
 import { cn } from "cn"
@@ -24,7 +24,9 @@ import { cn } from "cn"
 import { SPRING_DOCK } from "@/lib/motion"
 import { useOrg } from "@/lib/org-context"
 import { useTheme } from "@/lib/theme"
-import { NOTIFICATIONS, PROJECTS, SESSIONS } from "@/mock/data"
+import { PROJECTS, SESSIONS } from "@/mock/data"
+import { INBOX } from "@/mock/inbox"
+import { SegmentedIconGroup } from "@/components/patterns/segmented"
 import { IconButton } from "@/components/ui/icon-button"
 import { StatusIcon } from "@/components/ui/status-icon"
 import {
@@ -45,6 +47,7 @@ import {
   SidebarPanel,
   SidebarSearch,
 } from "./sidebar"
+import { InfoMenu, ProfileMenu } from "./sidebar-controls"
 import { UiScaleControl } from "./ui-scale"
 
 /**
@@ -164,8 +167,7 @@ function AppShell({ children }: { children: React.ReactNode }) {
     return () => document.removeEventListener("keydown", onKeyDown)
   })
 
-  const unread = NOTIFICATIONS.filter((n) => !n.read).length
-  const liveSessions = SESSIONS.filter((s) => s.status === "live").length
+  const unread = INBOX.filter((e) => !e.readAt).length
 
   const actions: Array<CommandAction> = [
     {
@@ -310,13 +312,9 @@ function AppShell({ children }: { children: React.ReactNode }) {
                     match={() => false}
                   />
                   <SidebarItem
-                    icon={SparklesIcon}
-                    label="Agents"
-                    to="/mock/timeline"
-                    search={{ view: "agents" }}
-                    count={liveSessions}
-                    badge="live"
-                    match={() => false}
+                    icon={UsersIcon}
+                    label="Members"
+                    to="/mock/settings/organisation"
                   />
                 </SidebarGroup>
 
@@ -334,6 +332,7 @@ function AppShell({ children }: { children: React.ReactNode }) {
                     children={PROJECTS.map((p) => ({
                       label: p.name,
                       to: "/mock/projects",
+                      search: { project: p.slug },
                       icon: FolderGitIcon,
                     }))}
                   />
@@ -364,6 +363,7 @@ function AppShell({ children }: { children: React.ReactNode }) {
                   <SidebarItem
                     icon={ShieldIcon}
                     label="Administration"
+                    defaultOpen
                     children={[
                       {
                         label: "Usage",
@@ -380,22 +380,24 @@ function AppShell({ children }: { children: React.ReactNode }) {
                 </SidebarGroup>
               </SidebarBody>
 
-              <SidebarFooter>
-                <ThemeToggle />
-                {collapsed ? (
+              {/* You on the left; the rail's tools, grouped, on the right.
+                  Collapsed, the same pieces stack in the 52px rail. */}
+              <SidebarFooter className="justify-between">
+                <ProfileMenu />
+                <SegmentedIconGroup
+                  orientation={collapsed ? "vertical" : "horizontal"}
+                >
+                  <ThemeToggle />
+                  <UiScaleControl iconOnly />
+                  <InfoMenu />
+                </SegmentedIconGroup>
+                {collapsed && (
                   <IconButton
                     icon={PanelLeftIcon}
                     label="Expand sidebar"
                     size="sm"
                     onClick={() => setCollapsed(false)}
                   />
-                ) : (
-                  <>
-                    <UiScaleControl />
-                    <span className="ml-auto px-1.5 mono text-3xs text-disabled">
-                      v0.4.2
-                    </span>
-                  </>
                 )}
               </SidebarFooter>
             </SidebarPanel>

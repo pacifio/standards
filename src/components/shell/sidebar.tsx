@@ -9,7 +9,6 @@ import { cn } from "cn"
 
 import { SPRING_PILL, SPRING_RAIL } from "@/lib/motion"
 import { Icon } from "@/components/ui/icon"
-import { Kbd } from "@/components/ui/kbd"
 import { ScrollFade } from "@/components/ui/scroll-fade"
 
 /**
@@ -36,11 +35,17 @@ import { ScrollFade } from "@/components/ui/scroll-fade"
 const RAIL_WIDTH = "14rem"
 const RAIL_WIDTH_COLLAPSED = "3.25rem"
 
-type RailContext = { collapsed: boolean; railId: string; pathname: string }
+type RailContext = {
+  collapsed: boolean
+  railId: string
+  pathname: string
+  search: Record<string, unknown>
+}
 const SidebarContext = createContext<RailContext>({
   collapsed: false,
   railId: "",
   pathname: "",
+  search: {},
 })
 
 function useSidebar() {
@@ -58,9 +63,12 @@ function Sidebar({
 }) {
   const railId = useId()
   const pathname = useRouterState({ select: (s) => s.location.pathname })
+  const search = useRouterState({
+    select: (s) => s.location.search as Record<string, unknown>,
+  })
 
   return (
-    <SidebarContext.Provider value={{ collapsed, railId, pathname }}>
+    <SidebarContext.Provider value={{ collapsed, railId, pathname, search }}>
       <motion.nav
         data-slot="sidebar"
         data-panel=""
@@ -121,21 +129,23 @@ function SidebarSearch({ onOpen }: { onOpen: () => void }) {
   const { collapsed } = useSidebar()
   return (
     <div className="px-2 pb-2">
+      {/* The Atlas desktop app's search field (comms-home.tsx): a recessed
+          well at the panel's own radius, a quiet glyph and a quiet prompt.
+          It opens the command menu rather than filtering in place, so ⌘K
+          is announced to assistive tech instead of printed as a chip. */}
       <button
         type="button"
         onClick={onOpen}
+        aria-keyshortcuts="Meta+K"
         className={cn(
-          "flex h-7 w-full items-center gap-2 rounded-md border border-sidebar-border bg-card px-2 text-2xs text-muted-foreground",
-          "duration-fast transition-colors ease-out-strong hover:bg-sidebar-accent",
+          "flex h-7 w-full items-center gap-1.5 rounded-xl border border-border bg-surface px-2.5 text-xs text-disabled",
+          "duration-fast transition-colors ease-out-strong hover:border-border-strong hover:text-muted-foreground",
           collapsed && "justify-center px-0"
         )}
       >
-        <Icon icon={SearchIcon} size="sm" />
+        <Icon icon={SearchIcon} size="xs" />
         {!collapsed && (
-          <>
-            <span className="flex-1 truncate text-left">Search…</span>
-            <Kbd className="h-4 min-w-0 text-4xs">⌘K</Kbd>
-          </>
+          <span className="flex-1 truncate text-left">Jump to anything…</span>
         )}
       </button>
     </div>
@@ -177,7 +187,13 @@ function SidebarGroup({
 }: React.ComponentProps<"div"> & { label?: React.ReactNode }) {
   const { collapsed } = useSidebar()
   return (
-    <div data-slot="sidebar-group" className={cn("mb-3", className)} {...props}>
+    // Generous air between groups, as the Atlas app spaces its sections:
+    // the gap is what makes a group read as a group.
+    <div
+      data-slot="sidebar-group"
+      className={cn(collapsed ? "mb-3" : "mb-6", className)}
+      {...props}
+    >
       {label &&
         (collapsed ? (
           <div
@@ -185,7 +201,9 @@ function SidebarGroup({
             className="mx-auto mb-1.5 h-px w-5 bg-sidebar-border"
           />
         ) : (
-          <div className="px-2 pb-1.5 micro">{label}</div>
+          <div className="px-2 pb-2 text-xs font-medium text-muted-foreground">
+            {label}
+          </div>
         ))}
       <ul className="space-y-px">{children}</ul>
     </div>
@@ -212,6 +230,8 @@ type SidebarItemProps = {
   badge?: "ai" | "live" | "beta"
   /** Makes the row a disclosure. */
   children?: Array<SidebarChild>
+  /** A disclosure that starts open. It still opens itself for an active child. */
+  defaultOpen?: boolean
   /** Considered active when the pathname matches — defaults to `to`. */
   match?: (pathname: string) => boolean
   className?: string
@@ -226,13 +246,19 @@ function SidebarItem({
   count,
   badge,
   children,
+  defaultOpen = false,
   match,
   className,
 }: SidebarItemProps) {
-  const { collapsed, railId, pathname } = useSidebar()
+  const { collapsed, railId, pathname, search: current } = useSidebar()
   const hasChildren = !!children?.length
-  const childActive = hasChildren && children.some((c) => pathname === c.to)
-  const [open, setOpen] = useState(childActive)
+  // A child is active on its path AND its own search params, so five
+  // projects that share /projects are not all lit at once.
+  const isChildActive = (c: SidebarChild) =>
+    pathname === c.to &&
+    Object.entries(c.search ?? {}).every(([k, v]) => current[k] === v)
+  const childActive = hasChildren && children.some(isChildActive)
+  const [open, setOpen] = useState(defaultOpen || childActive)
 
   const selfActive = match
     ? match(pathname)
@@ -292,8 +318,11 @@ function SidebarItem({
                 {badge === "ai" ? "AI" : badge === "live" ? "●" : "β"}
               </span>
             )}
+            {/* Unread is the one number in the rail that asks for you, so it
+                is a solid red pill — like a notification badge — not a grey
+                whisper. */}
             {count !== undefined && count > 0 && (
-              <span className="rounded-full bg-muted px-1 text-4xs text-muted-foreground tnum">
+              <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-destructive px-1 text-3xs font-semibold text-destructive-foreground tnum">
                 {count}
               </span>
             )}
@@ -348,7 +377,7 @@ function SidebarItem({
           >
             <span className="absolute top-0 bottom-3 left-3.75 w-px bg-sidebar-border" />
             {children.map((child, index) => {
-              const active = pathname === child.to
+              const active = isChildActive(child)
               return (
                 <motion.li
                   key={`${child.to}#${child.label}`}

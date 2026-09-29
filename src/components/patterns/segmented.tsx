@@ -193,4 +193,33 @@ function CompoundFilter({
   )
 }
 
-export { CompoundFilter, SegmentedPills, UnderlineTabs }
+/**
+ * Icon buttons set into one segmented track — the same recessed, outlined
+ * pill as `SegmentedPills`, for a cluster of related tools rather than a
+ * choice between views. Each child is its own button (no selected state);
+ * the track is what says they belong together.
+ */
+function SegmentedIconGroup({
+  orientation = "horizontal",
+  className,
+  ...props
+}: React.ComponentProps<"div"> & {
+  orientation?: "horizontal" | "vertical"
+}) {
+  return (
+    <div
+      role="group"
+      data-slot="segmented-icon-group"
+      data-orientation={orientation}
+      className={cn(
+        "flex w-fit items-center gap-0.5 rounded-full bg-segment-track p-0.5 ring-1 ring-foreground/8",
+        "data-[orientation=vertical]:flex-col",
+        "[&_[data-slot=icon-button]]:rounded-full",
+        className
+      )}
+      {...props}
+    />
+  )
+}
+
+export { CompoundFilter, SegmentedIconGroup, SegmentedPills, UnderlineTabs }

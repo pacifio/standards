@@ -1,34 +1,35 @@
-import { useState } from "react"
-import { createFileRoute } from "@tanstack/react-router"
+import { useMemo, useRef, useState } from "react"
+import { Link, createFileRoute } from "@tanstack/react-router"
 import {
-  ArchiveIcon,
   AtSignIcon,
   CheckCheckIcon,
+  CornerDownRightIcon,
   InboxIcon,
   MessageSquareIcon,
-  ReplyIcon,
-  SlidersHorizontalIcon,
 } from "lucide-react"
 import type { LucideIcon } from "lucide-react"
 import { cn } from "cn"
 
-import { NOTIFICATIONS } from "@/mock/data"
-import type { NotificationKind } from "@/mock/types"
+import { MEMBERS } from "@/mock/data"
+import { INBOX, INBOX_NOW, INBOX_TIME_ZONE } from "@/mock/inbox"
+import type { ArtifactNotificationKind, InboxEntry } from "@/mock/types"
+import { hueFor } from "@/lib/hue"
+import { DashedRails } from "@/components/blocks/dashed-rails"
+import { TimelineCalendar } from "@/components/blocks/timeline-calendar"
+import type { CalendarDay } from "@/components/blocks/timeline-calendar"
+import { PersonAvatar } from "@/components/patterns/person-avatar"
 import { SegmentedPills } from "@/components/patterns/segmented"
-import { Button } from "@/components/ui/button"
 import { EmptyState } from "@/components/ui/empty-state"
 import { Icon } from "@/components/ui/icon"
 import { IconButton } from "@/components/ui/icon-button"
+import { MailboxIcon } from "@/components/ui/mailbox-icon"
+import type { MailboxIconHandle } from "@/components/ui/mailbox-icon"
+import { LabelMark } from "@/components/ui/tag"
 import {
-  ResizableGroup,
-  ResizableHandle,
-  ResizablePanel,
-} from "@/components/ui/resizable"
-import { ScrollFade } from "@/components/ui/scroll-fade"
-import { Tag } from "@/components/ui/tag"
-import { Textarea } from "@/components/ui/textarea"
-import { hueFor } from "@/lib/hue"
-import { PersonAvatar } from "@/components/patterns/person-avatar"
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 
 export const Route = createFileRoute("/mock/_app/inbox")({
   component: InboxScreen,
@@ -36,45 +37,199 @@ export const Route = createFileRoute("/mock/_app/inbox")({
 
 type Filter = "all" | "unread" | "mentions"
 
-const KIND_ICON: Record<NotificationKind, LucideIcon> = {
+/**
+ * The server's own icon and verb per kind (`apps/web/src/routes/inbox.tsx`
+ * in the server repo), so the mock and the product say the same thing.
+ */
+const KIND_ICON: Record<ArtifactNotificationKind, LucideIcon> = {
   artifact_mention: AtSignIcon,
-  artifact_reply: ReplyIcon,
+  artifact_reply: CornerDownRightIcon,
   artifact_session_comment: MessageSquareIcon,
 }
 
-const KIND_LABEL: Record<NotificationKind, string> = {
-  artifact_mention: "Mentioned you",
-  artifact_reply: "Replied",
-  artifact_session_comment: "Commented",
+const KIND_LABEL: Record<ArtifactNotificationKind, string> = {
+  artifact_mention: "mentioned you on",
+  artifact_reply: "replied to you on",
+  artifact_session_comment: "commented on your session",
+}
+
+/* --- Time -------------------------------------------------------------- */
+
+const DAY_KEY = new Intl.DateTimeFormat("en-CA", {
+  timeZone: INBOX_TIME_ZONE,
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+})
+const MONTH_DAY = new Intl.DateTimeFormat("en-US", {
+  timeZone: INBOX_TIME_ZONE,
+  month: "long",
+  day: "numeric",
+})
+const WEEKDAY = new Intl.DateTimeFormat("en-US", {
+  timeZone: INBOX_TIME_ZONE,
+  weekday: "long",
+})
+const FULL = new Intl.DateTimeFormat("en-GB", {
+  timeZone: INBOX_TIME_ZONE,
+  dateStyle: "full",
+  timeStyle: "short",
+})
+const RELATIVE = new Intl.RelativeTimeFormat("en", { numeric: "always" })
+
+/** The calendar day an instant falls on, in the inbox's zone. */
+const dayKey = (iso: string) => DAY_KEY.format(new Date(iso))
+
+/** "September 29 / Today", "September 28 / Yesterday", "September 25 / Thursday". */
+function dayLabel(iso: string): { date: string; day: string } {
+  const at = new Date(iso)
+  const diff = Math.round(
+    (Date.parse(dayKey(INBOX_NOW)) - Date.parse(dayKey(iso))) / 86_400_000
+  )
+  return {
+    date: MONTH_DAY.format(at),
+    day: diff === 0 ? "Today" : diff === 1 ? "Yesterday" : WEEKDAY.format(at),
+  }
+}
+
+/** "just now", "12 minutes ago", "1 hour ago", "3 days ago", "2 weeks ago". */
+function ago(iso: string): string {
+  const s = (Date.parse(INBOX_NOW) - Date.parse(iso)) / 1000
+  if (s < 60) return "just now"
+  const steps: Array<[Intl.RelativeTimeFormatUnit, number]> = [
+    ["minute", 60],
+    ["hour", 3600],
+    ["day", 86_400],
+    ["week", 604_800],
+    ["month", 2_592_000],
+    ["year", 31_536_000],
+  ]
+  let unit = steps[0]
+  for (const step of steps) if (s >= step[1]) unit = step
+  return RELATIVE.format(-Math.floor(s / unit[1]), unit[0])
+}
+
+/* --- People ------------------------------------------------------------ */
+
+type Actor = { name: string; email?: string; image?: string; guest: boolean }
+
+/**
+ * `actorName` is set only for guests; everyone else is resolved from the
+ * org directory by `actorId`, exactly as the real client does. Someone who
+ * has left is still shown — as a former member — because the comment is.
+ */
+function resolveActor(entry: InboxEntry): Actor {
+  if (entry.actorName) return { name: entry.actorName, guest: true }
+  const m = MEMBERS.find((x) => x.id === entry.actorId)
+  if (!m) return { name: "Former member", guest: false }
+  return {
+    name: m.name || m.email,
+    email: m.email,
+    image: m.image,
+    guest: false,
+  }
 }
 
 /**
  * The Inbox.
  *
- * Two resizable panes under the topbar, split by a hairline handle: the
- * list, and the one you are reading. The unread mark is a 6px foreground
- * dot in a fixed gutter — monochrome, like everything that is not a status
- * — so a read and an unread row are the same height and the list does not
- * shift as you work through it.
+ * Comments that concern you, from every project you can see — nothing else
+ * reaches it. Each entry is a sentence and a link: who, what they did, on
+ * which session, what they said, and where. So it is a list, not a
+ * list-and-reader: opening an entry takes you to the comment in its
+ * session, which is where you would answer it.
+ *
+ * Days are a timeline calendar — one sticky date that changes as you scroll
+ * into the next day — in a centred column with room either side. Rows are
+ * three lines separated by hairlines, not boxed: who and what, what they
+ * said, where and how long ago. The kind is a glyph in a ring (@ mention,
+ * ↳ reply, bubble for a comment on your session) and unread is a dot ON
+ * that ring, so a read row loses nothing but the dot and keeps its shape.
+ *
+ * The name, the session and the project are links in their own right; the
+ * rest of the row opens the comment. Opening marks it read, optimistically,
+ * as the server client does (`POST /inbox/read { ids }`). "Mark all as
+ * read" is `POST /inbox/read { all: true }`.
  */
 function InboxScreen() {
+  const scroller = useRef<HTMLDivElement>(null)
+  const mailbox = useRef<MailboxIconHandle>(null)
   const [filter, setFilter] = useState<Filter>("all")
-  const [selectedId, setSelectedId] = useState(NOTIFICATIONS[0]?.id)
-  const selected = NOTIFICATIONS.find((n) => n.id === selectedId)
-  const unread = NOTIFICATIONS.filter((n) => !n.read).length
+  const [readIds, setReadIds] = useState<Set<string>>(
+    () => new Set(INBOX.filter((e) => e.readAt).map((e) => e.id))
+  )
 
-  const visible = NOTIFICATIONS.filter((n) => {
-    if (filter === "unread") return !n.read
-    if (filter === "mentions") return n.kind === "artifact_mention"
-    return true
-  })
+  const isRead = (e: InboxEntry) => readIds.has(e.id)
+  const unread = INBOX.filter((e) => !isRead(e)).length
+
+  const byDay = useMemo(() => {
+    const visible = INBOX.filter((e) => {
+      if (filter === "unread") return !readIds.has(e.id)
+      if (filter === "mentions") return e.kind === "artifact_mention"
+      return true
+    })
+    const days = new Map<string, Array<InboxEntry>>()
+    for (const e of visible) {
+      const key = dayKey(e.createdAt)
+      days.set(key, [...(days.get(key) ?? []), e])
+    }
+    return [...days.entries()]
+  }, [filter, readIds])
+
+  function markRead(id: string) {
+    setReadIds((prev) => (prev.has(id) ? prev : new Set(prev).add(id)))
+  }
+
+  function markAllRead() {
+    setReadIds(new Set(INBOX.map((e) => e.id)))
+  }
+
+  const days: Array<CalendarDay> = byDay.map(([key, entries]) => ({
+    id: key,
+    ...dayLabel(entries[0].createdAt),
+    children: (
+      <ul className="divide-y divide-hairline">
+        {entries.map((entry) => (
+          <li key={entry.id}>
+            <InboxRow
+              entry={entry}
+              read={isRead(entry)}
+              onOpen={() => markRead(entry.id)}
+            />
+          </li>
+        ))}
+      </ul>
+    ),
+  }))
 
   return (
-    <>
-      <ResizableGroup orientation="horizontal" className="min-h-0 flex-1">
-        <ResizablePanel defaultSize="38%" minSize="28%" maxSize="55%">
-          <div className="flex h-full flex-col">
-            <div className="flex h-11 shrink-0 items-center gap-1 border-b border-hairline px-3">
+    <div
+      ref={scroller}
+      // A container, so the rails answer to the PANEL's width — which the
+      // sidebar and the dock both eat into — not the window's.
+      className="@container min-h-0 flex-1 overflow-y-auto"
+    >
+      <div className="flex min-h-full flex-col px-4 @5xl:px-12">
+        {/* A column framed by dashed rails at its edges; the content keeps a
+          gutter inside them. */}
+        <div className="relative mx-auto flex w-full max-w-212 flex-1 flex-col gap-6 px-8 pt-8 pb-24">
+          {/* The rails stand 5rem off the content (the 2rem gutter plus 3rem
+            outside the column). They need the panel to be wider than the
+            column plus that margin, so below 64rem of panel they are not
+            drawn at all rather than grazing the panel's edge. */}
+          <DashedRails offset="-3rem" className="hidden @5xl:block" />
+          {/* The title drives the mailbox: hovering anywhere on it raises
+            the flag, not just on the 20px glyph. */}
+          <header className="flex flex-wrap items-center justify-between gap-3">
+            <h1
+              className="flex items-center gap-2.5 text-xl font-medium tracking-tight"
+              onMouseEnter={() => mailbox.current?.startAnimation()}
+              onMouseLeave={() => mailbox.current?.stopAnimation()}
+            >
+              <MailboxIcon ref={mailbox} controlled size={22} />
+              Inbox
+            </h1>
+            <div className="flex flex-wrap items-center gap-2">
               <SegmentedPills<Filter>
                 size="sm"
                 value={filter}
@@ -89,174 +244,151 @@ function InboxScreen() {
                   { value: "mentions", label: "Mentions" },
                 ]}
               />
-              <div className="ml-auto flex items-center gap-0.5">
-                <IconButton
-                  icon={CheckCheckIcon}
-                  label="Mark all as read"
-                  size="sm"
-                />
-                <IconButton
-                  icon={SlidersHorizontalIcon}
-                  label="Display options"
-                  size="sm"
-                />
-              </div>
-            </div>
-            <ScrollFade className="min-h-0 flex-1">
-              {visible.length === 0 ? (
-                <EmptyState
-                  icon={InboxIcon}
-                  title="Nothing here"
-                  description="You are caught up."
-                  className="py-16"
-                />
-              ) : (
-                visible.map((n) => (
-                  <button
-                    key={n.id}
-                    type="button"
-                    onClick={() => setSelectedId(n.id)}
-                    aria-current={n.id === selectedId ? "true" : undefined}
-                    className={cn(
-                      "flex w-full items-start gap-2.5 border-b border-hairline px-3 py-2.5 text-left",
-                      "duration-fast transition-colors ease-out-strong",
-                      "hover:bg-element-hover",
-                      "aria-[current=true]:bg-element-selected"
-                    )}
-                  >
-                    {/* Fixed gutter: read and unread rows stay the same width. */}
-                    <span className="flex w-1.5 shrink-0 justify-center pt-1.5">
-                      {!n.read && (
-                        <span
-                          aria-label="Unread"
-                          className="size-1.5 rounded-full bg-foreground"
-                        />
-                      )}
-                    </span>
-                    <PersonAvatar
-                      size="sm"
-                      className="mt-px"
-                      name={n.actor}
-                      initials={n.actorInitials}
+              <Tooltip>
+                <TooltipTrigger
+                  render={
+                    <IconButton
+                      icon={CheckCheckIcon}
+                      label="Mark all as read"
+                      variant="outline"
+                      onClick={markAllRead}
+                      disabled={unread === 0}
                     />
-                    <span className="flex min-w-0 flex-1 flex-col gap-0.5">
-                      <span
-                        className={cn(
-                          "truncate text-xs",
-                          n.read
-                            ? "text-secondary-foreground"
-                            : "font-medium text-foreground"
-                        )}
-                      >
-                        <span className="mono text-2xs text-muted-foreground">
-                          {n.sessionRef}
-                        </span>{" "}
-                        {n.title}
-                      </span>
-                      <span className="flex items-center gap-1.5">
-                        <Icon
-                          icon={KIND_ICON[n.kind]}
-                          size="xs"
-                          className="shrink-0 text-muted-foreground"
-                        />
-                        <span className="truncate caption">{n.preview}</span>
-                      </span>
-                    </span>
-                    <span className="shrink-0 pt-0.5 caption tnum">{n.at}</span>
-                  </button>
-                ))
-              )}
-            </ScrollFade>
-          </div>
-        </ResizablePanel>
-
-        <ResizableHandle className="bg-hairline" />
-
-        <ResizablePanel>
-          {selected ? (
-            <div className="flex h-full flex-col">
-              <ScrollFade className="min-h-0 flex-1">
-                <div className="mx-auto flex max-w-2xl flex-col gap-5 px-6 py-5">
-                  <div className="flex flex-col gap-2">
-                    <div className="flex items-center gap-2">
-                      <Tag hue={hueFor(selected.project)} dot>
-                        {selected.project}
-                      </Tag>
-                      <span className="mono text-2xs text-muted-foreground">
-                        {selected.sessionRef}
-                      </span>
-                      <div className="ml-auto flex items-center gap-1">
-                        <IconButton
-                          icon={ArchiveIcon}
-                          label="Archive"
-                          size="sm"
-                        />
-                        <IconButton
-                          icon={CheckCheckIcon}
-                          label="Mark as read"
-                          size="sm"
-                        />
-                      </div>
-                    </div>
-                    <h2 className="text-md font-medium tracking-tight text-balance">
-                      {selected.title}
-                    </h2>
-                  </div>
-
-                  <div className="flex gap-2.5 rounded-xl bg-card p-4 ring-1 ring-foreground/10">
-                    <PersonAvatar
-                      size="md"
-                      name={selected.actor}
-                      initials={selected.actorInitials}
-                    />
-                    <div className="flex min-w-0 flex-1 flex-col gap-1">
-                      <p className="flex items-baseline gap-2">
-                        <span className="text-xs font-medium">
-                          {selected.actor}
-                        </span>
-                        <span className="caption">
-                          {KIND_LABEL[selected.kind]} · {selected.at} ago
-                        </span>
-                      </p>
-                      <p className="text-xs text-balance text-secondary-foreground">
-                        {selected.preview}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </ScrollFade>
-
-              {/* The reply composer: the same ringed card the thread uses,
-                  pinned to the bottom so the reply is beside the thing it
-                  answers. */}
-              <div className="shrink-0 border-t border-hairline p-3">
-                <div className="mx-auto flex max-w-2xl flex-col gap-2 rounded-xl bg-card p-2 ring-1 ring-foreground/10 focus-within:ring-foreground/25">
-                  <Textarea
-                    rows={2}
-                    placeholder={`Reply to ${selected.actor}`}
-                    className="resize-none border-0 bg-transparent px-1.5 shadow-none ring-0 focus-visible:ring-0"
-                  />
-                  <div className="flex items-center justify-end gap-1.5">
-                    <Button variant="ghost" size="xs">
-                      Open session
-                    </Button>
-                    <Button variant="default" size="xs">
-                      Reply
-                    </Button>
-                  </div>
-                </div>
-              </div>
+                  }
+                />
+                <TooltipContent>Mark all as read</TooltipContent>
+              </Tooltip>
             </div>
-          ) : (
+          </header>
+
+          {days.length === 0 ? (
             <EmptyState
               icon={InboxIcon}
-              title="Nothing selected"
-              description="Pick a notification to read it here."
-              className="h-full"
+              title={
+                filter === "all" ? "Nothing here yet" : "You are caught up"
+              }
+              description="When somebody mentions you, replies to you, or comments on a session you recorded, it will appear here."
+              className="py-20"
             />
+          ) : (
+            <TimelineCalendar days={days} root={scroller} />
           )}
-        </ResizablePanel>
-      </ResizableGroup>
-    </>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function InboxRow({
+  entry,
+  read,
+  onOpen,
+}: {
+  entry: InboxEntry
+  read: boolean
+  onOpen: () => void
+}) {
+  const actor = resolveActor(entry)
+  const deleted = entry.excerpt === ""
+  const title = entry.sessionTitle ?? "an untitled session"
+  // Inner links sit above the row's own link; hover underlines them.
+  const inline =
+    "relative z-10 underline-offset-2 hover:underline focus-visible:underline"
+
+  return (
+    <article
+      data-unread={!read || undefined}
+      className="group/row duration-fast relative -mx-3 flex gap-3 rounded-lg px-3 py-4 transition-colors ease-out-strong hover:bg-element-hover"
+    >
+      {/* The row itself opens the comment: a link stretched under the
+          content, so the inner links stay real links rather than nesting. */}
+      <Link
+        to="/mock/timeline"
+        search={{ view: "all" }}
+        onClick={onOpen}
+        aria-label={`${actor.name} ${KIND_LABEL[entry.kind]} ${title}`}
+        className="absolute inset-0 rounded-lg"
+      />
+
+      <span
+        aria-hidden="true"
+        className="relative mt-px flex size-7 shrink-0 items-center justify-center rounded-full text-muted-foreground ring-1 ring-foreground/12"
+      >
+        <Icon icon={KIND_ICON[entry.kind]} size="sm" />
+        {!read && (
+          <span className="absolute -top-0.5 -right-0.5 size-2 rounded-full bg-foreground ring-2 ring-background" />
+        )}
+      </span>
+      {!read && <span className="sr-only">Unread.</span>}
+
+      <div className="flex min-w-0 flex-1 flex-col gap-1.5">
+        <p className="flex min-w-0 flex-wrap items-center gap-x-1.5 gap-y-0.5 text-xs">
+          <PersonAvatar
+            size="xs"
+            name={actor.name}
+            email={actor.email}
+            image={actor.image}
+          />
+          {actor.guest ? (
+            <span className="font-medium text-foreground">{actor.name}</span>
+          ) : (
+            <Link
+              to="/mock/settings/organisation"
+              className={cn(
+                inline,
+                "font-medium",
+                read ? "text-secondary-foreground" : "text-foreground"
+              )}
+            >
+              {actor.name}
+            </Link>
+          )}
+          {actor.guest && (
+            <span className="rounded-full px-1.5 text-4xs tracking-wider text-muted-foreground uppercase ring-1 ring-foreground/15">
+              Guest
+            </span>
+          )}
+          <span className="text-muted-foreground">
+            {KIND_LABEL[entry.kind]}
+          </span>
+          <Link
+            to="/mock/timeline"
+            search={{ view: "all" }}
+            onClick={onOpen}
+            className={cn(
+              inline,
+              "min-w-0 truncate",
+              read ? "text-secondary-foreground" : "text-foreground"
+            )}
+          >
+            {title}
+          </Link>
+        </p>
+
+        <p
+          className={cn(
+            "line-clamp-2 text-xs leading-relaxed",
+            deleted ? "text-disabled italic" : "text-secondary-foreground"
+          )}
+        >
+          {deleted ? "Comment deleted" : entry.excerpt}
+        </p>
+
+        <p className="flex items-center gap-2 text-2xs text-muted-foreground">
+          <Link to="/mock/projects" className={inline}>
+            <LabelMark hue={hueFor(entry.workspaceSlug)}>
+              {entry.workspaceSlug}
+            </LabelMark>
+          </Link>
+          <span aria-hidden="true">·</span>
+          <time
+            dateTime={entry.createdAt}
+            title={FULL.format(new Date(entry.createdAt))}
+          >
+            {ago(entry.createdAt)}
+          </time>
+        </p>
+      </div>
+    </article>
   )
 }

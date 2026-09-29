@@ -31,6 +31,10 @@ import { HueDot, Tag } from "@/components/ui/tag"
 
 export const Route = createFileRoute("/mock/_app/projects")({
   component: ProjectsScreen,
+  // The sidebar links each project here by slug; the mock page shows the
+  // whole grid either way, but the param is what lights the right row.
+  validateSearch: (search: Record<string, unknown>): { project?: string } =>
+    typeof search.project === "string" ? { project: search.project } : {},
 })
 
 type Scope = "all" | "mine" | "restricted"

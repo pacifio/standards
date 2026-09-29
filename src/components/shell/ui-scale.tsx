@@ -27,7 +27,14 @@ import {
  */
 const PREVIEW_CLASS = ["text-xs", "text-sm", "text-md", "text-lg"] as const
 
-function UiScaleControl({ className }: { className?: string }) {
+function UiScaleControl({
+  className,
+  iconOnly = false,
+}: {
+  className?: string
+  /** Just the glyph, for a tight toolbar; the percentage stays in the label. */
+  iconOnly?: boolean
+}) {
   const { scale, setScale, step, reset } = useUiScale()
   const pct = Math.round(scale * 100)
 
@@ -35,15 +42,24 @@ function UiScaleControl({ className }: { className?: string }) {
     <Popover>
       <PopoverTrigger
         render={
-          <Button
-            variant="ghost"
-            size="sm"
-            className={cn("gap-1.5 text-muted-foreground", className)}
-            aria-label={`Interface scale, ${pct}%`}
-          >
-            <TypeIcon />
-            <span className="text-3xs tnum">{pct}%</span>
-          </Button>
+          iconOnly ? (
+            <IconButton
+              icon={TypeIcon}
+              label={`Interface scale, ${pct}%`}
+              size="sm"
+              className={className}
+            />
+          ) : (
+            <Button
+              variant="ghost"
+              size="sm"
+              className={cn("gap-1.5 text-muted-foreground", className)}
+              aria-label={`Interface scale, ${pct}%`}
+            >
+              <TypeIcon />
+              <span className="text-3xs tnum">{pct}%</span>
+            </Button>
+          )
         }
       />
       <PopoverContent align="end" className="w-58 gap-0 p-0">

@@ -108,21 +108,58 @@ export type TimelineEntry = {
   toolStatus?: "ok" | "error" | "running"
 }
 
-export type NotificationKind =
+/**
+ * The inbox, mirrored from `packages/contracts/src/notifications.ts` and
+ * `chat.ts` in the server repo. Field names are kept identical: the real
+ * `GET /inbox` returns `InboxPage`, and `POST /inbox/read` takes
+ * `MarkReadRequest`.
+ *
+ * The inbox holds only comment notifications, one row per comment per
+ * recipient, with the strongest reason winning: named in the comment →
+ * `artifact_mention`; replied to your thread → `artifact_reply`; commented
+ * on a session you recorded → `artifact_session_comment`.
+ */
+export type ArtifactNotificationKind =
   "artifact_mention" | "artifact_reply" | "artifact_session_comment"
 
-export type Notification = {
+/** Where on the session the comment is anchored. */
+export type CommentAnchorKind =
+  "session" | "message" | "tool_call" | "checkpoint"
+
+export type InboxEntry = {
+  /** ULID. */
   id: string
-  kind: NotificationKind
-  sessionRef: string
-  title: string
-  actor: string
-  actorInitials: string
-  preview: string
-  at: string
-  read: boolean
-  project: string
+  kind: ArtifactNotificationKind
+  orgId: string
+  workspaceId: string
+  workspaceSlug: string
+  sessionId: string
+  sessionTitle: string | null
+  commentId: string
+  anchorKind: CommentAnchorKind
+  anchorId: string
+  /** The client resolves the name from the org directory. */
+  actorId: string
+  /** Set only for guests, who are not in the directory. */
+  actorName: string | null
+  /** Up to 140 characters; "" once the comment is deleted. */
+  excerpt: string
+  /** ISO. */
+  createdAt: string
+  /** ISO, or null while unread. */
+  readAt: string | null
+  /** Relative deep link to the comment on the timeline. */
+  path: string
 }
+
+export type InboxPage = {
+  entries: Array<InboxEntry>
+  /** Total unread for the user (or within ?org=), not per page. */
+  unread: number
+  nextCursor: string | null
+}
+
+export type MarkReadRequest = { ids?: Array<string>; all?: boolean }
 
 export type Conversation = {
   id: string

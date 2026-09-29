@@ -7,7 +7,6 @@ import {
   LogOutIcon,
   PlusIcon,
   SettingsIcon,
-  UserIcon,
   UserPlusIcon,
 } from "lucide-react"
 import { cn } from "cn"
@@ -128,12 +127,6 @@ function OrgSwitcher({
         <DropdownMenuItem render={<Link to="/mock/settings/organisation" />}>
           <Icon icon={UserPlusIcon} size="sm" />
           Invite and manage members
-        </DropdownMenuItem>
-        {/* The account menu lived on the page bar; with the bar gone, the
-            workspace menu is the one place for "you" as well as "us". */}
-        <DropdownMenuItem render={<Link to="/mock/settings/account" />}>
-          <Icon icon={UserIcon} size="sm" />
-          Account settings
         </DropdownMenuItem>
 
         <DropdownMenuSeparator />
