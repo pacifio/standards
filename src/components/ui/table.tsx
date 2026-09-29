@@ -3,7 +3,7 @@ import { cn } from "cn"
 /**
  * A data table.
  *
- * Cursor's tables, which is to say: a single hairline under the header, no
+ * A single hairline under the header, no
  * zebra striping, no vertical rules, 32px rows, and the whole row highlighting
  * on hover. The grid is implied by alignment, not drawn.
  */

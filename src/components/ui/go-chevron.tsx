@@ -1,8 +1,7 @@
 import { cn } from "cn"
 
 /**
- * A chevron that says "this opens something" — Transitions.dev's "learn
- * more hover". When its trigger is hovered the chevron shifts forward and
+ * A chevron that says "this opens something". When its trigger is hovered the chevron shifts forward and
  * its two arms spread apart about the apex, opening into an arrow; it eases
  * back on leave. The motion values are tokens (`--learn-*`, tokens.css).
  *

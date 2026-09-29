@@ -1,8 +1,8 @@
 import { cn } from "cn"
 
 /**
- * Stacked-paper: two ghost cards peeking out behind the real one. natai's
- * `invoice-illustration` trick, done with pseudo-elements so it costs no
+ * Stacked-paper: two ghost cards peeking out behind the real one, done
+ * with pseudo-elements so it costs no
  * DOM — `before:` is the sheet directly behind, `after:` the one behind
  * that, each inset a little further and a little higher.
  *

@@ -6,7 +6,7 @@ import { cn } from "cn"
 /**
  * Tabs, in two shapes that do different jobs:
  *
- * - `segmented` — a pill sliding inside a recessed track. This is Cursor's
+ * - `segmented` — a pill sliding inside a recessed track. This is the
  *   `1d / 7d / 30d` control: a small, local switch between renderings of the
  *   same data. Keep it short; it does not scroll.
  * - `line` — an underline rail. This is a section-level switch between

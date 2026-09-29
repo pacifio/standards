@@ -826,7 +826,7 @@ export const CONVERSATIONS: Array<Conversation> = [
     kind: "channel",
     initials: "DR",
     unread: 0,
-    lastMessage: "Talha: pulled the Linear rail into the mock",
+    lastMessage: "Talha: pulled the dashed rail into the mock",
     at: "1h",
   },
   {

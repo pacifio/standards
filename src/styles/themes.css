@@ -10,7 +10,7 @@
    an entity — a label, a project, an agent — a stable identity.
 
    The surface ramp is five named steps that climb monotonically away from
-   the page (natai's floor, Auberge's step logic). Note `--illustration`: a
+   the page. Note `--illustration`: a
    card inside a card, and in dark the BRIGHTEST plane. In light "up"
    saturates at pure white, so card, illustration and popover coincide and
    hierarchy is carried by the ring and the two shadow rungs.
@@ -141,7 +141,7 @@
 [data-theme="light"] {
   color-scheme: light;
 
-  /* Auberge's off-white page with pure-white cards that lift off it. */
+  /* An off-white page with pure-white cards that lift off it. */
   --background: oklch(0.985 0 0);
   --surface: oklch(0.975 0 0);
   --card: oklch(1 0 0);

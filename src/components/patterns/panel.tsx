@@ -8,7 +8,7 @@ import { EASE_PANEL } from "@/lib/motion"
 import { Icon } from "@/components/ui/icon"
 
 /**
- * The card of this system. Auberge's `Panel`, from `dashboard.jpg`.
+ * The card of this system.
  *
  * `rounded-xl bg-card ring-1 ring-foreground/10` — a ring on a lighter step
  * of the ramp, never a shadow. Every panel carries a top-right action

@@ -29,7 +29,7 @@ function BlocksGallery() {
     <>
       <PageHeader
         title="Blocks"
-        description="The illustration and effect primitives, ported from natai and Auberge."
+        description="The illustration and effect primitives."
       />
 
       <Callout tone="info">
@@ -49,7 +49,7 @@ function BlocksGallery() {
 
       <Specimen
         title="Session pipeline"
-        note="natai's agent-pipeline illustration on real session data. Three states read by silhouette before colour: done is struck through and dimmed, the running step is the one ringed row with a slow dashed spinner, everything after sits at 40%."
+        note="An agent pipeline on real session data. Three states read by silhouette before colour: done is struck through and dimmed, the running step is the one ringed row with a slow dashed spinner, everything after sits at 40%."
       >
         <div className="w-full max-w-sm">
           <SessionPipeline session={LIVE} entries={PIPELINE_ENTRIES} />
@@ -58,7 +58,7 @@ function BlocksGallery() {
 
       <Specimen
         title="Session timeline"
-        note="natai's workflow illustration: entries hang off a dashed rail on quarter-round elbows. The head card carries the session's status glyph so the rail reads as one story with a conclusion."
+        note="Entries hang off a dashed rail on quarter-round elbows. The head card carries the session's status glyph so the rail reads as one story with a conclusion."
       >
         <div className="w-full max-w-sm">
           <SessionTimeline
@@ -127,7 +127,7 @@ function BlocksGallery() {
 
       <Specimen
         title="Plus corners and dashed rails"
-        note="natai's drafting marks. A cross-hair at each corner turns a bordered panel into a technical drawing; dashed rails in the gutters make a page read as a sheet."
+        note="Drafting marks. A cross-hair at each corner turns a bordered panel into a technical drawing; dashed rails in the gutters make a page read as a sheet."
       >
         <div className="relative w-full py-8">
           <DashedRails />

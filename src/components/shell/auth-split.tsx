@@ -50,8 +50,8 @@ function AuthSplit({
         <div className="flex h-8 shrink-0 items-center">{back}</div>
 
         <div className="flex w-full flex-1 items-center justify-center">
-          {/* The form sits in a dashed drafting box with cross-hair corners:
-              natai's bento frame, at sign-in scale. */}
+          {/* The form sits in a dashed drafting box with cross-hair corners,
+              the bento frame at sign-in scale. */}
           <div className="relative flex w-full max-w-88 flex-col gap-6 border border-dashed border-foreground/10 px-8 py-10">
             <PlusCorners />
             {children}

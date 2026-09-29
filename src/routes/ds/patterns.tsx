@@ -300,8 +300,8 @@ function PatternsGallery() {
       </Specimen>
 
       <Specimen
-        title="Where these came from"
-        note="The Panel, KPI strip, segmented controls, data table and the sliding-pill sidebar are Auberge's structure; the achromatic ramp, the dashed rails, the cross-hair corners and the illustration blocks are natai's. Neither reference's accent survived — the primary is the foreground, inverted."
+        title="In context"
+        note="The Panel, KPI strip, segmented controls, data table and the sliding-pill sidebar, on the achromatic ramp with dashed rails and cross-hair corners. There is no accent: the primary is the foreground, inverted."
       >
         <a
           href="/mock/timeline"

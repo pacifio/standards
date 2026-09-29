@@ -135,7 +135,7 @@ const COLUMNS: Array<Column<Session>> = [
  * Four bands, each answering one question, in the order someone scans:
  *
  *   1. Headline figures — tokens, cost, sessions, messages, cache — each on
- *      its own squircle with a dot-matrix of the period.
+ *      its own card with a dot-matrix of the period.
  *   2. Where the tokens went — input, output, cache read and write as shares
  *      of the whole, on segment meters.
  *   3. Now — a live activity stream beside quick member management.
@@ -158,8 +158,8 @@ function DashboardScreen() {
       <ScrollFade className="min-h-0 flex-1">
         <div className="@container flex flex-col gap-6 px-5 pt-4 pb-8">
           {/* A greeting rather than a page title — the sidebar already says
-              where you are. 20/25 at weight 400, the size Anthropic sets its
-              own greeting at: warm, not shouted. */}
+              where you are. 20/25 at weight 400: warm, not
+              shouted. */}
           <header className="flex flex-wrap items-end justify-between gap-3">
             <div className="min-w-0">
               <h1 className="flex items-center gap-2 text-xl/6.25 font-normal">

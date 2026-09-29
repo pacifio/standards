@@ -13,8 +13,7 @@ import { Icon } from "@/components/ui/icon"
 import { Tag } from "@/components/ui/tag"
 
 /**
- * A session as a pipeline of steps. natai's `agent-task-planning`
- * illustration, reworked onto real session data.
+ * A session as a pipeline of steps, drawn from real session data.
  *
  * Three visual states, and they are read by silhouette before colour: done
  * is a filled check with the title struck through and dimmed; the running

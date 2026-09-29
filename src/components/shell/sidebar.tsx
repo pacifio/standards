@@ -12,7 +12,7 @@ import { Icon } from "@/components/ui/icon"
 import { ScrollFade } from "@/components/ui/scroll-fade"
 
 /**
- * The left rail. Auberge's `app-sidebar`, on TanStack Router.
+ * The left rail, on TanStack Router.
  *
  * Three things make it feel like one object rather than a list of links:
  *

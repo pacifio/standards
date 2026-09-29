@@ -79,52 +79,125 @@
    Control heights.
    ────────────────────────────────────────────────────────────────────────── */
 
-@utility h-control-xs { height: var(--control-xs); }
-@utility h-control-sm { height: var(--control-sm); }
-@utility h-control-md { height: var(--control-md); }
-@utility h-control-lg { height: var(--control-lg); }
-@utility h-control-xl { height: var(--control-xl); }
+@utility h-control-xs {
+  height: var(--control-xs);
+}
+@utility h-control-sm {
+  height: var(--control-sm);
+}
+@utility h-control-md {
+  height: var(--control-md);
+}
+@utility h-control-lg {
+  height: var(--control-lg);
+}
+@utility h-control-xl {
+  height: var(--control-xl);
+}
 
-@utility min-w-control-xs { min-width: var(--control-xs); }
-@utility min-w-control-sm { min-width: var(--control-sm); }
-@utility min-w-control-md { min-width: var(--control-md); }
+@utility min-w-control-xs {
+  min-width: var(--control-xs);
+}
+@utility min-w-control-sm {
+  min-width: var(--control-sm);
+}
+@utility min-w-control-md {
+  min-width: var(--control-md);
+}
 
-@utility size-control-xs { width: var(--control-xs); height: var(--control-xs); }
-@utility size-control-sm { width: var(--control-sm); height: var(--control-sm); }
-@utility size-control-md { width: var(--control-md); height: var(--control-md); }
-@utility size-control-lg { width: var(--control-lg); height: var(--control-lg); }
-@utility size-control-xl { width: var(--control-xl); height: var(--control-xl); }
+@utility size-control-xs {
+  width: var(--control-xs);
+  height: var(--control-xs);
+}
+@utility size-control-sm {
+  width: var(--control-sm);
+  height: var(--control-sm);
+}
+@utility size-control-md {
+  width: var(--control-md);
+  height: var(--control-md);
+}
+@utility size-control-lg {
+  width: var(--control-lg);
+  height: var(--control-lg);
+}
+@utility size-control-xl {
+  width: var(--control-xl);
+  height: var(--control-xl);
+}
 
 /* ──────────────────────────────────────────────────────────────────────────
    Layout constants.
    ────────────────────────────────────────────────────────────────────────── */
 
-@utility w-sidebar { width: var(--sidebar-width); }
-@utility w-sidebar-collapsed { width: var(--sidebar-width-collapsed); }
-@utility h-topbar { height: var(--topbar-height); }
-@utility min-h-topbar { min-height: var(--topbar-height); }
-@utility w-dock { width: var(--dock-width); }
-@utility min-w-dock { min-width: var(--dock-width); }
-@utility w-list-pane { width: var(--list-pane-width); }
-@utility w-properties { width: var(--properties-width); }
-@utility h-row { height: var(--row-height); }
-@utility min-h-row { min-height: var(--row-height); }
-@utility w-settings-nav { width: var(--settings-nav-width); }
-@utility max-w-settings { max-width: var(--settings-content-max); }
+@utility w-sidebar {
+  width: var(--sidebar-width);
+}
+@utility w-sidebar-collapsed {
+  width: var(--sidebar-width-collapsed);
+}
+@utility h-topbar {
+  height: var(--topbar-height);
+}
+@utility min-h-topbar {
+  min-height: var(--topbar-height);
+}
+@utility w-dock {
+  width: var(--dock-width);
+}
+@utility min-w-dock {
+  min-width: var(--dock-width);
+}
+@utility w-list-pane {
+  width: var(--list-pane-width);
+}
+@utility w-properties {
+  width: var(--properties-width);
+}
+@utility h-row {
+  height: var(--row-height);
+}
+@utility min-h-row {
+  min-height: var(--row-height);
+}
+@utility w-settings-nav {
+  width: var(--settings-nav-width);
+}
+@utility max-w-settings {
+  max-width: var(--settings-content-max);
+}
 
 /* ──────────────────────────────────────────────────────────────────────────
    Z-layers. Nothing outside this file may write a z-index.
    ────────────────────────────────────────────────────────────────────────── */
 
-@utility z-panel { z-index: var(--z-panel); }
-@utility z-titlebar { z-index: var(--z-titlebar); }
-@utility z-drawer { z-index: var(--z-drawer); }
-@utility z-overlay { z-index: var(--z-overlay); }
-@utility z-modal { z-index: var(--z-modal); }
-@utility z-popover { z-index: var(--z-popover); }
-@utility z-toast { z-index: var(--z-toast); }
-@utility z-tooltip { z-index: var(--z-tooltip); }
-@utility z-drag { z-index: var(--z-drag); }
+@utility z-panel {
+  z-index: var(--z-panel);
+}
+@utility z-titlebar {
+  z-index: var(--z-titlebar);
+}
+@utility z-drawer {
+  z-index: var(--z-drawer);
+}
+@utility z-overlay {
+  z-index: var(--z-overlay);
+}
+@utility z-modal {
+  z-index: var(--z-modal);
+}
+@utility z-popover {
+  z-index: var(--z-popover);
+}
+@utility z-toast {
+  z-index: var(--z-toast);
+}
+@utility z-tooltip {
+  z-index: var(--z-tooltip);
+}
+@utility z-drag {
+  z-index: var(--z-drag);
+}
 
 /* ──────────────────────────────────────────────────────────────────────────
    Surfaces.
@@ -139,10 +212,14 @@
 
 /* Structural rules — a pane seam, a table row — use the WEAKER edge, so
    rules inside content read lighter than the ring around it. */
-@utility hairline-x { border-bottom: 1px solid var(--hairline); }
-@utility hairline-y { border-right: 1px solid var(--hairline); }
+@utility hairline-x {
+  border-bottom: 1px solid var(--hairline);
+}
+@utility hairline-y {
+  border-right: 1px solid var(--hairline);
+}
 
-/* natai's section divider. Dashed, never solid, between things on a page. */
+/* The section divider. Dashed, never solid, between things on a page. */
 @utility rule-dashed {
   border-top: 1px dashed color-mix(in oklch, var(--foreground) 10%, transparent);
 }
@@ -156,13 +233,19 @@
 
 /* A scrim is deliberately NOT themed: its job is to push what is behind it
    away from the reader, and only darkening does that. */
-@utility scrim { background-color: rgb(0 0 0 / 0.6); }
-@utility scrim-soft { background-color: rgb(0 0 0 / 0.2); }
+@utility scrim {
+  background-color: rgb(0 0 0 / 0.6);
+}
+@utility scrim-soft {
+  background-color: rgb(0 0 0 / 0.2);
+}
 
-@utility inset-highlight { box-shadow: var(--inset-highlight); }
+@utility inset-highlight {
+  box-shadow: var(--inset-highlight);
+}
 
 /* ──────────────────────────────────────────────────────────────────────────
-   The hue-coded tag. Auberge's `.tag`, verbatim in rem.
+   The hue-coded tag, in rem.
 
    A pill whose fill and edge are the hue mixed at per-theme ratios, so the
    same tone reads as a tint on light and a glow on dark without two sets of
@@ -175,7 +258,8 @@
   align-items: center;
   gap: 0.25rem;
   border-radius: 9999px;
-  border: 1px solid color-mix(in oklch, var(--tag) var(--tag-border-mix), transparent);
+  border: 1px solid
+    color-mix(in oklch, var(--tag) var(--tag-border-mix), transparent);
   background: color-mix(in oklch, var(--tag) var(--tag-bg-mix), transparent);
   color: var(--tag);
   padding: 0 0.4375rem;
@@ -185,17 +269,33 @@
   line-height: 1;
   white-space: nowrap;
 }
-@utility tag-grey { --tag: var(--hue-grey); }
-@utility tag-indigo { --tag: var(--hue-indigo); }
-@utility tag-purple { --tag: var(--hue-purple); }
-@utility tag-cyan { --tag: var(--hue-cyan); }
-@utility tag-green { --tag: var(--hue-green); }
-@utility tag-amber { --tag: var(--hue-amber); }
-@utility tag-orange { --tag: var(--hue-orange); }
-@utility tag-red { --tag: var(--hue-red); }
+@utility tag-grey {
+  --tag: var(--hue-grey);
+}
+@utility tag-indigo {
+  --tag: var(--hue-indigo);
+}
+@utility tag-purple {
+  --tag: var(--hue-purple);
+}
+@utility tag-cyan {
+  --tag: var(--hue-cyan);
+}
+@utility tag-green {
+  --tag: var(--hue-green);
+}
+@utility tag-amber {
+  --tag: var(--hue-amber);
+}
+@utility tag-orange {
+  --tag: var(--hue-orange);
+}
+@utility tag-red {
+  --tag: var(--hue-red);
+}
 
 /* ──────────────────────────────────────────────────────────────────────────
-   Scroll regions. Auberge's `sidebar.mp4`: edges dissolve, and only on the
+   Scroll regions: edges dissolve, and only on the
    side there is more content. ScrollFade measures and writes the two vars;
    they are registered in globals.css so the change animates.
    ────────────────────────────────────────────────────────────────────────── */
@@ -220,7 +320,9 @@
 /* Keep the scroll, lose the bar — already global; kept for explicitness. */
 @utility hide-scrollbar {
   scrollbar-width: none;
-  &::-webkit-scrollbar { display: none; }
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 /* Rendered Markdown in a session reader — an agent's response. The Atlas
@@ -243,21 +345,46 @@
   color: var(--secondary-foreground);
   overflow-wrap: anywhere;
 
-  & > * + * { margin-top: 0.55em; }
-  & strong { font-weight: 500; color: var(--foreground); }
-  & em { font-style: italic; }
-  & a { color: var(--foreground); text-decoration: underline; text-underline-offset: 2px; }
-  & h1, & h2, & h3, & h4 {
+  & > * + * {
+    margin-top: 0.55em;
+  }
+  & strong {
+    font-weight: 500;
+    color: var(--foreground);
+  }
+  & em {
+    font-style: italic;
+  }
+  & a {
+    color: var(--foreground);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+  & h1,
+  & h2,
+  & h3,
+  & h4 {
     font-size: inherit;
     font-weight: 500;
     color: var(--foreground);
     margin-top: 0.9em;
   }
-  & ul, & ol { padding-left: 1.25em; }
-  & ul { list-style: disc; }
-  & ol { list-style: decimal; }
-  & li + li { margin-top: 0.2em; }
-  & li::marker { color: var(--muted-foreground); }
+  & ul,
+  & ol {
+    padding-left: 1.25em;
+  }
+  & ul {
+    list-style: disc;
+  }
+  & ol {
+    list-style: decimal;
+  }
+  & li + li {
+    margin-top: 0.2em;
+  }
+  & li::marker {
+    color: var(--muted-foreground);
+  }
   & :not(pre) > code {
     font-family: var(--font-mono);
     font-size: 0.86em;
@@ -310,7 +437,9 @@
 }
 
 @utility focus-ring-none {
-  &:focus-visible { outline: none; }
+  &:focus-visible {
+    outline: none;
+  }
 }
 
 @utility contain-row {
@@ -320,7 +449,7 @@
 /* ──────────────────────────────────────────────────────────────────────────
    Morph — a trigger that grows into the panel it opens.
 
-   Transitions.dev "plus to menu morph", on the `--morph-*` tokens. The
+   On the `--morph-*` tokens. The
    container is the button when closed and the panel when open; `overflow:
    hidden` clips the content while the box grows. The open size is read from
    `--morph-open-w` / `--morph-open-h`, set by the component. The trigger

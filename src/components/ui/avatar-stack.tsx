@@ -4,8 +4,8 @@ import { Children, useRef } from "react"
 import { cn } from "cn"
 
 /**
- * Overlapping faces that spring when you move across them — the
- * Transitions.dev "avatar group hover", ported onto the token layer.
+ * Overlapping faces that spring when you move across them, on the
+ * `--avatar-*` tokens.
  *
  * On entering a face, every face gets a lift of `lift × falloff^distance`
  * and the hovered one a small scale, so the row ripples outward from the

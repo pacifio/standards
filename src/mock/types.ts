@@ -1,5 +1,5 @@
 /**
- * The domain, mirrored from `~/Desktop/server/apps/web/src/lib/api.ts`.
+ * The domain, mirrored from the server app's `apps/web/src/lib/api.ts`.
  *
  * These are re-declared rather than imported because `standards` does not
  * depend on the server repo — but the field names and the Role union are kept

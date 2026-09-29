@@ -9,7 +9,7 @@ import { Icon } from "@/components/ui/icon"
 import { ScrollFade } from "@/components/ui/scroll-fade"
 
 /**
- * The data table. Auberge's `data-table.tsx`, without the TanStack
+ * The data table, without a table-library
  * dependency — a mock with a dozen rows needs sort-by-column and a search
  * box, and both are twenty lines of state.
  *

@@ -7,8 +7,8 @@ import { cn } from "cn"
 import { Icon } from "@/components/ui/icon"
 
 /**
- * KPI cells split by vertical hairlines, not individual cards. Auberge's
- * `dashboard.jpg` strip: oversized, LIGHT-weight tabular figures with the
+ * KPI cells split by vertical hairlines, not individual cards:
+ * oversized, LIGHT-weight tabular figures with the
  * delta riding beside the label.
  */
 

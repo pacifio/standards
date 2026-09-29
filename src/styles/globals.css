@@ -96,7 +96,7 @@
 
   /* --- type scale -------------------------------------------------------
 
-     Auberge's, made into named steps. 10, 11 and 12px carry ~90% of the UI;
+     Named steps. 10, 11 and 12px carry ~90% of the UI;
      the body default is `text-xs`. rem at a 16 base so the scale control
      grows it. Half-pixel sizes round UP to the next step; no tenth step. */
   --text-4xs: 0.5625rem;
@@ -148,19 +148,81 @@
   /* A ring expanding out of a globe marker. Delay per ring is inline. */
   --animate-pulse-ring: pulse-ring 2s var(--ease-out-strong) infinite;
 
-  @keyframes pulse-ring { from { transform: scale(0.3); opacity: 0.8 } to { transform: scale(1.5); opacity: 0 } }
-  @keyframes fade-in { from { opacity: 0 } to { opacity: 1 } }
-  @keyframes fade-out { from { opacity: 1 } to { opacity: 0 } }
-  @keyframes scale-in { from { opacity: 0; transform: scale(0.95) } to { opacity: 1; transform: scale(1) } }
-  @keyframes scale-out { from { opacity: 1; transform: scale(1) } to { opacity: 0; transform: scale(0.95) } }
-  @keyframes slide-in-right { from { transform: translateX(100%) } to { transform: translateX(0) } }
-  @keyframes slide-in-left { from { transform: translateX(-100%) } to { transform: translateX(0) } }
-  @keyframes shimmer-row { 0%, 100% { opacity: 1 } 50% { opacity: 0.4 } }
+  @keyframes pulse-ring {
+    from {
+      transform: scale(0.3);
+      opacity: 0.8;
+    }
+    to {
+      transform: scale(1.5);
+      opacity: 0;
+    }
+  }
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  @keyframes fade-out {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
+    }
+  }
+  @keyframes scale-in {
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+  @keyframes scale-out {
+    from {
+      opacity: 1;
+      transform: scale(1);
+    }
+    to {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+  }
+  @keyframes slide-in-right {
+    from {
+      transform: translateX(100%);
+    }
+    to {
+      transform: translateX(0);
+    }
+  }
+  @keyframes slide-in-left {
+    from {
+      transform: translateX(-100%);
+    }
+    to {
+      transform: translateX(0);
+    }
+  }
+  @keyframes shimmer-row {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.4;
+    }
+  }
 }
 
 /* Registered so they can transition. Without this, `transition: --fade-top`
-   in ScrollFade does nothing and the fade snaps — Auberge relies on it
-   silently. */
+   in ScrollFade does nothing and the fade snaps. */
 @property --fade-top {
   syntax: "<length>";
   inherits: false;

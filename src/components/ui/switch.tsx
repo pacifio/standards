@@ -6,7 +6,7 @@ import { cn } from "cn"
 /**
  * A toggle.
  *
- * The control Cursor's settings surfaces are built from: a row of label +
+ * The control settings surfaces are built from: a row of label +
  * description with one of these hard-right. Off is the input fill, on is the
  * primary ink — no green, because "on" is a state, not a success.
  *

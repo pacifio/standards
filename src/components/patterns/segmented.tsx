@@ -7,7 +7,7 @@ import { cn } from "cn"
 import { SPRING_INDICATOR } from "@/lib/motion"
 
 /**
- * Three sliding-indicator controls. Auberge's `segmented.tsx`.
+ * Three sliding-indicator controls.
  *
  * In all three the active state is ONE shared-`layoutId` element that
  * physically slides between options rather than two backgrounds

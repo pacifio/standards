@@ -18,7 +18,7 @@ import {
  *
  * The control the server web app never had — every choice there is a raw
  * `<select>`, which is why its filter bars render differently on macOS, Windows
- * and Linux. This one is the row-right control in Cursor's settings cards:
+ * and Linux. This one is the row-right control in a settings card:
  * `GPT-5.4 High ⌄`, quiet until you touch it.
  *
  * Two trigger looks. `bordered` is a form field. `ghost` is a control that

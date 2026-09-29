@@ -4,7 +4,7 @@ import { TAG_CLASS, HUE_VAR } from "@/lib/hue"
 import type { LabelTone } from "@/mock/types"
 
 /**
- * The hue-coded identity pill. Auberge's `.tag`.
+ * The hue-coded identity pill.
  *
  * A hue is an IDENTITY, not a status — `purple` means "the Design label",
  * not "informational". The fill and edge are the hue mixed at per-theme
@@ -51,8 +51,7 @@ function HueDot({
 
 /**
  * A label as it appears inside a dense row: a hue dot and the name, no pill.
- * In a table the pill was the loudest shape in the row and the one most
- * obviously lifted from Linear; here identity is carried by the dot alone.
+ * In a table the pill was the loudest shape in the row; here identity is carried by the dot alone.
  * Use `<Tag>` where a label stands on its own — a header, a detail panel —
  * and this where it is one cell among many.
  */

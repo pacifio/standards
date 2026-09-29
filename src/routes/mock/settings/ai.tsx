@@ -98,8 +98,7 @@ const TIERS = [
  *
  * The routing tier is a RadioCardGroup rather than a select: the three options
  * differ by a sentence of consequence each, and a select would hide exactly
- * the sentence that decides it. This is the shape of Cursor's Privacy Mode
- * dialog, for the same reason.
+ * the sentence that decides it.
  */
 function AiSettings() {
   return (

@@ -15,6 +15,7 @@ import type { CalendarDay } from "@/components/blocks/timeline-calendar"
 import { PersonAvatar } from "@/components/patterns/person-avatar"
 import { CompoundFilter } from "@/components/patterns/segmented"
 import { SessionReader } from "@/components/session/session-reader"
+import { AvatarStack } from "@/components/ui/avatar-stack"
 import { DiffStat } from "@/components/ui/code-block"
 import { Icon } from "@/components/ui/icon"
 import { IconButton } from "@/components/ui/icon-button"
@@ -114,7 +115,7 @@ function TimelineScreen() {
   const days: Array<CalendarDay> = [...byDay.entries()].map(([key, list]) => ({
     id: key,
     ...dayLabel(list[0].lastActivityAt),
-    meta: <DayTokens sessions={list} />,
+    meta: <DayMeta sessions={list} />,
     children: (
       <ul className="divide-y divide-hairline">
         {list.map((s) => (
@@ -214,13 +215,34 @@ function TimelineScreen() {
   )
 }
 
-/** The day's tokens, and nothing else. */
-function DayTokens({ sessions }: { sessions: Array<SessionSummaryApi> }) {
+/** The day's tokens, a hairline, then who worked that day. */
+function DayMeta({ sessions }: { sessions: Array<SessionSummaryApi> }) {
   const tokens = sessions.reduce((a, s) => a + s.totalTokens, 0)
-  if (!tokens) return null
+  const people = [...new Set(sessions.map((s) => s.authorId))]
   return (
-    <span className="shrink-0 pb-0.5 mono text-2xs text-muted-foreground">
-      {formatTokens(tokens)} tok
+    <span className="flex shrink-0 items-center gap-2.5 pb-0.5">
+      {tokens > 0 && (
+        <>
+          <span className="mono text-2xs text-muted-foreground">
+            {formatTokens(tokens)} tok
+          </span>
+          <span aria-hidden="true" className="h-3 w-px bg-border" />
+        </>
+      )}
+      <AvatarStack>
+        {people.slice(0, 4).map((id) => {
+          const p = author(id)
+          return (
+            <PersonAvatar
+              key={id}
+              size="xs"
+              name={p.name}
+              email={p.email}
+              image={p.image}
+            />
+          )
+        })}
+      </AvatarStack>
     </span>
   )
 }

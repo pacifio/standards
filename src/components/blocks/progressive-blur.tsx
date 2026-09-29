@@ -5,7 +5,7 @@ import type { HTMLMotionProps } from "motion/react"
 import { cn } from "cn"
 
 /**
- * A graduated blur at one edge, iOS-style. natai's `motion-primitives`.
+ * A graduated blur at one edge.
  *
  * Stacks N masked `backdrop-filter` layers of increasing radius, each
  * masked to a band that slides along the edge, so blur ramps smoothly

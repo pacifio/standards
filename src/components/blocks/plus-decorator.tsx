@@ -1,7 +1,7 @@
 import { cn } from "cn"
 
 /**
- * A corner cross-hair. natai's `PlusDecorator`, from the bento grid.
+ * A corner cross-hair.
  *
  * Eight lines and no dependencies, and it is what makes a bordered panel
  * read as a technical drawing rather than a card. Place one at each corner

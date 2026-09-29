@@ -2,8 +2,8 @@ import { cn } from "cn"
 
 /**
  * A model, as a pill with its family's mark: the orange Claude spark, the
- * Gemini star, the OpenAI knot, the Cursor cube. The marks are LobeHub's model icons (MIT),
- * vendored under `public/logos/models/`.
+ * Gemini star, the OpenAI knot, the Cursor cube. The marks are
+ * vendored under `public/logos/models/` (licence: THIRD_PARTY_NOTICES.md).
  *
  * Claude and Gemini are drawn in their brand colours — like the logo strip
  * on the sign-in page, a third-party mark keeps its own colour. OpenAI's

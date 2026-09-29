@@ -9,8 +9,8 @@ import { Icon } from "@/components/ui/icon"
 import { StatusIcon } from "@/components/ui/status-icon"
 
 /**
- * A session's entries on a dashed rail with elbow connectors. natai's
- * `workflow` illustration, reworked onto real timeline data.
+ * A session's entries on a dashed rail with elbow connectors,
+ * drawn from real timeline data.
  *
  * The rail is a dashed hairline; each entry hangs off it on a quarter-round
  * elbow (`rounded-bl-full` on a bordered box, which is the whole trick). The

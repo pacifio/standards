@@ -5,7 +5,7 @@ import { cn } from "cn"
 
 /**
  * A scroll region whose top and bottom edges dissolve — but only on the side
- * there is actually more content. Auberge's `sidebar.mp4`.
+ * there is actually more content.
  *
  * It is the scroll container, not an overlay: it measures its own
  * `scrollTop` against `fade` and writes two registered custom properties the

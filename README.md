@@ -4,13 +4,12 @@ The UI design system for the Atlas web app — and a mock of that app built on
 it.
 
 **Achromatic surfaces, hairline rules, rings instead of shadows, and hue only
-where something has an identity.** The structure — curved panels set into a
+where something has an identity.** The structure: curved panels set into a
 canvas frame, a spring-collapsing sidebar whose active pill slides between rows, ringed
-panels, a KPI strip, hue-coded tags, an interface-scale control — comes from
-the Auberge dashboard. The palette and the illustration blocks — a monochrome
-OKLCH ramp, dashed rails, cross-hair corners, the Bayer-dither shader — come
-from natai. What is Atlas's own: the session-shaped blocks, the fixtures, and
-the ratchet that keeps the two from drifting apart.
+panels, a KPI strip, hue-coded tags, an interface-scale control. The palette
+and the illustration blocks: a monochrome OKLCH ramp, dashed rails, cross-hair
+corners, the Bayer-dither shader. Around them sit the session-shaped blocks,
+the fixtures, and the ratchet that keeps the system from drifting.
 
 ```bash
 bun install
@@ -23,13 +22,13 @@ bun run check    # prettier
 
 ## What is here
 
-| Route | What it is |
-|---|---|
-| `/ds/foundations/*` | Colour, type, density, motion & depth — every token with its value and the reason it exists |
-| `/ds/components/*` | 36 components: actions, forms, overlays, data, feedback. Every variant, size and state |
-| `/ds/patterns` | Panel, KPI strip, segmented controls, data table, setting card — the compositions that appear on more than one screen |
-| `/ds/blocks` | The illustration and effect primitives, including the draggable status globe |
-| `/mock/*` | The Atlas web app: Dashboard, Inbox, Timeline, Projects, Chat, Settings, Admin, Sign in |
+| Route               | What it is                                                                                                            |
+| ------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| `/ds/foundations/*` | Colour, type, density, motion & depth — every token with its value and the reason it exists                           |
+| `/ds/components/*`  | 36 components: actions, forms, overlays, data, feedback. Every variant, size and state                                |
+| `/ds/patterns`      | Panel, KPI strip, segmented controls, data table, setting card — the compositions that appear on more than one screen |
+| `/ds/blocks`        | The illustration and effect primitives, including the draggable status globe                                          |
+| `/mock/*`           | The Atlas web app: Dashboard, Inbox, Timeline, Projects, Chat, Settings, Admin, Sign in                               |
 
 Both themes are fully designed; dark is the default. Toggle from the sidebar
 footer or the gallery nav. The interface scale (`T 100%`) lives beside it.
@@ -64,13 +63,13 @@ tests/          the ratchet
   the ring. The token layer is the only place a colour literal may appear.
 - **The primary is the foreground, inverted.** No brand hue in the chrome.
   Focus is the foreground at 40%, selection at 22%.
-- **Two rules, not one.** `--hairline` (6–7%) for a rule *inside* content,
+- **Two rules, not one.** `--hairline` (6–7%) for a rule _inside_ content,
   `--border` (8–9%) for the edge of a thing, `--border-strong` for focus.
 - **Rings, not shadows.** A raised block is `rounded-xl bg-card ring-1
-  ring-foreground/10`. Only a menu (`shadow-md`) and a dialog (`shadow-lg`)
+ring-foreground/10`. Only a menu (`shadow-md`) and a dialog (`shadow-lg`)
   cast, because they float over content they are not part of.
 - **Chroma has exactly two jobs.** Four status inks (success / warning /
-  error / info) with `-muted` fills, and eight hues for *identity* — labels,
+  error / info) with `-muted` fills, and eight hues for _identity_ — labels,
   projects, roles — via `.tag-<hue>` and `hueFor(id)`. Done is an achromatic
   check, not a colour.
 - **Rem on a 16px root × `--ui-scale`.** `--spacing` is Tailwind's `0.25rem`;

@@ -8,7 +8,7 @@ import { cn } from "cn"
 import { useMeasure } from "@/lib/use-measure"
 
 /**
- * A seamless marquee. natai's `motion-primitives/infinite-slider`.
+ * A seamless marquee.
  *
  * Children render twice and the track translates by exactly half its
  * measured width, so the second copy lands where the first began. Width is

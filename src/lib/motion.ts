@@ -1,8 +1,7 @@
 /**
  * The motion vocabulary, as constants `motion` can take directly.
  *
- * Three springs, one ease, one stagger. These are Auberge's numbers and they
- * are what make the chrome feel like one object rather than a set of
+ * Three springs, one ease, one stagger. These numbers are what make the chrome feel like one object rather than a set of
  * components that each picked their own curve.
  *
  *   SPRING_RAIL       the sidebar changing width, the dock opening

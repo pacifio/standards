@@ -96,7 +96,7 @@ function StatusIcon({
 /**
  * Priority, as four stepped bars.
  *
- * Borrowed from Linear because it solves a real problem: priority needs to be
+ * Bars, because they solve a real problem: priority needs to be
  * comparable down a column at a glance, and a coloured chip per level turns
  * the list into a traffic light that competes with status. Bars encode
  * magnitude in height, which the eye reads without decoding a colour key.

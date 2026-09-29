@@ -13,7 +13,7 @@ import {
  * Everything in this system sizes in rem, so raising the root font size
  * grows type, spacing, controls and icons together rather than only the
  * text. This is the answer to "the sidebar is too condensed": the density
- * is Auberge's, and the person reading it decides how big that is.
+ * is the system's, and the person reading it decides how big that is.
  *
  * Written to `--ui-scale` on <html>; `globals.css` does
  * `font-size: calc(16px * var(--ui-scale))`. Persisted per browser.

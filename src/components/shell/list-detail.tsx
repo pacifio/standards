@@ -3,7 +3,7 @@ import { cn } from "cn"
 /**
  * The three-pane reading layout: list, detail, properties.
  *
- * Linear's shape, and the reason it works for Atlas is that a session board is
+ * The reason this shape works for Atlas is that a session board is
  * the same problem as an issue list — a long list of short rows where you want
  * to move through them without losing your place. The current `/timeline`
  * already puts a board beside a detail pane; this names the layout so
@@ -28,7 +28,7 @@ function ListDetail({ className, ...props }: React.ComponentProps<"div">) {
  * row is an avatar, a title and a line of preview.
  *
  * `wide` is the Issues shape: the list IS the screen, and the detail is the
- * narrower companion. A Linear-style row carries priority, id, status, title,
+ * narrower companion. A dense row carries priority, id, status, title,
  * labels, a diff and an assignee — roughly 700px of content — so putting it in
  * a 320px column truncates the title to nothing while the metadata keeps its
  * space. Which is exactly what happened here the first time.

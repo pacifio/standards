@@ -2,7 +2,7 @@
 
 This repo is the design system and a high-fidelity mock. Nothing here is wired
 to an API. This is what it takes to move it into
-`~/Desktop/server/apps/web`, in the order that keeps the app shippable at every
+the server's `apps/web`, in the order that keeps the app shippable at every
 step.
 
 Both repos are TanStack Start + TanStack Router + Vite + Tailwind v4 and React
@@ -28,7 +28,7 @@ Four things will move on their own, and they are the point:
   `--ring` the foreground at 40%. Every primary button and focus ring on every
   screen changes.
 - **The surface ramp becomes monotonic.** Page `0.08` → surface `0.10` → card
-  `0.12` → popover `0.17` in dark. The sidebar sits one step *below* the page
+  `0.12` → popover `0.17` in dark. The sidebar sits one step _below_ the page
   and every raised block one step above it, ringed rather than shadowed.
 - **Root font-size becomes `calc(16px * var(--ui-scale))`** and the body
   default becomes 12px. Every existing screen gets denser; the scale control
@@ -70,19 +70,19 @@ wrapper around one, or Base UI warns about a non-native button.
 It vendors 16. This repo has 36 primitives, five patterns and ten blocks. The
 gaps that matter, roughly in order of how much they are costing today:
 
-| Component | Why it matters |
-|---|---|
-| `select` | **Every choice in the app is a raw `<select>`** — the org picker, the project filter, the role picker, the facet bar. They render differently on macOS, Windows and Linux and cannot be styled into the system. |
-| `patterns/data-table`, `kpi-strip`, `segmented` | The timeline board, admin, usage and members are all the same three shapes. Today each screen hand-rolls its own table and its own filter row. |
-| `patterns/panel` | The ringed, staggered card that every dashboard surface is made of. |
-| `ui/tag` + `lib/hue.ts` | Labels, projects and roles get a stable identity hue via `hueFor(id)` instead of ad-hoc badge variants. |
-| `icon-button` | `label` is required, so the toolbar of unlabelled glyphs becomes a type error. |
-| `popover`, `command-menu` | There is no ⌘K and no lightweight floating panel. |
-| `scroll-fade` | Scrollbars are hidden system-wide; this is what tells you a region scrolls. |
-| `switch`, `checkbox`, `radio-group`, `slider` | No form controls beyond input and textarea. |
-| `resizable` | Panes are fixed or native-scrolled. |
-| `empty-state`, `callout`, `spinner`, `progress` | Each screen invents its own. |
-| `blocks/*` | `SessionPipeline` and `SessionTimeline` are the session view; `Globe` is the login aside (cobe, ~5kb, WebGL — it builds itself in an effect, so it is SSR-safe without `ClientOnly`). |
+| Component                                       | Why it matters                                                                                                                                                                                                  |
+| ----------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `select`                                        | **Every choice in the app is a raw `<select>`** — the org picker, the project filter, the role picker, the facet bar. They render differently on macOS, Windows and Linux and cannot be styled into the system. |
+| `patterns/data-table`, `kpi-strip`, `segmented` | The timeline board, admin, usage and members are all the same three shapes. Today each screen hand-rolls its own table and its own filter row.                                                                  |
+| `patterns/panel`                                | The ringed, staggered card that every dashboard surface is made of.                                                                                                                                             |
+| `ui/tag` + `lib/hue.ts`                         | Labels, projects and roles get a stable identity hue via `hueFor(id)` instead of ad-hoc badge variants.                                                                                                         |
+| `icon-button`                                   | `label` is required, so the toolbar of unlabelled glyphs becomes a type error.                                                                                                                                  |
+| `popover`, `command-menu`                       | There is no ⌘K and no lightweight floating panel.                                                                                                                                                               |
+| `scroll-fade`                                   | Scrollbars are hidden system-wide; this is what tells you a region scrolls.                                                                                                                                     |
+| `switch`, `checkbox`, `radio-group`, `slider`   | No form controls beyond input and textarea.                                                                                                                                                                     |
+| `resizable`                                     | Panes are fixed or native-scrolled.                                                                                                                                                                             |
+| `empty-state`, `callout`, `spinner`, `progress` | Each screen invents its own.                                                                                                                                                                                    |
+| `blocks/*`                                      | `SessionPipeline` and `SessionTimeline` are the session view; `Globe` is the login aside (cobe, ~5kb, WebGL — it builds itself in an effect, so it is SSR-safe without `ClientOnly`).                           |
 
 ## 4. One org context, replacing four
 
@@ -90,12 +90,12 @@ This is the largest structural change and the one with the clearest payoff.
 
 `apps/web` resolves the active organisation four different ways:
 
-| Where | How |
-|---|---|
-| `/timeline`, `/projects`, `/inbox` | URL search param `org`, validated per route |
-| `/chat` | component state plus its own `<select>` in the page header |
-| `/dashboard` → `OrgPanel` | better-auth `orgSetActive()` (`org-panel.tsx:391`) |
-| `/call/$callId`, `/space/$convId` | URL param again, validated differently |
+| Where                              | How                                                        |
+| ---------------------------------- | ---------------------------------------------------------- |
+| `/timeline`, `/projects`, `/inbox` | URL search param `org`, validated per route                |
+| `/chat`                            | component state plus its own `<select>` in the page header |
+| `/dashboard` → `OrgPanel`          | better-auth `orgSetActive()` (`org-panel.tsx:391`)         |
+| `/call/$callId`, `/space/$convId`  | URL param again, validated differently                     |
 
 So switching org on one screen does not switch it on the next, every page
 independently runs `orgList()` then `orgFull()`, and there is nowhere to put a

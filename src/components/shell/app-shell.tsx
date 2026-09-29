@@ -62,7 +62,7 @@ import { UiScaleControl } from "./ui-scale"
 
 /**
  * The application frame: curved panels on a canvas, as the Atlas desktop app
- * and Linear draw it.
+ * draws it.
  *
  *   ┌ canvas ─────────────────────────────────────────────────────┐
  *   │ workspace ▾   ┌──────────────────────────────┐ ┌─ dock ───┐ │

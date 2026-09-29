@@ -35,7 +35,7 @@ import { Icon } from "@/components/ui/icon"
  * `<select>` that sets better-auth's active org — which three other screens
  * then ignore, because they read the org from the URL instead.
  *
- * Linear's answer, which this copies:
+ * The answer here:
  *
  *  - The switcher is the FIRST thing in the rail, so the answer to "which
  *    workspace am I in" is in the same place on every screen.
