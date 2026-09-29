@@ -56,10 +56,14 @@ function TimelineCalendar({
 
   return (
     <div data-slot="timeline-calendar" className={className}>
+      {/* The backing bleeds 1rem past each side: rows widen their hover
+          background past the column's edges, and without the bleed that
+          background shows either side of the date as a row scrolls under. */}
       <header
         className={cn(
           HEADER,
-          "sticky top-0 z-panel flex items-end border-b border-border bg-background pb-2.5"
+          "sticky top-0 z-panel flex items-end border-b border-border bg-background pb-2.5",
+          "before:absolute before:-inset-x-4 before:inset-y-0 before:-z-10 before:bg-background"
         )}
       >
         <AnimatePresence mode="popLayout" initial={false}>

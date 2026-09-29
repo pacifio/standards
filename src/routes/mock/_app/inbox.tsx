@@ -155,15 +155,16 @@ function InboxScreen() {
       // sidebar and the dock both eat into — not the window's.
       className="@container min-h-0 flex-1 overflow-y-auto"
     >
-      <div className="flex min-h-full flex-col px-4 @5xl:px-12">
+      <div className="flex min-h-full flex-col px-2 @5xl:px-10">
         {/* A column framed by dashed rails at its edges; the content keeps a
           gutter inside them. */}
-        <div className="relative mx-auto flex w-full max-w-212 flex-1 flex-col gap-6 px-8 pt-8 pb-24">
-          {/* The rails stand 5rem off the content (the 2rem gutter plus 3rem
-            outside the column). They need the panel to be wider than the
-            column plus that margin, so below 64rem of panel they are not
-            drawn at all rather than grazing the panel's edge. */}
-          <DashedRails offset="-3rem" className="hidden @5xl:block" />
+        <div className="relative mx-auto flex w-full max-w-232 flex-1 flex-col gap-6 px-5 pt-8 pb-24">
+          {/* The rails stand 3.25rem off the content (the 1.25rem gutter plus
+            2rem outside the column), matching the timeline. They need the
+            panel to be wider than the column plus that margin, so below
+            64rem of panel they are not drawn at all rather than grazing the
+            panel's edge. */}
+          <DashedRails offset="-2rem" className="hidden @5xl:block" />
           {/* The title drives the mailbox: hovering anywhere on it raises
             the flag, not just on the 20px glyph. */}
           <header className="flex flex-wrap items-center justify-between gap-3">
@@ -244,7 +245,7 @@ function InboxRow({
   return (
     <article
       data-unread={!read || undefined}
-      className="group/row group/go duration-fast relative -mx-3 flex gap-3 rounded-lg px-3 py-4 transition-colors ease-out-strong hover:bg-element-hover"
+      className="group/row group/go duration-fast relative -mx-2 flex gap-2.5 rounded-lg px-2 py-2.5 transition-colors ease-out-strong hover:bg-element-hover"
     >
       {/* The row itself opens the comment: a link stretched under the
           content, so the inner links stay real links rather than nesting. */}
@@ -262,7 +263,7 @@ function InboxRow({
 
       <span
         aria-hidden="true"
-        className="relative mt-px flex size-7 shrink-0 items-center justify-center rounded-full text-muted-foreground ring-1 ring-foreground/12"
+        className="relative flex size-6 shrink-0 items-center justify-center rounded-full text-muted-foreground ring-1 ring-foreground/12"
       >
         <Icon icon={KIND_ICON[entry.kind]} size="sm" />
         {!read && (
@@ -271,7 +272,7 @@ function InboxRow({
       </span>
       {!read && <span className="sr-only">Unread.</span>}
 
-      <div className="flex min-w-0 flex-1 flex-col gap-1.5">
+      <div className="flex min-w-0 flex-1 flex-col gap-1">
         <p className="flex min-w-0 flex-wrap items-center gap-x-1.5 gap-y-0.5 text-xs">
           <PersonAvatar
             size="xs"
@@ -321,7 +322,7 @@ function InboxRow({
 
         <p
           className={cn(
-            "line-clamp-2 text-xs leading-relaxed",
+            "line-clamp-2 text-xs leading-snug",
             deleted ? "text-disabled italic" : "text-secondary-foreground"
           )}
         >
