@@ -53,6 +53,11 @@
   --border: oklch(1 0 0 / 8%);
   --border-strong: oklch(1 0 0 / 16%);
   --border-illustration: var(--border);
+  /* A segmented control: a recessed track and the raised thumb that slides
+     inside it. The thumb is always a step LIGHTER than the track — which
+     in dark means a lighter grey, and in light means white on grey. */
+  --segment-track: oklch(0.13 0 0);
+  --segment-thumb: oklch(0.26 0 0);
   --input: oklch(1 0 0 / 10%);
   --ring: oklch(0.97 0 0 / 40%);
 
@@ -148,6 +153,8 @@
   --hairline: oklch(0 0 0 / 7%);
   --border: oklch(0 0 0 / 9%);
   --border-strong: oklch(0 0 0 / 18%);
+  --segment-track: oklch(0.955 0 0);
+  --segment-thumb: oklch(1 0 0);
   --input: oklch(0 0 0 / 9%);
   --ring: oklch(0.1 0 0 / 40%);
 

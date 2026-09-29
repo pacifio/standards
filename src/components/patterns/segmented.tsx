@@ -22,7 +22,16 @@ export type SegmentOption<T extends string> = {
   icon?: React.ReactNode
 }
 
-/** The chip rail: a local switch between renderings of the same data. */
+/**
+ * A segmented control: a local switch between renderings of the same data.
+ *
+ * The options sit in ONE recessed track with a hairline edge, and the active
+ * one is a raised thumb that slides inside it — so the control reads as a
+ * single object with parts, not as loose words that happen to be clickable.
+ * The thumb is a step lighter than the track in both themes (tokens
+ * `segment-track` / `segment-thumb`), never the inverted primary: this is a
+ * view switch, not the loudest action on the screen.
+ */
 function SegmentedPills<T extends string>({
   options,
   value,
@@ -41,7 +50,10 @@ function SegmentedPills<T extends string>({
     <div
       data-slot="segmented-pills"
       role="tablist"
-      className={cn("flex items-center gap-1 overflow-x-auto", className)}
+      className={cn(
+        "flex w-fit max-w-full items-center gap-0.5 overflow-x-auto rounded-full bg-segment-track p-0.5 ring-1 ring-foreground/8",
+        className
+      )}
     >
       {options.map((option) => {
         const active = option.value === value
@@ -53,18 +65,18 @@ function SegmentedPills<T extends string>({
             aria-selected={active}
             onClick={() => onChange(option.value)}
             className={cn(
-              "relative shrink-0 rounded-full font-medium whitespace-nowrap transition-colors outline-none",
-              size === "sm" ? "h-6 px-2.5 text-2xs" : "h-7 px-3 text-xs",
+              "duration-fast relative shrink-0 rounded-full font-medium whitespace-nowrap transition-colors outline-none",
+              size === "sm" ? "h-5.5 px-2.5 text-2xs" : "h-6.5 px-3 text-xs",
               active
-                ? "text-primary-foreground"
-                : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                ? "text-foreground"
+                : "text-muted-foreground hover:text-foreground"
             )}
           >
             {active && (
               <motion.span
                 layoutId={layoutId}
                 transition={SPRING_INDICATOR}
-                className="absolute inset-0 rounded-full bg-primary"
+                className="absolute inset-0 rounded-full bg-segment-thumb ring-1 ring-foreground/8"
               />
             )}
             <span className="relative z-10 flex items-center gap-1.5">
@@ -75,7 +87,7 @@ function SegmentedPills<T extends string>({
                   className={cn(
                     "rounded-full px-1 text-3xs tnum",
                     active
-                      ? "bg-primary-foreground/20"
+                      ? "bg-foreground/10"
                       : "bg-element-emphasis text-muted-foreground"
                   )}
                 >

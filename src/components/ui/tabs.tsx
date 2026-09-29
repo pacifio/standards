@@ -43,7 +43,7 @@ const tabsListVariants = cva(
     variants: {
       variant: {
         segmented:
-          "h-control-lg gap-0.5 rounded-full bg-muted p-0.5 text-secondary-foreground",
+          "h-control-lg gap-0.5 rounded-full bg-segment-track p-0.5 text-secondary-foreground ring-1 ring-foreground/8",
         line: "h-control-lg w-full justify-start gap-4 rounded-none border-b border-hairline",
       },
     },
@@ -83,14 +83,14 @@ function TabsTrigger({ className, ...props }: TabsPrimitive.Tab.Props) {
         "group-data-[variant=segmented]/tabs-list:flex-1",
         "group-data-[variant=segmented]/tabs-list:rounded-full",
         "group-data-[variant=segmented]/tabs-list:px-2.5",
-        "group-data-[variant=segmented]/tabs-list:data-selected:bg-background",
-        "group-data-[variant=segmented]/tabs-list:data-selected:text-foreground",
-        "group-data-[variant=segmented]/tabs-list:data-selected:ring-1 group-data-[variant=segmented]/tabs-list:data-selected:ring-foreground/10",
+        "group-data-[variant=segmented]/tabs-list:data-active:bg-segment-thumb",
+        "group-data-[variant=segmented]/tabs-list:data-active:text-foreground",
+        "group-data-[variant=segmented]/tabs-list:data-active:ring-1 group-data-[variant=segmented]/tabs-list:data-active:ring-foreground/8",
 
         // line: a 2px rule under the active tab, overlapping the list's border
         "group-data-[variant=line]/tabs-list:h-full",
         "group-data-[variant=line]/tabs-list:rounded-none",
-        "group-data-[variant=line]/tabs-list:data-selected:text-foreground",
+        "group-data-[variant=line]/tabs-list:data-active:text-foreground",
         "group-data-[variant=line]/tabs-list:after:absolute",
         "group-data-[variant=line]/tabs-list:after:inset-x-0",
         "group-data-[variant=line]/tabs-list:after:-bottom-px",
@@ -98,7 +98,7 @@ function TabsTrigger({ className, ...props }: TabsPrimitive.Tab.Props) {
         "group-data-[variant=line]/tabs-list:after:bg-foreground",
         "group-data-[variant=line]/tabs-list:after:opacity-0",
         "group-data-[variant=line]/tabs-list:after:transition-opacity",
-        "group-data-[variant=line]/tabs-list:data-selected:after:opacity-100",
+        "group-data-[variant=line]/tabs-list:data-active:after:opacity-100",
         className
       )}
       {...props}

@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react"
 import { AnimatePresence, motion } from "motion/react"
 import {
+  ActivityIcon,
   BookmarkIcon,
   CheckIcon,
   MessageSquareIcon,
@@ -16,6 +17,7 @@ import { cn } from "cn"
 import { ACTIVITY_POOL } from "@/mock/dashboard"
 import type { ActivityEvent, ActivityKind } from "@/mock/dashboard"
 import { EASE_PANEL } from "@/lib/motion"
+import { CardHeader } from "@/components/dashboard/card-header"
 import { Icon } from "@/components/ui/icon"
 import { PersonAvatar } from "@/components/patterns/person-avatar"
 
@@ -110,15 +112,12 @@ function ActivityFeed({ className }: { className?: string }) {
       onFocus={() => setPaused(true)}
       onBlur={() => setPaused(false)}
     >
-      <header className="flex items-center justify-between gap-3 px-4 pt-3.5 pb-2">
-        <div className="min-w-0">
-          <h3 className="text-xs font-medium">Activity</h3>
-          <p className="mt-0.5 truncate text-2xs text-muted-foreground">
-            Sessions, checkpoints and people across the workspace
-          </p>
-        </div>
-        <LiveTag paused={paused} />
-      </header>
+      <CardHeader
+        icon={ActivityIcon}
+        title="Activity"
+        description="Sessions, checkpoints and people across the workspace"
+        action={<LiveTag paused={paused} />}
+      />
 
       <ol
         aria-live="polite"

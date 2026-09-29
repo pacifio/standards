@@ -9,6 +9,7 @@ import {
   EyeIcon,
   PlusIcon,
   ShieldCheckIcon,
+  UsersIcon,
 } from "lucide-react"
 import { cn } from "cn"
 
@@ -18,6 +19,7 @@ import type { Member, Role } from "@/mock/types"
 import { useOrg } from "@/lib/org-context"
 import { AvatarGroupCount } from "@/components/ui/avatar"
 import { AvatarStack } from "@/components/ui/avatar-stack"
+import { CardHeader } from "@/components/dashboard/card-header"
 import { Button, buttonVariants } from "@/components/ui/button"
 import { Icon } from "@/components/ui/icon"
 import { Input } from "@/components/ui/input"
@@ -104,21 +106,20 @@ function MemberQuickManage({ className }: { className?: string }) {
         className
       )}
     >
-      <header className="flex items-center justify-between gap-3 px-4 pt-3.5 pb-2">
-        <div className="min-w-0">
-          <h3 className="text-xs font-medium">Members</h3>
-          <p className="mt-0.5 truncate text-2xs text-muted-foreground tnum">
-            {active.length} active{pending > 0 && ` · ${pending} pending`}
-          </p>
-        </div>
-        <Link
-          to="/mock/settings/organisation"
-          className={buttonVariants({ variant: "ghost", size: "xs" })}
-        >
-          Manage
-          <Icon icon={ArrowRightIcon} size="xs" />
-        </Link>
-      </header>
+      <CardHeader
+        icon={UsersIcon}
+        title="Members"
+        description={`${active.length} active${pending > 0 ? ` · ${pending} pending` : ""}`}
+        action={
+          <Link
+            to="/mock/settings/organisation"
+            className={buttonVariants({ variant: "ghost", size: "xs" })}
+          >
+            Manage
+            <Icon icon={ArrowRightIcon} size="xs" />
+          </Link>
+        }
+      />
 
       <div className="flex items-center justify-between gap-3 px-4 pt-1 pb-3.5">
         <AvatarStack>

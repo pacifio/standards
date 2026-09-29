@@ -13,7 +13,7 @@ import { ActivityFeed } from "@/components/dashboard/activity-feed"
 import { MemberQuickManage } from "@/components/dashboard/member-quick-manage"
 import { DataTable } from "@/components/patterns/data-table"
 import type { Column } from "@/components/patterns/data-table"
-import { PageHeader, SectionHeader } from "@/components/patterns/section-header"
+import { SectionHeader } from "@/components/patterns/section-header"
 import { SegmentedPills } from "@/components/patterns/segmented"
 import { MeterCard, StatCard, StatGrid } from "@/components/patterns/stat-card"
 import { buttonVariants } from "@/components/ui/button"
@@ -147,7 +147,8 @@ const COLUMNS: Array<Column<Session>> = [
  * the table is always "latest", so neither pretends to have a range.
  */
 function DashboardScreen() {
-  const { org } = useOrg()
+  const { org, user } = useOrg()
+  const firstName = user.name.split(" ")[0]
   const navigate = useNavigate()
   const [range, setRange] = useState<DashboardRange>("7d")
   const figures = statFigures(range)
@@ -166,23 +167,30 @@ function DashboardScreen() {
 
       <ScrollFade className="min-h-0 flex-1">
         <div className="@container flex flex-col gap-6 px-5 pt-4 pb-8">
-          <PageHeader
-            className="pb-0"
-            title="Dashboard"
-            description={`${RANGE_LABEL[range]} across ${org.name}`}
-            action={
-              <SegmentedPills<DashboardRange>
-                size="sm"
-                value={range}
-                onChange={setRange}
-                options={[
-                  { value: "24h", label: "24h" },
-                  { value: "7d", label: "7d" },
-                  { value: "30d", label: "30d" },
-                ]}
-              />
-            }
-          />
+          {/* A greeting rather than a page title — the sidebar already says
+              where you are. 20/25 at weight 400, the size Anthropic sets its
+              own greeting at: warm, not shouted. */}
+          <header className="flex flex-wrap items-end justify-between gap-3">
+            <div className="min-w-0">
+              <h1 className="flex items-center gap-2 text-xl/6.25 font-normal">
+                <span aria-hidden="true">👋</span>
+                <span className="truncate">Welcome back, {firstName}</span>
+              </h1>
+              <p className="mt-0.5 truncate text-2xs text-muted-foreground">
+                {RANGE_LABEL[range]} across {org.name}
+              </p>
+            </div>
+            <SegmentedPills<DashboardRange>
+              size="sm"
+              value={range}
+              onChange={setRange}
+              options={[
+                { value: "24h", label: "24h" },
+                { value: "7d", label: "7d" },
+                { value: "30d", label: "30d" },
+              ]}
+            />
+          </header>
 
           <section aria-label="Usage" className="flex flex-col gap-3">
             {/* Two up until there is room for all five; the odd one out takes
