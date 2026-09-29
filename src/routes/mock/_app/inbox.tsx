@@ -20,6 +20,7 @@ import { TimelineCalendar } from "@/components/blocks/timeline-calendar"
 import type { CalendarDay } from "@/components/blocks/timeline-calendar"
 import { PersonAvatar } from "@/components/patterns/person-avatar"
 import { SegmentedPills } from "@/components/patterns/segmented"
+import { AvatarStack } from "@/components/ui/avatar-stack"
 import { EmptyState } from "@/components/ui/empty-state"
 import { GoChevron } from "@/components/ui/go-chevron"
 import { Icon } from "@/components/ui/icon"
@@ -74,6 +75,34 @@ function resolveActor(entry: InboxEntry): Actor {
     image: m.image,
     guest: false,
   }
+}
+
+/** How many updates the day holds, a hairline, then who they came from. */
+function DayMeta({ entries }: { entries: Array<InboxEntry> }) {
+  const people = [
+    ...new Map(
+      entries.map((e) => [e.actorName ?? e.actorId, resolveActor(e)])
+    ).values(),
+  ]
+  return (
+    <span className="flex shrink-0 items-center gap-2.5 pb-0.5">
+      <span className="mono text-2xs text-muted-foreground">
+        {entries.length} {entries.length === 1 ? "update" : "updates"}
+      </span>
+      <span aria-hidden="true" className="h-3 w-px bg-border" />
+      <AvatarStack>
+        {people.slice(0, 4).map((p) => (
+          <PersonAvatar
+            key={p.name}
+            size="xs"
+            name={p.name}
+            email={p.email}
+            image={p.image}
+          />
+        ))}
+      </AvatarStack>
+    </span>
+  )
 }
 
 /**
@@ -133,6 +162,7 @@ function InboxScreen() {
   const days: Array<CalendarDay> = byDay.map(([key, entries]) => ({
     id: key,
     ...dayLabel(entries[0].createdAt),
+    meta: <DayMeta entries={entries} />,
     children: (
       <ul className="divide-y divide-hairline">
         {entries.map((entry) => (

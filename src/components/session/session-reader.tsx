@@ -1,7 +1,7 @@
 "use client"
 
-import { useEffect, useMemo, useRef, useState } from "react"
-import { CheckIcon, GitBranchIcon, XIcon } from "lucide-react"
+import { useEffect, useMemo, useRef } from "react"
+import { GitBranchIcon, XIcon } from "lucide-react"
 
 import type { SessionDetailApi } from "@/mock/sessions-api"
 import { ago } from "@/mock/time"
@@ -9,15 +9,9 @@ import { Icon } from "@/components/ui/icon"
 import { ModelMark, agentFamily } from "@/components/ui/model-badge"
 import { IconButton } from "@/components/ui/icon-button"
 import { StatusIcon } from "@/components/ui/status-icon"
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip"
-import { UploadIcon } from "@/components/ui/upload-icon"
-import type { UploadIconHandle } from "@/components/ui/upload-icon"
 import { CommentButton, CommentsProvider, useComments } from "./comments"
 import { CommentsMorph } from "./comments-morph"
+import { ShareMorph } from "./share-morph"
 import { EntryRail, groupEntries } from "./entry-rail"
 import { SessionStats } from "./session-stats"
 
@@ -138,7 +132,7 @@ function Reader({
         aria-hidden="true"
         className="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-linear-to-b from-transparent to-card"
       />
-      <BottomBar sessionId={s.id} entries={entries} />
+      <BottomBar detail={detail} entries={entries} />
     </div>
   )
 }
@@ -200,67 +194,19 @@ function Chip({ children }: { children: React.ReactNode }) {
 }
 
 function BottomBar({
-  sessionId,
+  detail,
   entries,
 }: {
-  sessionId: string
+  detail: SessionDetailApi
   entries: SessionDetailApi["entries"]
 }) {
-  // `items-end`: the comments button grows up and left into its panel, so
-  // the bar must hold its items to the bottom edge while it does.
+  // `items-end`: each button grows up out of its corner into its panel, so
+  // the bar must hold its items to the bottom edge while they do.
   return (
     <div className="pointer-events-none absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 px-4 pb-3.5 *:pointer-events-auto">
-      <ShareButton sessionId={sessionId} />
+      <ShareMorph detail={detail} />
       <CommentsMorph entries={entries} />
     </div>
-  )
-}
-
-/**
- * Copies a link to this session. The arrow lifts out of its tray while the
- * button is hovered; after a press the glyph turns to a check for a moment,
- * and the tooltip says what happened.
- */
-function ShareButton({ sessionId }: { sessionId: string }) {
-  const upload = useRef<UploadIconHandle>(null)
-  const [copied, setCopied] = useState(false)
-
-  async function share() {
-    const url = new URL(window.location.href)
-    url.searchParams.set("session", sessionId)
-    try {
-      await navigator.clipboard.writeText(url.toString())
-    } catch {
-      // Clipboard can be refused; the button still acknowledges the press.
-    }
-    setCopied(true)
-    window.setTimeout(() => setCopied(false), 1600)
-  }
-
-  return (
-    <Tooltip>
-      <TooltipTrigger
-        render={
-          <button
-            type="button"
-            aria-label={copied ? "Link copied" : "Share session"}
-            onClick={share}
-            onMouseEnter={() => upload.current?.startAnimation()}
-            onMouseLeave={() => upload.current?.stopAnimation()}
-            className="duration-fast relative flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-full border border-border bg-card/80 text-muted-foreground shadow-md backdrop-blur-xl transition-colors hover:text-foreground"
-          >
-            {copied ? (
-              <Icon icon={CheckIcon} size="sm" className="text-success" />
-            ) : (
-              <UploadIcon ref={upload} controlled />
-            )}
-          </button>
-        }
-      />
-      <TooltipContent side="top">
-        {copied ? "Link copied" : "Share"}
-      </TooltipContent>
-    </Tooltip>
   )
 }
 

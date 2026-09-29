@@ -454,7 +454,7 @@
    hidden` clips the content while the box grows. The open size is read from
    `--morph-open-w` / `--morph-open-h`, set by the component. The trigger
    glyph is pinned to the bottom-right corner so it stays put while the box
-   grows up and left out of it.
+   grows up and left out of it; `data-anchor="start"` mirrors that.
    ────────────────────────────────────────────────────────────────────────── */
 
 @layer components {
@@ -527,6 +527,26 @@
     transform: translateX(0) scale(1);
     filter: blur(0);
     pointer-events: auto;
+  }
+
+  /* Anchored at the bottom-LEFT: the glyph pins to that corner and the
+     box grows up and right, so every slide runs the other way. */
+  .t-morph[data-anchor="start"] .t-morph-trigger {
+    inset: auto auto 0 0;
+  }
+  .t-morph[data-anchor="start"][data-open="true"] .t-morph-trigger {
+    transform: translateX(var(--morph-slide));
+  }
+  .t-morph[data-anchor="start"][data-open="true"] .t-morph-trigger svg {
+    transform: scale(var(--morph-scale)) rotate(calc(-1 * var(--morph-rotate)));
+  }
+  .t-morph[data-anchor="start"] .t-morph-menu {
+    transform: translateX(calc(-1 * var(--morph-slide)))
+      scale(var(--morph-scale));
+    transform-origin: bottom left;
+  }
+  .t-morph[data-anchor="start"][data-open="true"] .t-morph-menu {
+    transform: translateX(0) scale(1);
   }
 
   @media (prefers-reduced-motion: reduce) {
