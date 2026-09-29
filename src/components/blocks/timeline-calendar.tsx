@@ -27,6 +27,8 @@ export type CalendarDay = {
   date: string
   /** The quiet part after the slash, e.g. "Today" or "Monday". */
   day: string
+  /** Right-aligned summary of the day — counts, totals, a face stack. */
+  meta?: React.ReactNode
   children: React.ReactNode
 }
 
@@ -61,17 +63,22 @@ function TimelineCalendar({
         )}
       >
         <AnimatePresence mode="popLayout" initial={false}>
-          <motion.p
+          <motion.div
             key={current.id}
             initial={{ x: -6, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.22, ease: EASE_PANEL }}
-            className="text-lg tracking-tight"
+            className="flex flex-1 items-end justify-between gap-3"
           >
-            <span className="font-medium text-foreground">{current.date}</span>
-            <span className="text-muted-foreground"> / {current.day}</span>
-          </motion.p>
+            <span className="text-lg tracking-tight">
+              <span className="font-medium text-foreground">
+                {current.date}
+              </span>
+              <span className="text-muted-foreground"> / {current.day}</span>
+            </span>
+            {current.meta}
+          </motion.div>
         </AnimatePresence>
       </header>
 
@@ -125,11 +132,14 @@ function Day({
       <h2
         className={cn(
           HEADER,
-          "flex items-end border-b border-border pb-2.5 text-lg tracking-tight"
+          "flex items-end justify-between gap-3 border-b border-border pb-2.5"
         )}
       >
-        <span className="font-medium text-foreground">{day.date}</span>
-        <span className="text-muted-foreground">&nbsp;/ {day.day}</span>
+        <span className="text-lg tracking-tight">
+          <span className="font-medium text-foreground">{day.date}</span>
+          <span className="text-muted-foreground">&nbsp;/ {day.day}</span>
+        </span>
+        {day.meta}
       </h2>
       {day.children}
     </section>

@@ -10,10 +10,11 @@ import type { InboxEntry } from "./types"
  * "Yesterday" on a client past midnight, and hydration would fail.
  */
 
-/** The mock's "now". */
-export const INBOX_NOW = "2026-09-29T17:45:00+06:00"
-/** The mock user's zone. The real app uses the browser's. */
-export const INBOX_TIME_ZONE = "Asia/Dhaka"
+/** The pinned "now" and zone every inbox time is read against. */
+export {
+  MOCK_NOW as INBOX_NOW,
+  MOCK_TIME_ZONE as INBOX_TIME_ZONE,
+} from "./time"
 
 export const INBOX: Array<InboxEntry> = [
   {

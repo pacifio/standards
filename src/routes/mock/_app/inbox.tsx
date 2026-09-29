@@ -11,7 +11,8 @@ import type { LucideIcon } from "lucide-react"
 import { cn } from "cn"
 
 import { MEMBERS } from "@/mock/data"
-import { INBOX, INBOX_NOW, INBOX_TIME_ZONE } from "@/mock/inbox"
+import { INBOX } from "@/mock/inbox"
+import { ago, dayKey, dayLabel, fullStamp } from "@/mock/time"
 import type { ArtifactNotificationKind, InboxEntry } from "@/mock/types"
 import { hueFor } from "@/lib/hue"
 import { DashedRails } from "@/components/blocks/dashed-rails"
@@ -52,62 +53,6 @@ const KIND_LABEL: Record<ArtifactNotificationKind, string> = {
   artifact_mention: "mentioned you on",
   artifact_reply: "replied to you on",
   artifact_session_comment: "commented on your session",
-}
-
-/* --- Time -------------------------------------------------------------- */
-
-const DAY_KEY = new Intl.DateTimeFormat("en-CA", {
-  timeZone: INBOX_TIME_ZONE,
-  year: "numeric",
-  month: "2-digit",
-  day: "2-digit",
-})
-const MONTH_DAY = new Intl.DateTimeFormat("en-US", {
-  timeZone: INBOX_TIME_ZONE,
-  month: "long",
-  day: "numeric",
-})
-const WEEKDAY = new Intl.DateTimeFormat("en-US", {
-  timeZone: INBOX_TIME_ZONE,
-  weekday: "long",
-})
-const FULL = new Intl.DateTimeFormat("en-GB", {
-  timeZone: INBOX_TIME_ZONE,
-  dateStyle: "full",
-  timeStyle: "short",
-})
-const RELATIVE = new Intl.RelativeTimeFormat("en", { numeric: "always" })
-
-/** The calendar day an instant falls on, in the inbox's zone. */
-const dayKey = (iso: string) => DAY_KEY.format(new Date(iso))
-
-/** "September 29 / Today", "September 28 / Yesterday", "September 25 / Thursday". */
-function dayLabel(iso: string): { date: string; day: string } {
-  const at = new Date(iso)
-  const diff = Math.round(
-    (Date.parse(dayKey(INBOX_NOW)) - Date.parse(dayKey(iso))) / 86_400_000
-  )
-  return {
-    date: MONTH_DAY.format(at),
-    day: diff === 0 ? "Today" : diff === 1 ? "Yesterday" : WEEKDAY.format(at),
-  }
-}
-
-/** "just now", "12 minutes ago", "1 hour ago", "3 days ago", "2 weeks ago". */
-function ago(iso: string): string {
-  const s = (Date.parse(INBOX_NOW) - Date.parse(iso)) / 1000
-  if (s < 60) return "just now"
-  const steps: Array<[Intl.RelativeTimeFormatUnit, number]> = [
-    ["minute", 60],
-    ["hour", 3600],
-    ["day", 86_400],
-    ["week", 604_800],
-    ["month", 2_592_000],
-    ["year", 31_536_000],
-  ]
-  let unit = steps[0]
-  for (const step of steps) if (s >= step[1]) unit = step
-  return RELATIVE.format(-Math.floor(s / unit[1]), unit[0])
 }
 
 /* --- People ------------------------------------------------------------ */
@@ -305,7 +250,11 @@ function InboxRow({
           content, so the inner links stay real links rather than nesting. */}
       <Link
         to="/mock/timeline"
-        search={{ view: "all" }}
+        search={{
+          view: "all",
+          session: entry.sessionId,
+          comment: entry.commentId,
+        }}
         onClick={onOpen}
         aria-label={`${actor.name} ${KIND_LABEL[entry.kind]} ${title}`}
         className="absolute inset-0 rounded-lg"
@@ -354,7 +303,11 @@ function InboxRow({
           </span>
           <Link
             to="/mock/timeline"
-            search={{ view: "all" }}
+            search={{
+              view: "all",
+              session: entry.sessionId,
+              comment: entry.commentId,
+            }}
             onClick={onOpen}
             className={cn(
               inline,
@@ -382,10 +335,7 @@ function InboxRow({
             </LabelMark>
           </Link>
           <span aria-hidden="true">·</span>
-          <time
-            dateTime={entry.createdAt}
-            title={FULL.format(new Date(entry.createdAt))}
-          >
+          <time dateTime={entry.createdAt} title={fullStamp(entry.createdAt)}>
             {ago(entry.createdAt)}
           </time>
         </p>

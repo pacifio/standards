@@ -1,62 +1,47 @@
-import { useState } from "react"
+import { useMemo, useRef } from "react"
 import { createFileRoute, useNavigate } from "@tanstack/react-router"
-import {
-  ChevronDownIcon,
-  MessageSquareIcon,
-  SlidersHorizontalIcon,
-  XIcon,
-} from "lucide-react"
+import { ChevronDownIcon, GitBranchIcon, LayersIcon } from "lucide-react"
+import { cn } from "cn"
 
-import { SESSIONS, TIMELINE_ENTRIES } from "@/mock/data"
-import { ageMinutes } from "@/mock/age"
-import type { Session, SessionStatus } from "@/mock/types"
-import { Dock } from "@/components/shell/app-shell"
-import { PropertyRow } from "@/components/shell/list-detail"
-import { SessionPipeline } from "@/components/blocks/session-pipeline"
-import { SessionTimeline } from "@/components/blocks/session-timeline"
-import { DataTable, TableSearch } from "@/components/patterns/data-table"
-import type { Column } from "@/components/patterns/data-table"
-import { KpiStrip } from "@/components/patterns/kpi-strip"
-import { PageHeader } from "@/components/patterns/section-header"
-import { CompoundFilter, SegmentedPills } from "@/components/patterns/segmented"
-import { Button } from "@/components/ui/button"
-import { Code, DiffStat } from "@/components/ui/code-block"
-import { Icon } from "@/components/ui/icon"
-import { IconButton } from "@/components/ui/icon-button"
-import { ScrollFade } from "@/components/ui/scroll-fade"
-import { LabelMark, Tag } from "@/components/ui/tag"
-import { PriorityIcon, StatusIcon } from "@/components/ui/status-icon"
+import { MEMBERS } from "@/mock/data"
+import { SESSION_SUMMARIES, sessionDetail } from "@/mock/sessions-api"
+import type { SessionSummaryApi } from "@/mock/sessions-api"
+import { dayKey, dayLabel, formatDuration, formatTokens } from "@/mock/time"
+import { hueFor } from "@/lib/hue"
+import { Dock, DockSizeToggle } from "@/components/shell/app-shell"
+import { DashedRails } from "@/components/blocks/dashed-rails"
+import { TimelineCalendar } from "@/components/blocks/timeline-calendar"
+import type { CalendarDay } from "@/components/blocks/timeline-calendar"
 import { PersonAvatar } from "@/components/patterns/person-avatar"
+import { CompoundFilter } from "@/components/patterns/segmented"
+import { SessionReader } from "@/components/session/session-reader"
+import { AvatarStack } from "@/components/ui/avatar-stack"
+import { DiffStat } from "@/components/ui/code-block"
+import { Icon } from "@/components/ui/icon"
+import { StatusIcon } from "@/components/ui/status-icon"
+import { LabelMark } from "@/components/ui/tag"
 
 type BoardView = "all" | "mine" | "agents"
 
+type TimelineSearch = {
+  view: BoardView
+  /** The session open in the side panel. */
+  session?: string
+  /** A comment to open and mark, from an inbox deep link. */
+  comment?: string
+}
+
 export const Route = createFileRoute("/mock/_app/timeline")({
   component: TimelineScreen,
-  // `view` is a real filter, not decoration: it is what makes "My sessions"
-  // and "Agents" distinct destinations rather than three links to one page.
-  validateSearch: (search: Record<string, unknown>): { view: BoardView } => {
-    const view = search.view
-    return {
-      view: view === "mine" || view === "agents" ? view : "all",
-    }
-  },
+  // `view` stays a real filter — the sidebar's "My sessions" link uses it —
+  // but it is no longer surfaced as pills on the page.
+  validateSearch: (search: Record<string, unknown>): TimelineSearch => ({
+    view:
+      search.view === "mine" || search.view === "agents" ? search.view : "all",
+    ...(typeof search.session === "string" ? { session: search.session } : {}),
+    ...(typeof search.comment === "string" ? { comment: search.comment } : {}),
+  }),
 })
-
-const STATUS_LABEL: Record<SessionStatus, string> = {
-  live: "Live",
-  queued: "Queued",
-  failed: "Failed",
-  done: "Done",
-}
-
-// Board order: what is running first, then what is waiting, then what broke,
-// then history. A flat sort by time buries a live session under yesterday.
-const STATUS_ORDER: Record<SessionStatus, number> = {
-  live: 0,
-  queued: 1,
-  failed: 2,
-  done: 3,
-}
 
 const VIEW_TITLE: Record<BoardView, string> = {
   all: "Timeline",
@@ -64,171 +49,108 @@ const VIEW_TITLE: Record<BoardView, string> = {
   agents: "Agents",
 }
 
-// Seven days of activity per status, for the strip's sparklines. Fixtures,
-// like everything else on this screen.
-const SPARK: Record<SessionStatus, Array<number>> = {
-  live: [1, 2, 1, 3, 2, 2, 2],
-  queued: [3, 2, 4, 2, 1, 2, 1],
-  failed: [0, 1, 0, 0, 1, 0, 1],
-  done: [4, 6, 5, 8, 7, 9, 5],
+const SELF = "m1"
+
+function author(id: string) {
+  const m = MEMBERS.find((x) => x.id === id)
+  return m
+    ? { name: m.name || m.email, email: m.email, image: m.image }
+    : { name: "Former member" }
 }
 
 /**
- * The session board.
+ * The timeline: every captured session, by day.
  *
- * Three bands down the page — a strip of counts, the table, and the selected
- * session in the shell's dock — instead of a two-pane list-detail. The
- * table is the board: sortable by any column, grouped by status through the
- * default sort rather than through section headers, so a live session is
- * always the first row and the status glyph carries the grouping.
+ * The same frame as the inbox — a centred column between dashed rails, one
+ * sticky date that changes as you scroll into the next day — because it is
+ * the same act: reading down a record of what happened. Each day header
+ * carries the server's own day summary (sessions · active time · tokens)
+ * and the faces of who worked that day.
+ *
+ * A row is what the server's board shows: the state on the rail, the title,
+ * then branch · tokens · author · workspace · checkpoints · diff, with the
+ * agent, model and active time on the right when there is room. Opening a
+ * row puts the session in the side panel — the captured-session reader —
+ * at whichever of its three sizes you last chose.
  */
 function TimelineScreen() {
-  const { view } = Route.useSearch()
+  const { view, session, comment } = Route.useSearch()
   const navigate = useNavigate({ from: Route.fullPath })
-  const [selectedId, setSelectedId] = useState<string | null>(SESSIONS[0].id)
-  const [query, setQuery] = useState("")
-  const selected = SESSIONS.find((s) => s.id === selectedId) ?? null
+  const scroller = useRef<HTMLDivElement>(null)
 
-  const visible = SESSIONS.filter((s) => {
-    if (view === "mine" && s.author !== "Adib Mohsin") return false
-    if (view === "agents" && s.status !== "live" && s.status !== "queued")
-      return false
-    if (!query) return true
-    const q = query.toLowerCase()
-    return (
-      s.title.toLowerCase().includes(q) ||
-      s.ref.toLowerCase().includes(q) ||
-      s.labels.some((l) => l.name.toLowerCase().includes(q))
-    )
-  }).sort(
-    (a, b) =>
-      STATUS_ORDER[a.status] - STATUS_ORDER[b.status] ||
-      ageMinutes(a.startedAt) - ageMinutes(b.startedAt)
+  const detail = useMemo(
+    () => (session ? sessionDetail(session) : null),
+    [session]
   )
 
-  const count = (status: SessionStatus) =>
-    SESSIONS.filter((s) => s.status === status).length
+  const rows = SESSION_SUMMARIES.filter((s) => {
+    if (view === "mine") return s.authorId === SELF
+    if (view === "agents") return s.live || s.status === "queued"
+    return true
+  })
 
-  const columns: Array<Column<Session>> = [
-    {
-      id: "priority",
-      header: <span className="sr-only">Priority</span>,
-      cell: (s) => <PriorityIcon priority={s.priority} />,
-      className: "w-8 pr-0",
-    },
-    {
-      id: "ref",
-      header: "Ref",
-      cell: (s) => (
-        <span className="mono text-2xs whitespace-nowrap text-muted-foreground">
-          {s.ref}
-        </span>
-      ),
-      sortValue: (s) => Number(s.ref.replace(/\D/g, "")),
-      className: "w-18",
-    },
-    {
-      id: "status",
-      header: "Status",
-      cell: (s) => (
-        <span className="flex items-center gap-1.5">
-          <StatusIcon status={s.status} />
-          <span className="mono text-3xs tracking-wide text-secondary-foreground uppercase">
-            {STATUS_LABEL[s.status]}
-          </span>
-        </span>
-      ),
-      sortValue: (s) => STATUS_ORDER[s.status],
-      className: "w-22",
-    },
-    {
-      id: "title",
-      header: "Session",
-      cell: (s) => (
-        <span className="flex min-w-0 items-center gap-2 overflow-hidden">
-          <span className="truncate font-medium text-foreground">
-            {s.title}
-          </span>
-          {/* Labels drop out before the title truncates; identity is worth
-              less than the name of the thing. */}
-          <span className="hidden shrink-0 items-center gap-2.5 @4xl:flex">
-            {s.labels.map((l) => (
-              <LabelMark key={l.name} hue={l.tone}>
-                {l.name}
-              </LabelMark>
-            ))}
-          </span>
-        </span>
-      ),
-      sortValue: (s) => s.title,
-      // min-w keeps the title column from collapsing when the fixed columns
-      // and the dock squeeze the table at a large interface scale.
-      className: "w-full max-w-0 min-w-36",
-    },
-    {
-      id: "agent",
-      header: "Agent",
-      cell: (s) => (
-        <span className="text-2xs whitespace-nowrap">{s.agent}</span>
-      ),
-      sortValue: (s) => s.agent,
-      className: "hidden @3xl:table-cell",
-    },
-    {
-      id: "changes",
-      header: "Changes",
-      cell: (s) =>
-        s.added > 0 || s.removed > 0 ? (
-          <DiffStat added={s.added} removed={s.removed} />
-        ) : (
-          <span className="text-disabled">—</span>
-        ),
-      sortValue: (s) => s.added + s.removed,
-      align: "right",
-      className: "hidden @2xl:table-cell",
-    },
-    {
-      id: "started",
-      header: "Started",
-      cell: (s) => <span className="caption">{s.startedAt}</span>,
-      align: "right",
-      className: "hidden w-20 @md:table-cell",
-    },
-    {
-      id: "author",
-      header: <span className="sr-only">Author</span>,
-      cell: (s) => (
-        <PersonAvatar size="xs" name={s.author} initials={s.authorInitials} />
-      ),
-      className: "w-10",
-    },
-  ]
+  const live = rows.filter((s) => s.live).length
+
+  const byDay = new Map<string, Array<SessionSummaryApi>>()
+  for (const s of rows) {
+    const key = dayKey(s.lastActivityAt)
+    byDay.set(key, [...(byDay.get(key) ?? []), s])
+  }
+
+  const open = (id: string | undefined) =>
+    navigate({
+      search: (prev) => ({ view: prev.view, ...(id ? { session: id } : {}) }),
+    })
+
+  const days: Array<CalendarDay> = [...byDay.entries()].map(([key, list]) => ({
+    id: key,
+    ...dayLabel(list[0].lastActivityAt),
+    meta: <DayMeta sessions={list} />,
+    children: (
+      <ul className="divide-y divide-hairline">
+        {list.map((s) => (
+          <li key={s.id}>
+            <SessionRow
+              session={s}
+              selected={s.id === session}
+              onOpen={() => open(s.id === session ? undefined : s.id)}
+            />
+          </li>
+        ))}
+      </ul>
+    ),
+  }))
 
   return (
     <>
       <Dock>
-        {selected && (
-          <SessionDock session={selected} onClose={() => setSelectedId(null)} />
+        {detail && (
+          <SessionReader
+            detail={detail}
+            highlight={comment}
+            toolbar={<DockSizeToggle />}
+            onClose={() => open(undefined)}
+          />
         )}
       </Dock>
 
-      <ScrollFade className="min-h-0 flex-1">
-        <div className="flex flex-col gap-4 px-5 pt-4 pb-6">
-          <PageHeader
-            className="pb-0"
-            title={VIEW_TITLE[view]}
-            description={`${count("live")} live · ${count("queued")} queued · ${SESSIONS.length} sessions`}
-            action={
+      <div ref={scroller} className="@container min-h-0 flex-1 overflow-y-auto">
+        <div className="flex min-h-full flex-col px-4 @5xl:px-12">
+          <div className="relative mx-auto flex w-full max-w-212 flex-1 flex-col gap-6 px-8 pt-8 pb-24">
+            <DashedRails offset="-3rem" className="hidden @5xl:block" />
+
+            <header className="flex flex-wrap items-center justify-between gap-3">
+              <div className="min-w-0">
+                <h1 className="flex items-center gap-2.5 text-xl font-medium tracking-tight">
+                  <Icon icon={LayersIcon} size="lg" />
+                  {VIEW_TITLE[view]}
+                </h1>
+                <p className="mt-0.5 text-2xs text-muted-foreground tnum">
+                  {live > 0 && `${live} live · `}
+                  {rows.length} sessions
+                </p>
+              </div>
               <div className="flex flex-wrap items-center gap-2">
-                <SegmentedPills<BoardView>
-                  value={view}
-                  onChange={(next) => navigate({ search: { view: next } })}
-                  options={[
-                    { value: "all", label: "All" },
-                    { value: "mine", label: "Mine" },
-                    { value: "agents", label: "Agents" },
-                  ]}
-                />
                 <CompoundFilter label="Project">
                   All
                   <Icon icon={ChevronDownIcon} size="xs" />
@@ -237,159 +159,157 @@ function TimelineScreen() {
                   Any
                   <Icon icon={ChevronDownIcon} size="xs" />
                 </CompoundFilter>
-                <TableSearch
-                  placeholder="Search sessions"
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                />
-                <IconButton
-                  icon={SlidersHorizontalIcon}
-                  label="Display options"
-                  size="sm"
-                />
               </div>
-            }
-          />
+            </header>
 
-          <KpiStrip
-            cells={(["live", "queued", "failed", "done"] as const).map(
-              (status) => ({
-                id: status,
-                label: STATUS_LABEL[status],
-                value: count(status),
-                spark: SPARK[status],
-                delta:
-                  status === "done"
-                    ? 12
-                    : status === "failed"
-                      ? -50
-                      : undefined,
-              })
+            {days.length ? (
+              <TimelineCalendar days={days} root={scroller} />
+            ) : (
+              <p className="py-20 text-center text-xs text-muted-foreground">
+                No sessions here yet.
+              </p>
             )}
-          />
-
-          <DataTable
-            rows={visible}
-            columns={columns}
-            rowId={(s) => s.id}
-            selectedId={selectedId ?? undefined}
-            onRowClick={(s) => setSelectedId(s.id)}
-            footer={
-              <>
-                <span className="tnum">
-                  {visible.length} of {SESSIONS.length} sessions
-                </span>
-                <span className="ml-auto">Sorted by status</span>
-              </>
-            }
-          />
+          </div>
         </div>
-      </ScrollFade>
+      </div>
     </>
   )
 }
 
-/**
- * The selected session, in the dock.
- *
- * One column: masthead, a compact property block, then the entry stream.
- * A live session gets the pipeline illustration in place of the stream,
- * because "what is it doing now" is the question, not "what did it do".
- */
-function SessionDock({
-  session,
-  onClose,
-}: {
-  session: Session
-  onClose: () => void
-}) {
+/** "4 sessions · 2h 11m · 486.3K tok", then who worked that day. */
+function DayMeta({ sessions }: { sessions: Array<SessionSummaryApi> }) {
+  const active = sessions.reduce((a, s) => a + s.activeSeconds, 0)
+  const tokens = sessions.reduce((a, s) => a + s.totalTokens, 0)
+  const people = [...new Set(sessions.map((s) => s.authorId))]
   return (
-    <div className="flex min-h-0 flex-1 flex-col">
-      <div className="flex h-topbar shrink-0 items-center gap-2 border-b border-hairline px-3">
-        <StatusIcon status={session.status} />
-        <span className="text-xs font-medium">
-          {STATUS_LABEL[session.status]}
-        </span>
-        <span className="mono text-2xs text-muted-foreground">
-          {session.ref}
-        </span>
-        <IconButton
-          icon={XIcon}
-          label="Close"
-          size="sm"
-          className="ml-auto"
-          onClick={onClose}
-        />
-      </div>
-
-      <ScrollFade className="min-h-0 flex-1">
-        <div className="flex flex-col gap-4 p-4">
-          <div className="flex flex-col gap-2">
-            <h2 className="text-md font-medium tracking-tight text-balance">
-              {session.title}
-            </h2>
-            <div className="flex flex-wrap items-center gap-1.5">
-              <span className="flex items-center gap-1.5 text-2xs text-secondary-foreground">
-                <PersonAvatar
-                  size="xs"
-                  name={session.author}
-                  initials={session.authorInitials}
-                />
-                {session.author}
-              </span>
-              {session.labels.map((l) => (
-                <Tag key={l.name} hue={l.tone} dot>
-                  {l.name}
-                </Tag>
-              ))}
-            </div>
-          </div>
-
-          <div className="flex flex-col rounded-xl bg-card px-3 py-1.5 ring-1 ring-foreground/10">
-            <PropertyRow label="Priority">
-              <PriorityIcon priority={session.priority} />
-              <span className="capitalize">{session.priority}</span>
-            </PropertyRow>
-            <PropertyRow label="Agent">{session.agent}</PropertyRow>
-            <PropertyRow label="Model">
-              <Code className="truncate">{session.model}</Code>
-            </PropertyRow>
-            <PropertyRow label="Project">
-              <Tag hue="grey">{session.project}</Tag>
-            </PropertyRow>
-            <PropertyRow label="Branch">
-              <Code className="truncate">{session.branch}</Code>
-            </PropertyRow>
-            <PropertyRow label="Tokens">
-              <span className="tnum">{session.tokens.toLocaleString()}</span>
-            </PropertyRow>
-            <PropertyRow label="Duration">
-              <span className="tnum">{session.durationMinutes} min</span>
-            </PropertyRow>
-            <PropertyRow label="Changes">
-              <DiffStat added={session.added} removed={session.removed} />
-            </PropertyRow>
-          </div>
-
-          {session.status === "live" ? (
-            <SessionPipeline session={session} entries={TIMELINE_ENTRIES} />
-          ) : (
-            <SessionTimeline
-              status={session.status}
-              entries={TIMELINE_ENTRIES}
+    <span className="flex shrink-0 items-center gap-3 pb-0.5">
+      <span className="hidden text-2xs text-muted-foreground tnum @2xl:inline">
+        {sessions.length} {sessions.length === 1 ? "session" : "sessions"}
+        {active > 0 && ` · ${formatDuration(active)}`}
+        {tokens > 0 && ` · ${formatTokens(tokens)} tok`}
+      </span>
+      <AvatarStack>
+        {people.slice(0, 4).map((id) => {
+          const p = author(id)
+          return (
+            <PersonAvatar
+              key={id}
+              size="xs"
+              name={p.name}
+              email={p.email}
+              image={p.image}
             />
-          )}
-        </div>
-      </ScrollFade>
+          )
+        })}
+      </AvatarStack>
+    </span>
+  )
+}
 
-      <div className="shrink-0 border-t border-hairline p-2">
-        <Button variant="ghost" size="sm" className="w-full justify-start">
-          <Icon icon={MessageSquareIcon} size="sm" />
-          <span className="flex-1 text-left">
-            {session.commentCount} comments
+function SessionRow({
+  session: s,
+  selected,
+  onOpen,
+}: {
+  session: SessionSummaryApi
+  selected: boolean
+  onOpen: () => void
+}) {
+  const who = author(s.authorId)
+  return (
+    <button
+      type="button"
+      onClick={onOpen}
+      aria-pressed={selected}
+      className={cn(
+        "-mx-3 flex w-[calc(100%+1.5rem)] items-start gap-3 rounded-lg px-3 py-3.5 text-left",
+        "duration-fast transition-colors ease-out-strong hover:bg-element-hover",
+        selected && "bg-element-selected hover:bg-element-selected"
+      )}
+    >
+      <span className="flex size-7 shrink-0 items-center justify-center">
+        <StatusIcon status={s.status} />
+      </span>
+
+      <span className="flex min-w-0 flex-1 flex-col gap-1.5">
+        <span className="line-clamp-2 text-sm font-medium text-foreground">
+          {s.title ?? "Untitled session"}
+        </span>
+        <span className="flex flex-wrap items-center gap-x-2 gap-y-1 text-2xs text-muted-foreground">
+          {s.branches[0] && (
+            <span className="flex items-center gap-1 mono">
+              <Icon icon={GitBranchIcon} size="xs" />
+              {s.branches[0]}
+            </span>
+          )}
+          {s.totalTokens > 0 && (
+            <>
+              <Dot />
+              <span className="mono">{formatTokens(s.totalTokens)} tok</span>
+            </>
+          )}
+          <Dot />
+          <span className="flex items-center gap-1.5 text-secondary-foreground">
+            <PersonAvatar
+              size="xs"
+              name={who.name}
+              email={who.email}
+              image={who.image}
+              className="size-4"
+            />
+            {who.name}
           </span>
-        </Button>
-      </div>
-    </div>
+          <Dot />
+          <LabelMark hue={hueFor(s.workspaceSlug)}>{s.workspaceSlug}</LabelMark>
+          {s.checkpointCount > 0 && (
+            <>
+              <Dot />
+              <span>
+                {s.checkpointCount}{" "}
+                {s.checkpointCount === 1 ? "checkpoint" : "checkpoints"}
+              </span>
+            </>
+          )}
+          {s.insertions + s.deletions > 0 && (
+            <>
+              <Dot />
+              <DiffStat added={s.insertions} removed={s.deletions} />
+            </>
+          )}
+          {/* Narrow: the right-hand column folds into this line. */}
+          <span className="flex items-center gap-2 @3xl:hidden">
+            <Dot />
+            {s.agent}
+            <Dot />
+            <span className={cn("mono", s.live && "text-success")}>
+              {formatDuration(s.activeSeconds)}
+            </span>
+          </span>
+        </span>
+      </span>
+
+      <span className="hidden shrink-0 items-center gap-4 pt-0.5 text-2xs @3xl:flex">
+        <span className="text-secondary-foreground">{s.agent}</span>
+        <span className="w-28 truncate mono text-muted-foreground">
+          {s.model}
+        </span>
+        <span
+          className={cn(
+            "w-14 text-right mono tnum",
+            s.live ? "text-success" : "text-muted-foreground"
+          )}
+        >
+          {formatDuration(s.activeSeconds)}
+        </span>
+      </span>
+    </button>
+  )
+}
+
+function Dot() {
+  return (
+    <span aria-hidden="true" className="text-disabled">
+      ·
+    </span>
   )
 }

@@ -223,6 +223,58 @@
   &::-webkit-scrollbar { display: none; }
 }
 
+/* Rendered Markdown in a session reader — an agent's response. The Atlas
+   desktop app's `.prose-chat`, on this system's tokens: body text in the
+   secondary ink, emphasis and headings in the foreground, code in the mono
+   face on a card, lists with their markers in the muted ink. */
+@utility prose-session {
+  font-size: var(--text-sm);
+  line-height: 1.65;
+  color: var(--secondary-foreground);
+  overflow-wrap: anywhere;
+
+  & > * + * { margin-top: 0.75em; }
+  & strong { font-weight: 500; color: var(--foreground); }
+  & em { font-style: italic; }
+  & a { color: var(--foreground); text-decoration: underline; text-underline-offset: 2px; }
+  & h1, & h2, & h3, & h4 {
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--foreground);
+    margin-top: 1.25em;
+  }
+  & ul, & ol { padding-left: 1.25em; }
+  & ul { list-style: disc; }
+  & ol { list-style: decimal; }
+  & li + li { margin-top: 0.35em; }
+  & li::marker { color: var(--muted-foreground); }
+  & :not(pre) > code {
+    font-family: var(--font-mono);
+    font-size: 0.86em;
+    padding: 0.1em 0.35em;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--hairline);
+    background: var(--card);
+    color: var(--foreground);
+  }
+  & pre {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    line-height: 1.6;
+    padding: 0.75rem 0.875rem;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--hairline);
+    background: var(--card);
+    color: var(--foreground);
+    overflow-x: auto;
+  }
+  & blockquote {
+    padding-left: 0.875em;
+    border-left: 2px solid var(--border);
+    color: var(--muted-foreground);
+  }
+}
+
 /* One face in an AvatarStack. `--shift` and `--scale-active` are written
    per item by the component on hover; translate comes before scale so the
    scale does not amplify the lift. */

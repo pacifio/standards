@@ -239,8 +239,11 @@ function DashboardScreen() {
               rows={RECENT}
               columns={COLUMNS}
               rowId={(s) => s.id}
-              onRowClick={() =>
-                navigate({ to: "/mock/timeline", search: { view: "all" } })
+              onRowClick={(s) =>
+                navigate({
+                  to: "/mock/timeline",
+                  search: { view: "all", session: s.id },
+                })
               }
             />
           </section>
