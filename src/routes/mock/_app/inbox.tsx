@@ -20,6 +20,7 @@ import type { CalendarDay } from "@/components/blocks/timeline-calendar"
 import { PersonAvatar } from "@/components/patterns/person-avatar"
 import { SegmentedPills } from "@/components/patterns/segmented"
 import { EmptyState } from "@/components/ui/empty-state"
+import { GoChevron } from "@/components/ui/go-chevron"
 import { Icon } from "@/components/ui/icon"
 import { IconButton } from "@/components/ui/icon-button"
 import { MailboxIcon } from "@/components/ui/mailbox-icon"
@@ -298,7 +299,7 @@ function InboxRow({
   return (
     <article
       data-unread={!read || undefined}
-      className="group/row duration-fast relative -mx-3 flex gap-3 rounded-lg px-3 py-4 transition-colors ease-out-strong hover:bg-element-hover"
+      className="group/row group/go duration-fast relative -mx-3 flex gap-3 rounded-lg px-3 py-4 transition-colors ease-out-strong hover:bg-element-hover"
     >
       {/* The row itself opens the comment: a link stretched under the
           content, so the inner links stay real links rather than nesting. */}
@@ -389,6 +390,15 @@ function InboxRow({
           </time>
         </p>
       </div>
+
+      {/* Says "this opens the comment". Decorative: the row itself is the
+          link, and the chevron answers the row's hover. */}
+      <span
+        aria-hidden="true"
+        className="duration-fast flex size-7 shrink-0 items-center justify-center self-center rounded-full text-muted-foreground transition-colors group-hover/row:text-foreground"
+      >
+        <GoChevron />
+      </span>
     </article>
   )
 }
