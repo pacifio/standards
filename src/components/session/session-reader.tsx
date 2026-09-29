@@ -3,10 +3,10 @@
 import { useEffect, useMemo, useRef, useState } from "react"
 import { CheckIcon, GitBranchIcon, XIcon } from "lucide-react"
 
-import { estCost } from "@/mock/sessions-api"
 import type { SessionDetailApi } from "@/mock/sessions-api"
-import { ago, formatDuration, formatTokens, hm } from "@/mock/time"
+import { ago } from "@/mock/time"
 import { Icon } from "@/components/ui/icon"
+import { ModelMark, agentFamily } from "@/components/ui/model-badge"
 import { IconButton } from "@/components/ui/icon-button"
 import { StatusIcon } from "@/components/ui/status-icon"
 import {
@@ -19,6 +19,7 @@ import type { UploadIconHandle } from "@/components/ui/upload-icon"
 import { CommentButton, CommentsProvider, useComments } from "./comments"
 import { CommentsMorph } from "./comments-morph"
 import { EntryRail, groupEntries } from "./entry-rail"
+import { SessionStats } from "./session-stats"
 
 /**
  * A captured session, read top to bottom — the Atlas desktop app's session
@@ -125,10 +126,10 @@ function Reader({
       </header>
 
       <div ref={scroller} className="min-h-0 flex-1 overflow-y-auto">
-        <div className="mx-auto w-full max-w-230 px-5 pt-8 pb-32 @3xl:px-14 @3xl:pt-12">
+        <div className="mx-auto w-full max-w-230 px-4 pt-6 pb-24 @3xl:px-10 @3xl:pt-8">
           <Masthead detail={detail} />
-          <div className="mt-10">
-            <EntryRail groups={groups} />
+          <div className="mt-7">
+            <EntryRail groups={groups} agent={s.agent} />
           </div>
         </div>
       </div>
@@ -144,23 +145,11 @@ function Reader({
 
 function Masthead({ detail }: { detail: SessionDetailApi }) {
   const { summary: s } = detail
-  const cost = estCost(s)
-  const mix = [
-    { label: "read", n: s.cacheReadTokens, cls: "bg-foreground/20" },
-    { label: "write", n: s.cacheCreationTokens, cls: "bg-foreground/40" },
-    { label: "in", n: s.inputTokens, cls: "bg-foreground/65" },
-    { label: "out", n: s.outputTokens, cls: "bg-foreground/95" },
-  ]
-  const mixTotal = mix.reduce((a, m) => a + m.n, 0)
-  const top = [...mix]
-    .sort((a, b) => b.n - a.n)
-    .slice(0, 2)
-    .filter((m) => m.n > 0)
 
   return (
     <div data-slot="session-masthead" data-entry={s.id}>
       <div className="flex items-start gap-3">
-        <h1 className="min-w-0 flex-1 text-xl leading-tight font-medium tracking-tight text-balance">
+        <h1 className="min-w-0 flex-1 text-lg leading-snug font-medium tracking-tight text-balance">
           {s.title ?? "Untitled session"}
         </h1>
         <CommentButton
@@ -170,62 +159,34 @@ function Masthead({ detail }: { detail: SessionDetailApi }) {
         />
       </div>
 
-      <div className="mt-5 flex flex-wrap items-center gap-2">
-        {s.agent && <Chip>{s.agent.toLowerCase()}</Chip>}
+      <div className="mt-3.5 flex flex-wrap items-center gap-1.5">
+        {s.agent && (
+          <Chip>
+            {agentFamily(s.agent) && (
+              <ModelMark family={agentFamily(s.agent)!} className="size-3" />
+            )}
+            {s.agent}
+          </Chip>
+        )}
         {s.branches[0] && (
           <Chip>
             <Icon icon={GitBranchIcon} size="xs" />
             {s.branches[0]}
           </Chip>
         )}
-        <span className="mono text-2xs text-muted-foreground">
-          {ago(s.lastActivityAt)} · {formatDuration(s.activeSeconds)}
-        </span>
+        <time
+          dateTime={s.lastActivityAt}
+          className="ml-auto text-2xs text-muted-foreground"
+        >
+          {ago(s.lastActivityAt)}
+        </time>
       </div>
 
       {/* Cells split by 1px gaps over a hairline backing, so the rules
           survive the 4 → 2×2 wrap at compact width. */}
-      <dl className="mt-5 grid grid-cols-2 gap-px overflow-hidden rounded-md border border-border bg-hairline @2xl:grid-cols-4">
-        <Stat
-          label="Active"
-          value={formatDuration(s.activeSeconds)}
-          sub={`${hm(s.startedAt)} → ${hm(s.lastActivityAt)} · ${formatDuration(s.wallSeconds)} span`}
-        />
-        <Stat
-          label="Tokens"
-          value={`${formatTokens(s.totalTokens)} tok`}
-          sub={`${formatTokens(s.inputTokens)} in + ${formatTokens(s.outputTokens)} out`}
-        />
-        <div className="bg-card px-3.5 py-3">
-          <dt className="micro">Token mix</dt>
-          <dd>
-            <div className="mt-3.5 flex h-1.5 overflow-hidden rounded-full bg-element-hover">
-              {mixTotal > 0 &&
-                mix.map((m) => (
-                  <span
-                    key={m.label}
-                    className={m.cls}
-                    style={{ width: `${(m.n / mixTotal) * 100}%` }}
-                  />
-                ))}
-            </div>
-            <p className="mt-2 mono text-3xs text-disabled">
-              {top.length
-                ? top
-                    .map(
-                      (m) => `${m.label} ${Math.round((m.n / mixTotal) * 100)}%`
-                    )
-                    .join(" · ")
-                : "—"}
-            </p>
-          </dd>
-        </div>
-        <Stat
-          label="Est. cost"
-          value={cost === null ? "—" : `$${cost.toFixed(2)}`}
-          sub={s.model ?? "unknown model"}
-        />
-      </dl>
+      <div className="mt-3.5">
+        <SessionStats detail={detail} />
+      </div>
     </div>
   )
 }
@@ -235,28 +196,6 @@ function Chip({ children }: { children: React.ReactNode }) {
     <span className="flex h-5.5 items-center gap-1.5 rounded-full border border-border bg-card px-2.5 mono text-2xs text-muted-foreground">
       {children}
     </span>
-  )
-}
-
-function Stat({
-  label,
-  value,
-  sub,
-}: {
-  label: string
-  value: string
-  sub: string
-}) {
-  return (
-    <div className="min-w-0 bg-card px-3.5 py-3">
-      <dt className="micro">{label}</dt>
-      <dd>
-        <p className="mt-1.5 truncate mono text-md font-medium tracking-tight">
-          {value}
-        </p>
-        <p className="mt-0.5 truncate mono text-3xs text-disabled">{sub}</p>
-      </dd>
-    </div>
   )
 }
 

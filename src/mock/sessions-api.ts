@@ -56,6 +56,9 @@ export type SessionSummaryApi = {
   outputTokens: number
   cacheCreationTokens: number
   cacheReadTokens: number
+  /** Tokens in the model's context at the last turn, and its window. */
+  contextUsed: number | null
+  contextSize: number | null
   live: boolean
   incomplete: boolean
   /** Mock only: the board's ref and status. */
@@ -125,6 +128,14 @@ function seed(id: string): number {
   return h
 }
 
+/** Context window per model, in tokens. */
+const CONTEXT_WINDOW: Record<string, number> = {
+  "claude-opus-5": 1_000_000,
+  "claude-sonnet-5": 1_000_000,
+  "gpt-5.4-high": 400_000,
+  "gemini-3-pro": 1_000_000,
+}
+
 function toSummary(s: Session): SessionSummaryApi {
   const h = seed(s.id)
   const active = s.durationMinutes * 60
@@ -160,6 +171,13 @@ function toSummary(s: Session): SessionSummaryApi {
     outputTokens: s.tokens - input,
     cacheCreationTokens: Math.round(s.tokens * 0.22),
     cacheReadTokens: s.tokens * (5 + (h % 4)),
+    contextSize: s.tokens ? (CONTEXT_WINDOW[s.model] ?? 200_000) : null,
+    // Between 30% and 96% of the window, fixed per session.
+    contextUsed: s.tokens
+      ? Math.round(
+          (CONTEXT_WINDOW[s.model] ?? 200_000) * (0.3 + (h % 67) / 100)
+        )
+      : null,
     live: s.status === "live",
     incomplete: s.status === "failed",
     ref: s.ref,

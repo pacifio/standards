@@ -2,7 +2,7 @@ import { cn } from "cn"
 
 /**
  * A model, as a pill with its family's mark: the orange Claude spark, the
- * Gemini star, the OpenAI knot. The marks are LobeHub's model icons (MIT),
+ * Gemini star, the OpenAI knot, the Cursor cube. The marks are LobeHub's model icons (MIT),
  * vendored under `public/logos/models/`.
  *
  * Claude and Gemini are drawn in their brand colours — like the logo strip
@@ -11,7 +11,7 @@ import { cn } from "cn"
  * theme's ink instead of vanishing on the dark canvas.
  */
 
-type Family = "claude" | "openai" | "gemini"
+type Family = "claude" | "openai" | "gemini" | "cursor"
 
 function familyOf(model: string): Family | null {
   const m = model.toLowerCase()
@@ -23,6 +23,22 @@ function familyOf(model: string): Family | null {
   return null
 }
 
+/** The mark for a coding agent: Claude Code, Codex, Gemini CLI, Cursor. */
+function agentFamily(agent: string): Family | null {
+  const a = agent.toLowerCase()
+  if (a.includes("claude")) return "claude"
+  if (a.includes("codex") || a.includes("openai")) return "openai"
+  if (a.includes("gemini")) return "gemini"
+  if (a.includes("cursor")) return "cursor"
+  return null
+}
+
+/** Monochrome marks, drawn as a mask so they take the theme's ink. */
+const MONO: Partial<Record<Family, string>> = {
+  openai: "mask-[url(/logos/models/openai.svg)]",
+  cursor: "mask-[url(/logos/models/cursor.svg)]",
+}
+
 function ModelMark({
   family,
   className,
@@ -30,13 +46,15 @@ function ModelMark({
   family: Family
   className?: string
 }) {
-  if (family === "openai") {
+  const mono = MONO[family]
+  if (mono) {
     return (
       <span
         aria-hidden="true"
         className={cn(
           "inline-block size-3 shrink-0 bg-current",
-          "mask-[url(/logos/models/openai.svg)] mask-contain mask-center mask-no-repeat",
+          mono,
+          "mask-contain mask-center mask-no-repeat",
           className
         )}
       />
@@ -74,4 +92,4 @@ function ModelBadge({
   )
 }
 
-export { ModelBadge, ModelMark, familyOf }
+export { ModelBadge, ModelMark, agentFamily, familyOf }

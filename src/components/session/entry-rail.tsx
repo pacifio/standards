@@ -18,6 +18,7 @@ import type {
 import { clock } from "@/mock/time"
 import { DiffStat } from "@/components/ui/code-block"
 import { Icon } from "@/components/ui/icon"
+import { ModelMark, agentFamily } from "@/components/ui/model-badge"
 import { Clamp } from "./clamp"
 import { ActivityLog, CommentButton } from "./comments"
 import { ToolCalls } from "./tool-calls"
@@ -69,9 +70,12 @@ function anchorKindFor(e: ApiTimelineEntry): CommentAnchorKindApi {
 
 function EntryRail({
   groups,
+  agent,
   expandCalls,
 }: {
   groups: Array<EntryGroup>
+  /** The agent that ran the session; its mark stands on response nodes. */
+  agent?: string | null
   expandCalls?: boolean
 }) {
   return (
@@ -82,6 +86,7 @@ function EntryRail({
           group={g}
           first={i === 0}
           last={i === groups.length - 1}
+          agent={agent}
           expandCalls={expandCalls}
         />
       ))}
@@ -93,11 +98,13 @@ function Row({
   group,
   first,
   last,
+  agent,
   expandCalls,
 }: {
   group: EntryGroup
   first: boolean
   last: boolean
+  agent?: string | null
   expandCalls?: boolean
 }) {
   const head = group.kind === "calls" ? group.calls[0] : group.entry
@@ -112,7 +119,7 @@ function Row({
   return (
     <li
       data-entry={head.id}
-      className="group/row relative grid grid-cols-[2rem_minmax(0,1fr)] gap-3.5"
+      className="group/row relative grid grid-cols-[2rem_minmax(0,1fr)] gap-3"
     >
       {/* The rail: centre of the first node to centre of the last. */}
       <span
@@ -124,14 +131,14 @@ function Row({
         )}
       />
       <div className="relative flex justify-center">
-        <Node kind={kind} failed={failed} />
+        <Node kind={kind} failed={failed} agent={agent} />
       </div>
 
-      <div className="min-w-0 pb-7">
+      <div className="min-w-0 pb-5">
         <div className="flex min-h-8 items-center gap-2">
           <span
             className={cn(
-              "text-sm font-medium",
+              "type-reading font-medium",
               kind === "prompt"
                 ? "text-foreground"
                 : kind === "checkpoint"
@@ -155,6 +162,7 @@ function Row({
               {group.calls.length} calls
             </span>
           )}
+          {group.kind === "calls" && <CallsDiff calls={group.calls} />}
           <span className="flex-1" />
           {group.kind === "entry" && (
             <CommentButton
@@ -179,9 +187,11 @@ function Row({
 function Node({
   kind,
   failed,
+  agent,
 }: {
   kind: ApiTimelineEntry["kind"]
   failed: boolean
+  agent?: string | null
 }) {
   if (kind === "tool_call") {
     return (
@@ -207,9 +217,44 @@ function Node({
       </span>
     )
   }
+  // A response is the agent speaking, so it wears the agent's mark.
+  const family = kind === "response" && agent ? agentFamily(agent) : null
   return (
     <span className="flex size-8 items-center justify-center rounded-full border border-border-strong/50 bg-card text-secondary-foreground">
-      <Icon icon={kind === "prompt" ? UserIcon : SparklesIcon} size="sm" />
+      {family ? (
+        <ModelMark family={family} className="size-3.5" />
+      ) : (
+        <Icon icon={kind === "prompt" ? UserIcon : SparklesIcon} size="sm" />
+      )}
+    </span>
+  )
+}
+
+/**
+ * "8 modified +1155 −4" — what a run of tool calls did to the tree: the
+ * distinct files edited or created, and the lines they added and removed.
+ */
+function CallsDiff({ calls }: { calls: Array<ApiTimelineEntry> }) {
+  const edits = calls.filter(
+    (c) =>
+      (c.toolName === "Edit" || c.toolName === "Write") &&
+      c.toolStatus !== "failed"
+  )
+  const files = new Set(edits.flatMap((c) => c.paths ?? []))
+  let added = 0
+  let removed = 0
+  for (const c of edits) {
+    const m = /\+(\d+)\s*[−-](\d+)/.exec(c.result ?? "")
+    if (m) {
+      added += Number(m[1])
+      removed += Number(m[2])
+    }
+  }
+  if (!files.size) return null
+  return (
+    <span className="flex items-center gap-2 mono text-2xs">
+      <span className="text-disabled">{files.size} modified</span>
+      {added + removed > 0 && <DiffStat added={added} removed={removed} />}
     </span>
   )
 }
@@ -218,7 +263,7 @@ function Body({ entry }: { entry: ApiTimelineEntry }) {
   if (entry.kind === "prompt") {
     return (
       <Clamp>
-        <p className="mt-2.5 rounded-md border border-hairline bg-card px-3.5 py-3 mono text-xs leading-relaxed break-words whitespace-pre-wrap text-secondary-foreground">
+        <p className="mt-1.5 rounded-md border border-hairline bg-card px-3 py-2 mono text-xs leading-relaxed break-words whitespace-pre-wrap text-secondary-foreground">
           {entry.text}
         </p>
       </Clamp>
@@ -234,7 +279,7 @@ function Body({ entry }: { entry: ApiTimelineEntry }) {
   }
   return (
     <Clamp>
-      <div className="prose-session mt-1.5">
+      <div className="prose-session mt-1">
         <Markdown remarkPlugins={[remarkGfm]}>{entry.text ?? ""}</Markdown>
       </div>
     </Clamp>
@@ -244,7 +289,7 @@ function Body({ entry }: { entry: ApiTimelineEntry }) {
 function Checkpoint({ entry }: { entry: ApiTimelineEntry }) {
   const files = entry.files ?? []
   return (
-    <div className="mt-2.5 overflow-hidden rounded-md border border-border bg-card">
+    <div className="mt-1.5 overflow-hidden rounded-md border border-border bg-card">
       <div className="flex items-center gap-2 border-b border-hairline px-3 py-2">
         <Icon
           icon={GitCommitHorizontalIcon}

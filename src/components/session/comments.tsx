@@ -470,7 +470,7 @@ function ActivityLog({ anchorId }: { anchorId: string }) {
   const list = useAnchor(anchorId)
   if (!list.length) return null
   return (
-    <ul className="mt-4 flex flex-col gap-2">
+    <ul className="mt-2.5 flex flex-col gap-1.5">
       {list.map((c) => {
         const p = person(c.authorId, c.guestName)
         return (

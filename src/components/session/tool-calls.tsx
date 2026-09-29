@@ -86,7 +86,7 @@ function ToolCalls({
         type="button"
         aria-expanded={open}
         onClick={() => setOpen((v) => !v)}
-        className="duration-fast mt-1.5 flex max-w-full min-w-0 items-center gap-1.5 text-xs whitespace-nowrap text-muted-foreground transition-colors hover:text-foreground"
+        className="duration-fast mt-0.5 flex max-w-full min-w-0 items-center gap-1.5 text-xs whitespace-nowrap text-muted-foreground transition-colors hover:text-foreground"
       >
         {open ? "Hide tool calls" : "Show tool calls"}
         <Icon
@@ -108,7 +108,7 @@ function ToolCalls({
       </button>
 
       {open && (
-        <ul className="mt-2.5 divide-y divide-hairline overflow-hidden rounded-md border border-border">
+        <ul className="mt-1.5 divide-y divide-hairline overflow-hidden rounded-md border border-border">
           {calls.map((call) => (
             <CallRow
               key={call.id}
