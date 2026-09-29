@@ -45,7 +45,7 @@ src/components/ ui/           36 primitives on @base-ui/react, shadcn base-mira 
                 patterns/     Panel, KpiStrip, Segmented, DataTable, SettingCard, headers
                 blocks/       ProgressiveBlur, InfiniteSlider, DashedRails, PlusDecorator,
                               GhostCards, Glow, SpinningBorderPill, SessionPipeline,
-                              SessionTimeline, RevealWaveImage
+                              SessionTimeline, RevealWaveImage, Globe
                 shell/        AppShell, Sidebar, TopBar, OrgSwitcher, CommandMenu,
                               SettingsShell, AuthSplit, UiScaleControl
                 gallery/      the gallery's own furniture

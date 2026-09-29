@@ -6,6 +6,7 @@ import { PageHeader } from "@/components/patterns/section-header"
 import { Specimen } from "@/components/gallery/specimen"
 import { DashedRails } from "@/components/blocks/dashed-rails"
 import { GhostCards } from "@/components/blocks/ghost-cards"
+import { Globe } from "@/components/blocks/globe"
 import { Glow } from "@/components/blocks/glow"
 import { InfiniteSlider } from "@/components/blocks/infinite-slider"
 import { PlusCorners } from "@/components/blocks/plus-decorator"
@@ -47,6 +48,15 @@ function BlocksGallery() {
         here is self-contained and reads through the token layer, so it inverts
         with the theme and grows with the interface scale.
       </Callout>
+
+      <Specimen
+        title="Globe"
+        note="cobe's dotted WebGL globe in the theme's own ink, turning slowly and draggable. Markers are DOM, pinned with CSS anchor positioning and faded on the far side. The sign-in aside parks it off the top-right corner so only the northern hemisphere shows."
+      >
+        <div className="relative h-64 w-full overflow-hidden rounded-xl bg-surface ring-1 ring-foreground/10">
+          <Globe className="absolute -top-1/4 left-1/2 w-96 -translate-x-1/2" />
+        </div>
+      </Specimen>
 
       <Specimen
         title="Reveal wave image"

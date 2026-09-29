@@ -15,6 +15,7 @@ import { useOrg } from "@/lib/org-context"
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -137,32 +138,36 @@ function OrgSwitcher({
           </DropdownMenuSubTrigger>
           <DropdownMenuSubContent className="w-64">
             {/* Which login this list belongs to, before which workspace. */}
-            <DropdownMenuLabel className="tracking-normal normal-case">
-              {user.email}
-            </DropdownMenuLabel>
-            {orgs.map((o, i) => (
-              <DropdownMenuItem key={o.id} onClick={() => setOrg(o.id)}>
-                <OrgMark initials={o.initials} />
-                <span className="flex-1 truncate">{o.name}</span>
-                {o.id === org.id && (
-                  <Icon
-                    icon={CheckIcon}
-                    size="sm"
-                    className="text-foreground"
-                  />
-                )}
-                <span className="w-3 text-right text-2xs text-disabled tnum">
-                  {i + 1}
-                </span>
-              </DropdownMenuItem>
-            ))}
+            <DropdownMenuGroup>
+              <DropdownMenuLabel className="tracking-normal normal-case">
+                {user.email}
+              </DropdownMenuLabel>
+              {orgs.map((o, i) => (
+                <DropdownMenuItem key={o.id} onClick={() => setOrg(o.id)}>
+                  <OrgMark initials={o.initials} />
+                  <span className="flex-1 truncate">{o.name}</span>
+                  {o.id === org.id && (
+                    <Icon
+                      icon={CheckIcon}
+                      size="sm"
+                      className="text-foreground"
+                    />
+                  )}
+                  <span className="w-3 text-right text-2xs text-disabled tnum">
+                    {i + 1}
+                  </span>
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuLabel>Account</DropdownMenuLabel>
-            <DropdownMenuItem>
-              <Icon icon={PlusIcon} size="sm" />
-              Create or join a workspace…
-            </DropdownMenuItem>
-            <DropdownMenuItem>Add an account…</DropdownMenuItem>
+            <DropdownMenuGroup>
+              <DropdownMenuLabel>Account</DropdownMenuLabel>
+              <DropdownMenuItem>
+                <Icon icon={PlusIcon} size="sm" />
+                Create or join a workspace…
+              </DropdownMenuItem>
+              <DropdownMenuItem>Add an account…</DropdownMenuItem>
+            </DropdownMenuGroup>
           </DropdownMenuSubContent>
         </DropdownMenuSub>
 

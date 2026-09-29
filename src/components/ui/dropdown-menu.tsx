@@ -61,6 +61,13 @@ function DropdownMenuContent({
   )
 }
 
+/**
+ * A heading for a run of items. Base UI renders this as `Menu.GroupLabel`,
+ * which throws at render ("MenuGroupContext is missing") unless it sits
+ * inside a group — so wrap the label AND the items it names in
+ * `DropdownMenuGroup`. The group is also what gives the items
+ * their accessible name.
+ */
 function DropdownMenuLabel({
   className,
   ...props

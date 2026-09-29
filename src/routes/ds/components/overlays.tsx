@@ -29,6 +29,7 @@ import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -86,23 +87,25 @@ function OverlaysGallery() {
             }
           />
           <DropdownMenuContent className="w-56">
-            <DropdownMenuLabel>Session</DropdownMenuLabel>
-            <DropdownMenuItem>
-              <Icon icon={CopyIcon} size="sm" />
-              Copy link
-              <DropdownMenuShortcut>⌘ C</DropdownMenuShortcut>
-            </DropdownMenuItem>
-            <DropdownMenuCheckboxItem defaultChecked>
-              Subscribe to updates
-            </DropdownMenuCheckboxItem>
-            <DropdownMenuSub>
-              <DropdownMenuSubTrigger>Move to project</DropdownMenuSubTrigger>
-              <DropdownMenuSubContent>
-                <DropdownMenuItem>atlas</DropdownMenuItem>
-                <DropdownMenuItem>server</DropdownMenuItem>
-                <DropdownMenuItem>standards</DropdownMenuItem>
-              </DropdownMenuSubContent>
-            </DropdownMenuSub>
+            <DropdownMenuGroup>
+              <DropdownMenuLabel>Session</DropdownMenuLabel>
+              <DropdownMenuItem>
+                <Icon icon={CopyIcon} size="sm" />
+                Copy link
+                <DropdownMenuShortcut>⌘ C</DropdownMenuShortcut>
+              </DropdownMenuItem>
+              <DropdownMenuCheckboxItem defaultChecked>
+                Subscribe to updates
+              </DropdownMenuCheckboxItem>
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger>Move to project</DropdownMenuSubTrigger>
+                <DropdownMenuSubContent>
+                  <DropdownMenuItem>atlas</DropdownMenuItem>
+                  <DropdownMenuItem>server</DropdownMenuItem>
+                  <DropdownMenuItem>standards</DropdownMenuItem>
+                </DropdownMenuSubContent>
+              </DropdownMenuSub>
+            </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuItem variant="destructive">
               <Icon icon={Trash2Icon} size="sm" />

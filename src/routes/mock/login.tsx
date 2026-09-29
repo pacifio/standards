@@ -48,7 +48,9 @@ function LoginScreen() {
           </AuthAsideNote>
         </>
       }
-      proof={<LogoMarquee />}
+      // -mx-10 cancels AuthSplit's p-10 aside padding, so the strip runs
+      // edge to edge and fades into the pane's own borders.
+      proof={<LogoMarquee trackClassName="-mx-10" />}
     >
       <div className="flex flex-col gap-1.5 text-center">
         <h1 className="text-lg font-semibold tracking-tight">
@@ -92,34 +94,36 @@ function LoginScreen() {
         </Link>
       </div>
 
-      <p className="text-center text-2xs text-balance text-muted-foreground">
-        By continuing you agree to the{" "}
-        <a
-          href="#"
-          className="text-secondary-foreground underline-offset-2 hover:underline"
-        >
-          Terms
-        </a>{" "}
-        and{" "}
-        <a
-          href="#"
-          className="text-secondary-foreground underline-offset-2 hover:underline"
-        >
-          Privacy Policy
-        </a>
-        .
-      </p>
+      <div className="flex flex-col gap-2">
+        <p className="text-center text-2xs text-balance text-muted-foreground">
+          By continuing you agree to the{" "}
+          <a
+            href="#"
+            className="text-secondary-foreground underline-offset-2 hover:underline"
+          >
+            Terms
+          </a>{" "}
+          and{" "}
+          <a
+            href="#"
+            className="text-secondary-foreground underline-offset-2 hover:underline"
+          >
+            Privacy Policy
+          </a>
+          .
+        </p>
 
-      <div className="flex items-center justify-center gap-1 text-2xs">
-        <span className="text-muted-foreground">
-          Signing in from the desktop app?
-        </span>
-        <Link
-          to="/mock/inbox"
-          className="font-medium text-foreground underline-offset-2 hover:underline"
-        >
-          Use a device code
-        </Link>
+        <div className="flex items-center justify-center gap-1 text-2xs">
+          <span className="text-muted-foreground">
+            Signing in from the desktop app?
+          </span>
+          <Link
+            to="/mock/inbox"
+            className="font-medium text-foreground underline-offset-2 hover:underline"
+          >
+            Use a device code
+          </Link>
+        </div>
       </div>
     </AuthSplit>
   )

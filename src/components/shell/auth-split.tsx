@@ -1,17 +1,8 @@
-import { lazy, Suspense } from "react"
-import { ClientOnly } from "@tanstack/react-router"
 import { cn } from "cn"
 
 import { DashedRails } from "@/components/blocks/dashed-rails"
+import { Globe } from "@/components/blocks/globe"
 import { PlusCorners } from "@/components/blocks/plus-decorator"
-import { DitherField } from "@/components/ui/dither-field"
-
-// three + fiber load only on the client, only for this screen.
-const RevealWaveImage = lazy(() =>
-  import("@/components/blocks/reveal-wave-image").then((m) => ({
-    default: m.RevealWaveImage,
-  }))
-)
 
 /**
  * The two-pane authentication layout.
@@ -26,8 +17,10 @@ const RevealWaveImage = lazy(() =>
  * copyright line on a page nobody reads for legal information. The page is
  * two buttons; everything that is not those two buttons is competition.
  *
- * Right is atmosphere and proof: the dither field from the landing site, one
- * line of copy and the logo cloud, all anchored to the bottom. It collapses
+ * Right is atmosphere and proof: a draggable globe parked off the top-right
+ * corner on the bare pane, one line of copy and the logo cloud anchored to
+ * the bottom. There is no image behind it — the pane is the surface, and
+ * the globe is the only thing moving on the page. It collapses
  * entirely below `lg` — on a phone it would be a screenful of texture
  * between the user and the button they came to press.
  *
@@ -71,34 +64,14 @@ function AuthSplit({
       </div>
 
       <aside className="relative hidden w-1/2 shrink-0 overflow-hidden border-l border-hairline bg-surface lg:block">
-        {/*
-          The shader forces the image to three grey levels in the theme's own
-          ink and paper; colour only returns inside the cursor. The canvas
-          dither stands in on the server and while three loads.
-        */}
-        <ClientOnly
-          fallback={<DitherField mode="glyphs" hollow={[0.12, 0.42]} />}
-        >
-          <Suspense
-            fallback={<DitherField mode="glyphs" hollow={[0.12, 0.42]} />}
-          >
-            <RevealWaveImage
-              src="/login/abstract.avif"
-              pixelSize={2}
-              waveSpeed={0.2}
-              waveFrequency={0.7}
-              waveAmplitude={0.5}
-              revealRadius={0.5}
-              revealSoftness={1}
-              mouseRadius={0.4}
-              className="absolute inset-0 h-full w-full"
-            />
-          </Suspense>
-        </ClientOnly>
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-64 bg-linear-to-t from-surface to-transparent" />
+        {/* Oversized and offset past the corner, so only the northern
+            hemisphere shows and it reads as a horizon, not an object. */}
+        <Globe className="absolute -top-[28%] -right-[30%] w-[120%]" />
 
-        <div className="absolute inset-0 flex flex-col justify-end p-10">
-          <div className="flex flex-col gap-16">
+        {/* Click-through, so the globe stays draggable everywhere but the
+            copy and the logos. */}
+        <div className="pointer-events-none absolute inset-0 flex flex-col justify-end p-10">
+          <div className="pointer-events-auto flex flex-col gap-8">
             <div className="flex flex-col gap-2">{aside}</div>
             {proof}
           </div>

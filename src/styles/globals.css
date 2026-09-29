@@ -144,7 +144,10 @@
   /* The one place chroma is allowed to MOVE: the glow behind an object. */
   --animate-hue-rotate: hue-rotate 4s linear infinite;
   --animate-spin-border: spin-border 3s linear infinite;
+  /* A ring expanding out of a globe marker. Delay per ring is inline. */
+  --animate-pulse-ring: pulse-ring 2s var(--ease-out-strong) infinite;
 
+  @keyframes pulse-ring { from { transform: scale(0.3); opacity: 0.8 } to { transform: scale(1.5); opacity: 0 } }
   @keyframes fade-in { from { opacity: 0 } to { opacity: 1 } }
   @keyframes fade-out { from { opacity: 1 } to { opacity: 0 } }
   @keyframes scale-in { from { opacity: 0; transform: scale(0.95) } to { opacity: 1; transform: scale(1) } }

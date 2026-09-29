@@ -15,6 +15,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -141,21 +142,23 @@ function TopBarCluster() {
           }
         />
         <DropdownMenuContent align="end" className="w-56">
-          <DropdownMenuLabel className="tracking-normal normal-case">
-            {user.email}
-          </DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem render={<Link to="/mock/settings/account" />}>
-            <Icon icon={SettingsIcon} size="sm" />
-            Account settings
-          </DropdownMenuItem>
-          <DropdownMenuItem
-            variant="destructive"
-            render={<Link to="/mock/login" />}
-          >
-            <Icon icon={LogOutIcon} size="sm" />
-            Log out
-          </DropdownMenuItem>
+          <DropdownMenuGroup>
+            <DropdownMenuLabel className="tracking-normal normal-case">
+              {user.email}
+            </DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem render={<Link to="/mock/settings/account" />}>
+              <Icon icon={SettingsIcon} size="sm" />
+              Account settings
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              variant="destructive"
+              render={<Link to="/mock/login" />}
+            >
+              <Icon icon={LogOutIcon} size="sm" />
+              Log out
+            </DropdownMenuItem>
+          </DropdownMenuGroup>
         </DropdownMenuContent>
       </DropdownMenu>
     </>
