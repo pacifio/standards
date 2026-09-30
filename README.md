@@ -104,7 +104,8 @@ tests/          the ratchet
 
 - **Everything is OKLCH and almost everything has zero chroma.** Six surface
   steps in dark — page `0.08`, surface `0.10`, card `0.12`, illustration
-  `0.13`, muted `0.15`, popover `0.17` — each one lighter than the last. In
+  `0.13`, muted `0.15`, popover `0.17` — each one lighter than the last, set
+  into a lighter grey app frame (`0.17`) so the panels read against it. In
   light the ramp saturates at white after the card and hierarchy is carried by
   the ring. The token layer is the only place a colour literal may appear.
 - **Any element can switch theme.** Set `data-theme="light"` or `"dark"` on it
