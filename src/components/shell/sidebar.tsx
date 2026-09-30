@@ -10,6 +10,11 @@ import { cn } from "cn"
 import { SPRING_PILL, SPRING_RAIL } from "@/lib/motion"
 import { Icon } from "@/components/ui/icon"
 import { ScrollFade } from "@/components/ui/scroll-fade"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 
 /**
  * The left rail, on TanStack Router.
@@ -124,6 +129,30 @@ function SidebarPanel({ className, ...props }: React.ComponentProps<"div">) {
   )
 }
 
+/**
+ * Collapsed, a row is only its glyph, so its name comes back as a tooltip
+ * off the rail's edge. Expanded, the label is on screen and this is a
+ * pass-through.
+ */
+function RailTip({
+  label,
+  children,
+}: {
+  label: string
+  children: React.ReactElement
+}) {
+  const { collapsed } = useSidebar()
+  if (!collapsed) return children
+  return (
+    <Tooltip>
+      <TooltipTrigger render={children} />
+      <TooltipContent side="right" arrow>
+        {label}
+      </TooltipContent>
+    </Tooltip>
+  )
+}
+
 /** The ⌘K affordance. Collapsed, it is just the glyph. */
 function SidebarSearch({ onOpen }: { onOpen: () => void }) {
   const { collapsed } = useSidebar()
@@ -133,21 +162,23 @@ function SidebarSearch({ onOpen }: { onOpen: () => void }) {
           well at the panel's own radius, a quiet glyph and a quiet prompt.
           It opens the command menu rather than filtering in place, so ⌘K
           is announced to assistive tech instead of printed as a chip. */}
-      <button
-        type="button"
-        onClick={onOpen}
-        aria-keyshortcuts="Meta+K"
-        className={cn(
-          "flex h-7 w-full items-center gap-1.5 rounded-xl border border-border bg-surface px-2.5 text-xs text-disabled",
-          "duration-fast transition-colors ease-out-strong hover:border-border-strong hover:text-muted-foreground",
-          collapsed && "justify-center px-0"
-        )}
-      >
-        <Icon icon={SearchIcon} size="xs" />
-        {!collapsed && (
-          <span className="flex-1 truncate text-left">Jump to anything…</span>
-        )}
-      </button>
+      <RailTip label="Jump to anything… ⌘K">
+        <button
+          type="button"
+          onClick={onOpen}
+          aria-keyshortcuts="Meta+K"
+          className={cn(
+            "flex h-7 w-full items-center gap-1.5 rounded-xl border border-border bg-surface px-2.5 text-xs text-disabled",
+            "duration-fast transition-colors ease-out-strong hover:border-border-strong hover:text-muted-foreground",
+            collapsed && "justify-center px-0"
+          )}
+        >
+          <Icon icon={SearchIcon} size="xs" />
+          {!collapsed && (
+            <span className="flex-1 truncate text-left">Jump to anything…</span>
+          )}
+        </button>
+      </RailTip>
     </div>
   )
 }
@@ -353,16 +384,13 @@ function SidebarItem({
           {row}
         </button>
       ) : to ? (
-        <Link
-          to={to}
-          search={search as never}
-          title={collapsed ? label : undefined}
-          className="block outline-none"
-        >
-          {row}
-        </Link>
+        <RailTip label={label}>
+          <Link to={to} search={search as never} className="block outline-none">
+            {row}
+          </Link>
+        </RailTip>
       ) : (
-        row
+        <RailTip label={label}>{row}</RailTip>
       )}
 
       {/* Children hang off an animated rail with L-connectors. */}

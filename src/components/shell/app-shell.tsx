@@ -5,15 +5,16 @@ import {
   useCallback,
   useContext,
   useEffect,
-  useRef,
   useState,
 } from "react"
 import { createPortal } from "react-dom"
 import { AnimatePresence, motion } from "motion/react"
 import {
   BoxIcon,
+  CircleUserIcon,
   FolderGitIcon,
   GaugeIcon,
+  HashIcon,
   InboxIcon,
   Columns2Icon,
   LayoutDashboardIcon,
@@ -22,20 +23,22 @@ import {
   MessageSquareIcon,
   MoonIcon,
   PanelLeftIcon,
+  SettingsIcon,
   ShieldIcon,
+  SparklesIcon,
   SunIcon,
-  UserIcon,
   UsersIcon,
-  WavesIcon,
 } from "lucide-react"
 import type { LucideIcon } from "lucide-react"
 import { cn } from "cn"
 
 import { SPRING_DOCK } from "@/lib/motion"
+import { useMeasure } from "@/lib/use-measure"
 import { useOrg } from "@/lib/org-context"
 import { useTheme } from "@/lib/theme"
-import { PROJECTS, SESSIONS } from "@/mock/data"
+import { CONVERSATIONS, MEMBERS, PROJECTS, SESSIONS } from "@/mock/data"
 import { INBOX } from "@/mock/inbox"
+import { PersonAvatar } from "@/components/patterns/person-avatar"
 import { SegmentedIconGroup } from "@/components/patterns/segmented"
 import { IconButton } from "@/components/ui/icon-button"
 import { StatusIcon } from "@/components/ui/status-icon"
@@ -209,8 +212,13 @@ function DockSizeToggle({ className }: { className?: string }) {
 function AppShell({ children }: { children: React.ReactNode }) {
   const [dockSlot, setDockSlot] = useState<HTMLElement | null>(null)
   const [dockMode, setDockModeState] = useState<DockMode>("compact")
-  const [work, setWork] = useState(0)
-  const workRef = useRef<HTMLDivElement>(null)
+  // The work area is the page + dock row; the dock's half width is a
+  // fraction of it. Measured through a callback ref, not a ref read once in
+  // an effect: when the shell remounts (a hot reload, a route that rebuilds
+  // it) the observer must follow the new element, or it keeps reporting the
+  // detached one and "half" silently falls back to compact.
+  const [workRef, workRect] = useMeasure<HTMLDivElement>()
+  const work = Math.round(workRect.width)
 
   useEffect(() => {
     try {
@@ -228,18 +236,6 @@ function AppShell({ children }: { children: React.ReactNode }) {
     } catch {
       // ignore
     }
-  }, [])
-
-  // The work area is the page + dock row; the dock's half width
-  // are fractions of it.
-  useEffect(() => {
-    const el = workRef.current
-    if (!el) return
-    const ro = new ResizeObserver(([entry]) =>
-      setWork(Math.round(entry.contentRect.width))
-    )
-    ro.observe(el)
-    return () => ro.disconnect()
   }, [])
 
   const { org } = useOrg()
@@ -420,13 +416,6 @@ function AppShell({ children }: { children: React.ReactNode }) {
                     count={unread}
                   />
                   <SidebarItem
-                    icon={UserIcon}
-                    label="My sessions"
-                    to="/mock/timeline"
-                    search={{ view: "mine" }}
-                    match={() => false}
-                  />
-                  <SidebarItem
                     icon={UsersIcon}
                     label="Members"
                     to="/mock/settings/organisation"
@@ -444,19 +433,37 @@ function AppShell({ children }: { children: React.ReactNode }) {
                     icon={FolderGitIcon}
                     label="Projects"
                     to="/mock/projects"
-                    children={PROJECTS.map((p) => ({
-                      label: p.name,
-                      to: "/mock/projects",
-                      search: { project: p.slug },
-                      icon: FolderGitIcon,
-                    }))}
                   />
                   <SidebarItem
                     icon={MessageSquareIcon}
                     label="Chat"
                     to="/mock/chat"
                   />
-                  <SidebarItem icon={WavesIcon} label="Spaces" badge="beta" />
+                </SidebarGroup>
+
+                <SidebarGroup label="Quick chats">
+                  {CONVERSATIONS.map((c) => (
+                    <SidebarItem
+                      key={c.id}
+                      to="/mock/chat"
+                      search={{ c: c.id }}
+                      label={c.name}
+                      icon={
+                        c.kind === "channel"
+                          ? HashIcon
+                          : c.kind === "group"
+                            ? UsersIcon
+                            : undefined
+                      }
+                      mark={
+                        c.kind === "dm" ? (
+                          <ConversationFace name={c.name} />
+                        ) : undefined
+                      }
+                      count={c.unread}
+                      match={() => false}
+                    />
+                  ))}
                 </SidebarGroup>
 
                 <SidebarGroup label="Recent">
@@ -474,10 +481,10 @@ function AppShell({ children }: { children: React.ReactNode }) {
                   ))}
                 </SidebarGroup>
 
-                <SidebarGroup label="Administration">
+                <SidebarGroup label="Organisation">
                   <SidebarItem
-                    icon={ShieldIcon}
-                    label="Administration"
+                    icon={CircleUserIcon}
+                    label="My Account"
                     defaultOpen
                     children={[
                       {
@@ -486,10 +493,25 @@ function AppShell({ children }: { children: React.ReactNode }) {
                         icon: GaugeIcon,
                       },
                       {
-                        label: "Platform admin",
-                        to: "/mock/admin",
-                        icon: ShieldIcon,
+                        label: "AI",
+                        to: "/mock/settings/ai",
+                        icon: SparklesIcon,
                       },
+                      {
+                        label: "Account Settings",
+                        to: "/mock/settings/account",
+                        icon: SettingsIcon,
+                      },
+                      // Admin only for an org you administer.
+                      ...(org.role === "admin"
+                        ? [
+                            {
+                              label: "Admin",
+                              to: "/mock/admin",
+                              icon: ShieldIcon,
+                            },
+                          ]
+                        : []),
                     ]}
                   />
                 </SidebarGroup>
@@ -531,6 +553,20 @@ function AppShell({ children }: { children: React.ReactNode }) {
         <CommandMenu open={open} onOpenChange={setOpen} actions={actions} />
       </div>
     </DockContext.Provider>
+  )
+}
+
+/** A direct message's face in the rail: the member's photo, at icon size. */
+function ConversationFace({ name }: { name: string }) {
+  const m = MEMBERS.find((x) => x.name === name)
+  return (
+    <PersonAvatar
+      size="xs"
+      name={name}
+      email={m?.email}
+      image={m?.image}
+      className="size-4"
+    />
   )
 }
 

@@ -25,6 +25,7 @@ export const ORGANISATIONS: Array<Organisation> = [
     slug: "atlas",
     initials: "AT",
     memberCount: 12,
+    role: "admin",
   },
   {
     id: "org_antarys",
@@ -32,6 +33,7 @@ export const ORGANISATIONS: Array<Organisation> = [
     slug: "antarys-core",
     initials: "AC",
     memberCount: 6,
+    role: "developer",
   },
   {
     id: "org_personal",
@@ -39,6 +41,7 @@ export const ORGANISATIONS: Array<Organisation> = [
     slug: "adib-personal",
     initials: "AP",
     memberCount: 1,
+    role: "admin",
   },
   {
     id: "org_autana",
@@ -46,6 +49,7 @@ export const ORGANISATIONS: Array<Organisation> = [
     slug: "autana-systems",
     initials: "AS",
     memberCount: 4,
+    role: "member",
   },
   {
     id: "org_supercog",
@@ -53,6 +57,7 @@ export const ORGANISATIONS: Array<Organisation> = [
     slug: "super-cognition",
     initials: "SC",
     memberCount: 23,
+    role: "product_owner",
   },
 ]
 

@@ -4,6 +4,7 @@ import { Link } from "@tanstack/react-router"
 import {
   BookOpenIcon,
   CircleHelpIcon,
+  DownloadIcon,
   GlobeIcon,
   KeyboardIcon,
   LogOutIcon,
@@ -133,6 +134,10 @@ function InfoMenu() {
           Follow on X
         </DropdownMenuItem>
         <DropdownMenuSeparator />
+        <DropdownMenuItem render={external("https://tryatlas.cc")}>
+          <Icon icon={DownloadIcon} size="sm" />
+          Download desktop
+        </DropdownMenuItem>
         <DropdownMenuItem render={<Link to="/mock/settings/organisation" />}>
           <Icon icon={SettingsIcon} size="sm" />
           Settings

@@ -35,8 +35,8 @@ type TimelineSearch = {
 
 export const Route = createFileRoute("/mock/_app/timeline")({
   component: TimelineScreen,
-  // `view` stays a real filter — the sidebar's "My sessions" link uses it —
-  // but it is no longer surfaced as pills on the page.
+  // `view` stays a real filter for deep links (`?view=mine`), but nothing
+  // on the page or in the sidebar surfaces it any more.
   validateSearch: (search: Record<string, unknown>): TimelineSearch => ({
     view:
       search.view === "mine" || search.view === "agents" ? search.view : "all",

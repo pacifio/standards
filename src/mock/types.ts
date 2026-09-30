@@ -31,6 +31,8 @@ export type Organisation = {
   /** Two-letter mark shown when there is no logo. */
   initials: string
   memberCount: number
+  /** Your role in this org; decides what the sidebar offers. */
+  role: Role
 }
 
 export type Member = {

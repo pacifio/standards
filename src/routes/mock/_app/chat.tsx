@@ -1,5 +1,4 @@
-import { useState } from "react"
-import { createFileRoute } from "@tanstack/react-router"
+import { createFileRoute, useNavigate } from "@tanstack/react-router"
 import {
   HashIcon,
   MessageSquareIcon,
@@ -20,6 +19,10 @@ import { PersonAvatar } from "@/components/patterns/person-avatar"
 
 export const Route = createFileRoute("/mock/_app/chat")({
   component: ChatScreen,
+  // `c` is the open conversation, so the sidebar's quick chats can link
+  // straight into one.
+  validateSearch: (search: Record<string, unknown>): { c?: string } =>
+    typeof search.c === "string" ? { c: search.c } : {},
 })
 
 /**
@@ -33,8 +36,13 @@ export const Route = createFileRoute("/mock/_app/chat")({
  * app, so a thread and its reply box read as one object.
  */
 function ChatScreen() {
-  const [selectedId, setSelectedId] = useState(CONVERSATIONS[0].id)
-  const selected = CONVERSATIONS.find((c) => c.id === selectedId)!
+  const { c: selectedParam } = Route.useSearch()
+  const navigate = useNavigate({ from: Route.fullPath })
+  const selected =
+    CONVERSATIONS.find((c) => c.id === selectedParam) ?? CONVERSATIONS[0]
+  const selectedId = selected.id
+  const setSelectedId = (id: string) =>
+    void navigate({ search: { c: id }, replace: true })
   const pinned = MESSAGES.filter((m) => m.pinned)
 
   return (
