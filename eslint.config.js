@@ -15,6 +15,14 @@ export default [
     },
   },
   {
-    ignores: ["eslint.config.js", ".prettierrc"],
+    // Build output (Nitro writes `.output`, and `.vercel/output` on Vercel)
+    // is generated JavaScript, not source.
+    ignores: [
+      "eslint.config.js",
+      ".prettierrc",
+      ".output/**",
+      ".vercel/**",
+      "dist/**",
+    ],
   },
 ]

@@ -29,6 +29,7 @@
     "cobe": "^2.0.1",
     "lucide-react": "^1.48.0",
     "motion": "^13.4.4",
+    "nitro": "^3.0.260903-beta",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "react-markdown": "^10.1.0",
