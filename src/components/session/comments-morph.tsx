@@ -8,6 +8,7 @@ import { MEMBERS } from "@/mock/data"
 import type { ApiTimelineEntry, ArtifactComment } from "@/mock/sessions-api"
 import { MOCK_NOW, ago } from "@/mock/time"
 import { useTheme } from "@/lib/theme"
+import { useDockRoom } from "@/components/shell/app-shell"
 import { PersonAvatar } from "@/components/patterns/person-avatar"
 import { SegmentedPills } from "@/components/patterns/segmented"
 import { Icon } from "@/components/ui/icon"
@@ -27,6 +28,11 @@ import { useComments } from "./comments"
  * over the session rather than more of it. Choosing a thread closes the
  * panel and jumps to where the comment lives: the reader scrolls the entry
  * into view, marks it, and opens that entry's thread.
+ *
+ * The compact dock is too narrow for the panel, so opening it there first
+ * widens the dock to half, waits for it to settle, then grows the panel;
+ * closing hands the dock back to compact. At half width or on the public
+ * page it just opens.
  */
 
 type Filter = "all" | "open" | "unread"
@@ -76,6 +82,21 @@ function CommentsMorph({ entries }: { entries: Array<ApiTimelineEntry> }) {
   const inverted = appearance === "dark" ? "light" : "dark"
 
   const [open, setOpen] = useState(false)
+  const room = useDockRoom()
+  const wasOpen = useRef(false)
+
+  function openPanel() {
+    const wait = room.expand()
+    if (wait) window.setTimeout(() => setOpen(true), wait)
+    else setOpen(true)
+  }
+
+  // However it closes — ✕, Escape, a click outside, or jumping to a
+  // comment — give back any room it borrowed.
+  useEffect(() => {
+    if (wasOpen.current && !open) room.restore()
+    wasOpen.current = open
+  }, [open, room])
   const [filter, setFilter] = useState<Filter>("all")
   const [query, setQuery] = useState("")
   const root = useRef<HTMLDivElement>(null)
@@ -166,7 +187,10 @@ function CommentsMorph({ entries }: { entries: Array<ApiTimelineEntry> }) {
         data-open={open}
         className={cn(
           "t-morph border border-border bg-card/80 shadow-md backdrop-blur-xl data-[open=true]:shadow-lg",
-          "[--morph-open-h:min(32rem,calc(100svh-10rem))] [--morph-open-w:min(24rem,calc(100cqw-2rem))]"
+          // The width cap leaves the bar's padding (2rem), the share button
+          // beside it (2rem) and the gap between them (0.75rem), so the
+          // panel never runs past the reader's edge.
+          "[--morph-open-h:min(32rem,calc(100svh-10rem))] [--morph-open-w:min(24rem,calc(100cqw-4.75rem))]"
         )}
       >
         {/* The panel's own surface, in the other theme; fades in as the
@@ -303,7 +327,7 @@ function CommentsMorph({ entries }: { entries: Array<ApiTimelineEntry> }) {
           type="button"
           aria-label={`${live.length} comments — open all comments`}
           aria-expanded={open}
-          onClick={() => setOpen(true)}
+          onClick={openPanel}
           onMouseEnter={() => icon.current?.startAnimation()}
           onMouseLeave={() => icon.current?.stopAnimation()}
           // `-right-px -bottom-px`: the box has a 1px border and positioned

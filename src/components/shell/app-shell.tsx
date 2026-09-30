@@ -5,6 +5,7 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useRef,
   useState,
 } from "react"
 import { createPortal } from "react-dom"
@@ -149,6 +150,31 @@ const DockContext = createContext<DockContextValue>({
 })
 
 const useDock = () => useContext(DockContext)
+
+/**
+ * Borrow room from the dock for something that will not fit in it — a panel
+ * that grows out of a button, say. `expand()` widens a compact dock to half
+ * and returns how long to wait for it to finish widening (0 when there was
+ * nothing to do, or no dock at all: `work` is only measured inside the app
+ * shell). `restore()` puts it back — but only if it was this hook that
+ * widened it, and only if nobody has resized it since.
+ */
+function useDockRoom() {
+  const { mode, setMode, work } = useDock()
+  const borrowed = useRef(false)
+  const expand = useCallback(() => {
+    if (work === 0 || mode !== "compact") return 0
+    borrowed.current = true
+    setMode("half")
+    return 320
+  }, [mode, setMode, work])
+  const restore = useCallback(() => {
+    if (!borrowed.current) return
+    borrowed.current = false
+    if (mode === "half") setMode("compact")
+  }, [mode, setMode])
+  return { expand, restore }
+}
 
 function Dock({ children }: { children?: React.ReactNode }) {
   const { slot, mode, work } = useDock()
@@ -571,4 +597,4 @@ function ConversationFace({ name }: { name: string }) {
   )
 }
 
-export { AppShell, Dock, DockSizeToggle, ThemeToggle, useDock }
+export { AppShell, Dock, DockSizeToggle, ThemeToggle, useDock, useDockRoom }
