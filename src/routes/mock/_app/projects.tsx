@@ -9,12 +9,14 @@ import {
   UsersIcon,
 } from "lucide-react"
 
+import { cn } from "cn"
+
 import { PROJECTS } from "@/mock/data"
 import { hueFor } from "@/lib/hue"
 import { Panel } from "@/components/patterns/panel"
+import { NewProjectDrawer } from "@/components/projects/new-project-drawer"
 import { PageHeader } from "@/components/patterns/section-header"
 import { CompoundFilter, SegmentedPills } from "@/components/patterns/segmented"
-import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -27,6 +29,11 @@ import { IconButton } from "@/components/ui/icon-button"
 import { Progress } from "@/components/ui/progress"
 import { ScrollFade } from "@/components/ui/scroll-fade"
 import { Spinner } from "@/components/ui/spinner"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 import { HueDot, Tag } from "@/components/ui/tag"
 
 export const Route = createFileRoute("/mock/_app/projects")({
@@ -52,21 +59,30 @@ type Scope = "all" | "mine" | "restricted"
  *
  * A project mid-sync shows a determinate bar inside the card, because the
  * card is the thing being synced.
+ *
+ * "New project" — the floating button and the dashed slot — opens a three-step sheet
+ * from the bottom; what it creates lands first in the grid, ringed for a
+ * moment so the eye finds it.
  */
 function ProjectsScreen() {
   const [scope, setScope] = useState<Scope>("all")
-  const visible = PROJECTS.filter((p) =>
+  const [projects, setProjects] = useState(PROJECTS)
+  const [creating, setCreating] = useState(false)
+  // The project just made, marked for a moment where it lands.
+  const [fresh, setFresh] = useState<string | null>(null)
+  const visible = projects.filter((p) =>
     scope === "restricted" ? p.visibility === "restricted" : true
   )
 
   return (
-    <>
+    // Relative, so the floating button pins to this panel's corner.
+    <div className="relative flex min-h-0 flex-1 flex-col">
       <ScrollFade className="min-h-0 flex-1">
         <div className="flex flex-col gap-4 px-5 pt-4 pb-6">
           <PageHeader
             className="pb-0"
             title="Projects"
-            description={`${PROJECTS.length} repositories Atlas is watching for this workspace`}
+            description={`${projects.length} repositories Atlas is watching for this workspace`}
             action={
               <div className="flex flex-wrap items-center gap-2">
                 <SegmentedPills<Scope>
@@ -82,10 +98,6 @@ function ProjectsScreen() {
                   Recent
                   <Icon icon={ChevronDownIcon} size="xs" />
                 </CompoundFilter>
-                <Button variant="default" size="sm">
-                  <PlusIcon />
-                  New project
-                </Button>
               </div>
             }
           />
@@ -97,6 +109,10 @@ function ProjectsScreen() {
                 <Panel
                   key={p.id}
                   delay={i * 0.05}
+                  className={cn(
+                    "duration-slow transition-shadow",
+                    fresh === p.id && "ring-2 ring-success/50"
+                  )}
                   title={
                     <span className="flex items-center gap-2">
                       <HueDot hue={hue} />
@@ -168,6 +184,7 @@ function ProjectsScreen() {
                 It is the "New project" action drawn as the thing it makes. */}
             <button
               type="button"
+              onClick={() => setCreating(true)}
               className="flex min-h-28 flex-col items-center justify-center gap-1.5 rounded-xl border border-dashed border-border text-muted-foreground transition-colors hover:border-border-strong hover:bg-element-hover hover:text-foreground"
             >
               <span className="flex size-7 items-center justify-center rounded-full bg-muted">
@@ -178,7 +195,37 @@ function ProjectsScreen() {
           </div>
         </div>
       </ScrollFade>
-    </>
+
+      <NewProjectDrawer
+        open={creating}
+        onOpenChange={setCreating}
+        existing={projects.map((p) => p.slug)}
+        onCreate={(p) => {
+          setProjects((all) => [p, ...all])
+          setScope("all")
+          setFresh(p.id)
+          window.setTimeout(() => setFresh(null), 2400)
+        }}
+      />
+
+      {/* The page's one action, floating in the corner rather than
+          competing with the filters in the header. */}
+      <Tooltip>
+        <TooltipTrigger
+          render={
+            <button
+              type="button"
+              aria-label="New project"
+              onClick={() => setCreating(true)}
+              className="duration-fast absolute right-5 bottom-5 z-10 flex size-12 cursor-pointer items-center justify-center rounded-full bg-foreground text-background shadow-lg transition-transform ease-out-strong hover:scale-105 active:scale-95"
+            >
+              <Icon icon={PlusIcon} size="md" />
+            </button>
+          }
+        />
+        <TooltipContent side="left">New project</TooltipContent>
+      </Tooltip>
+    </div>
   )
 }
 
@@ -186,7 +233,9 @@ function Figure({ value, label }: { value: number; label: string }) {
   return (
     <span className="flex items-baseline gap-1">
       <span className="text-lg leading-none figure">{value}</span>
-      <span className="caption">{label}</span>
+      <span className="caption">
+        {value === 1 ? label.replace(/s$/, "") : label}
+      </span>
     </span>
   )
 }

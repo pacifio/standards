@@ -42,13 +42,15 @@
   /* --- Radius -----------------------------------------------------------
 
      sm controls · md rows and menu items · lg popups · xl panels and tables
-     · 2xl the illustration cards · full every pill, tag and button. */
+     · 2xl the illustration cards · 3xl a bottom sheet · full every pill,
+     tag and button. */
   --radius: 0.5rem;
   --radius-sm: 0.25rem;
   --radius-md: 0.375rem;
   --radius-lg: 0.5rem;
   --radius-xl: 0.75rem;
   --radius-2xl: 1rem;
+  --radius-3xl: 1.75rem;
   --radius-full: 9999px;
 
   /* --- Elevation --------------------------------------------------------

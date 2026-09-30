@@ -123,6 +123,7 @@
   --radius-lg: var(--radius-lg);
   --radius-xl: var(--radius-xl);
   --radius-2xl: var(--radius-2xl);
+  --radius-3xl: var(--radius-3xl);
   --radius-full: 9999px;
 
   /* Two rungs. Tailwind rewrites --shadow-* at build time, so they point at
