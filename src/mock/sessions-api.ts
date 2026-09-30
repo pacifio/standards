@@ -476,6 +476,24 @@ const COMMENTS: Array<CommentSeed> = [
   },
 ]
 
+/* --- Public links ------------------------------------------------------ */
+
+/**
+ * How a session is shared outside the org. A public link is readable by
+ * anyone who has it; `guestComments` decides whether those readers can
+ * also comment, as guests, or only read. Sessions not listed are public
+ * with guest comments on — the mock's default, so every link opens.
+ */
+export type PublicShare = { public: boolean; guestComments: boolean }
+
+const SHARES: Record<string, PublicShare> = {
+  s3: { public: true, guestComments: false },
+  s7: { public: false, guestComments: false },
+}
+
+export const publicShare = (id: string): PublicShare =>
+  SHARES[id] ?? { public: true, guestComments: true }
+
 /* --- Detail ------------------------------------------------------------ */
 
 export function sessionDetail(id: string): SessionDetailApi | null {

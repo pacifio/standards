@@ -105,9 +105,15 @@ function ShareMorph({ detail }: { detail: SessionDetailApi }) {
 
   useEffect(() => {
     if (!open) return
-    const link = new URL(window.location.href)
-    link.search = ""
-    link.searchParams.set("session", s.id)
+    // "Anyone" hands out the public page; "Atlas org" the session in the
+    // app, which needs a sign-in.
+    const link = new URL(window.location.origin)
+    if (access === "link") {
+      link.pathname = `/mock/s/${s.id}`
+    } else {
+      link.pathname = "/mock/timeline"
+      link.searchParams.set("session", s.id)
+    }
     setUrl(link.toString())
     function onDown(e: PointerEvent) {
       if (root.current?.contains(e.target as Node)) return
@@ -122,7 +128,7 @@ function ShareMorph({ detail }: { detail: SessionDetailApi }) {
       document.removeEventListener("pointerdown", onDown)
       document.removeEventListener("keydown", onKey)
     }
-  }, [open, s.id])
+  }, [open, s.id, access])
 
   async function copy() {
     try {

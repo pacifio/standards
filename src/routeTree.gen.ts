@@ -35,6 +35,7 @@ import { Route as MockAppInboxRouteImport } from './routes/mock/_app/inbox'
 import { Route as MockAppProjectsRouteImport } from './routes/mock/_app/projects'
 import { Route as MockAppSpacesRouteImport } from './routes/mock/_app/spaces'
 import { Route as MockAppTimelineRouteImport } from './routes/mock/_app/timeline'
+import { Route as MockSSessionIdRouteImport } from './routes/mock/s.$sessionId'
 import { Route as MockSettingsIndexRouteImport } from './routes/mock/settings/index'
 import { Route as MockSettingsAccountRouteImport } from './routes/mock/settings/account'
 import { Route as MockSettingsAiRouteImport } from './routes/mock/settings/ai'
@@ -171,6 +172,11 @@ const MockAppTimelineRoute = MockAppTimelineRouteImport.update({
   path: '/timeline',
   getParentRoute: () => MockAppRoute,
 } as any)
+const MockSSessionIdRoute = MockSSessionIdRouteImport.update({
+  id: '/s/$sessionId',
+  path: '/s/$sessionId',
+  getParentRoute: () => MockRouteRoute,
+} as any)
 const MockSettingsIndexRoute = MockSettingsIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -229,6 +235,7 @@ export interface FileRoutesByFullPath {
   '/mock/projects': typeof MockAppProjectsRoute
   '/mock/spaces': typeof MockAppSpacesRoute
   '/mock/timeline': typeof MockAppTimelineRoute
+  '/mock/s/$sessionId': typeof MockSSessionIdRoute
   '/mock/settings/account': typeof MockSettingsAccountRoute
   '/mock/settings/ai': typeof MockSettingsAiRoute
   '/mock/settings/organisation': typeof MockSettingsOrganisationRoute
@@ -259,6 +266,7 @@ export interface FileRoutesByTo {
   '/mock/projects': typeof MockAppProjectsRoute
   '/mock/spaces': typeof MockAppSpacesRoute
   '/mock/timeline': typeof MockAppTimelineRoute
+  '/mock/s/$sessionId': typeof MockSSessionIdRoute
   '/mock/settings/account': typeof MockSettingsAccountRoute
   '/mock/settings/ai': typeof MockSettingsAiRoute
   '/mock/settings/organisation': typeof MockSettingsOrganisationRoute
@@ -294,6 +302,7 @@ export interface FileRoutesById {
   '/mock/_app/projects': typeof MockAppProjectsRoute
   '/mock/_app/spaces': typeof MockAppSpacesRoute
   '/mock/_app/timeline': typeof MockAppTimelineRoute
+  '/mock/s/$sessionId': typeof MockSSessionIdRoute
   '/mock/settings/account': typeof MockSettingsAccountRoute
   '/mock/settings/ai': typeof MockSettingsAiRoute
   '/mock/settings/organisation': typeof MockSettingsOrganisationRoute
@@ -329,6 +338,7 @@ export interface FileRouteTypes {
     | '/mock/projects'
     | '/mock/spaces'
     | '/mock/timeline'
+    | '/mock/s/$sessionId'
     | '/mock/settings/account'
     | '/mock/settings/ai'
     | '/mock/settings/organisation'
@@ -359,6 +369,7 @@ export interface FileRouteTypes {
     | '/mock/projects'
     | '/mock/spaces'
     | '/mock/timeline'
+    | '/mock/s/$sessionId'
     | '/mock/settings/account'
     | '/mock/settings/ai'
     | '/mock/settings/organisation'
@@ -393,6 +404,7 @@ export interface FileRouteTypes {
     | '/mock/_app/projects'
     | '/mock/_app/spaces'
     | '/mock/_app/timeline'
+    | '/mock/s/$sessionId'
     | '/mock/settings/account'
     | '/mock/settings/ai'
     | '/mock/settings/organisation'
@@ -591,6 +603,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MockAppTimelineRouteImport
       parentRoute: typeof MockAppRoute
     }
+    '/mock/s/$sessionId': {
+      id: '/mock/s/$sessionId'
+      path: '/s/$sessionId'
+      fullPath: '/mock/s/$sessionId'
+      preLoaderRoute: typeof MockSSessionIdRouteImport
+      parentRoute: typeof MockRouteRoute
+    }
     '/mock/settings/': {
       id: '/mock/settings/'
       path: '/'
@@ -718,6 +737,7 @@ interface MockRouteRouteChildren {
   MockAppRoute: typeof MockAppRouteWithChildren
   MockLoginRoute: typeof MockLoginRoute
   MockIndexRoute: typeof MockIndexRoute
+  MockSSessionIdRoute: typeof MockSSessionIdRoute
 }
 
 const MockRouteRouteChildren: MockRouteRouteChildren = {
@@ -725,6 +745,7 @@ const MockRouteRouteChildren: MockRouteRouteChildren = {
   MockAppRoute: MockAppRouteWithChildren,
   MockLoginRoute: MockLoginRoute,
   MockIndexRoute: MockIndexRoute,
+  MockSSessionIdRoute: MockSSessionIdRoute,
 }
 
 const MockRouteRouteWithChildren = MockRouteRoute._addFileChildren(

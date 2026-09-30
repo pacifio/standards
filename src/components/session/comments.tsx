@@ -23,7 +23,19 @@ import {
  * The pill on an entry shows up to three faces and a count and opens the
  * threads in a popover; under the entry, activity lines say who commented
  * and when. Posting, replying and resolving are local to the mock.
+ *
+ * Who is reading decides what they can do. A member comments as themselves
+ * and can resolve. On a public link the reader is a guest: if the link
+ * allows guest comments they give a name once and post under it — marked
+ * GUEST, as the server stores them — and they never resolve; if it does
+ * not, the threads are read-only.
  */
+
+/** Who is reading. */
+export type Viewer =
+  { kind: "member"; id: string } | { kind: "guest"; canComment: boolean }
+
+const GUEST_NAME_KEY = "atlas-guest-name"
 
 const SELF = "m1"
 
@@ -46,6 +58,12 @@ type CommentsContextValue = {
     parentId: string | null
   ) => void
   resolve: (id: string, resolved: boolean) => void
+  viewer: Viewer
+  /** Whether this reader may post at all. */
+  canComment: boolean
+  /** A guest's chosen name; null until they give one. */
+  guestName: string | null
+  setGuestName: (name: string) => void
   /** A comment to open and mark, from an inbox deep link. */
   highlight?: string
   /**
@@ -71,18 +89,44 @@ function CommentsProvider({
   sessionId,
   initial,
   highlight,
+  viewer = { kind: "member", id: SELF },
   children,
 }: {
   sessionId: string
   initial: Array<ArtifactComment>
   highlight?: string
+  viewer?: Viewer
   children: React.ReactNode
 }) {
   const [comments, setComments] = useState(initial)
   const [focus, setFocus] = useState<CommentFocus | null>(null)
+  const [guestName, setGuestNameState] = useState<string | null>(null)
+
+  // A guest's name outlives the page, like the real app's cookie.
+  useEffect(() => {
+    if (viewer.kind !== "guest") return
+    try {
+      setGuestNameState(localStorage.getItem(GUEST_NAME_KEY))
+    } catch {
+      // ignore
+    }
+  }, [viewer.kind])
+
+  const canComment = viewer.kind === "member" || viewer.canComment
   const value = useMemo<CommentsContextValue>(
     () => ({
       comments,
+      viewer,
+      canComment,
+      guestName,
+      setGuestName: (name) => {
+        setGuestNameState(name)
+        try {
+          localStorage.setItem(GUEST_NAME_KEY, name)
+        } catch {
+          // ignore
+        }
+      },
       highlight: focus?.commentId ?? highlight,
       focus,
       focusComment: (anchorId, commentId) =>
@@ -96,8 +140,8 @@ function CommentsProvider({
             anchorKind,
             anchorId,
             parentId,
-            authorId: SELF,
-            guestName: null,
+            authorId: viewer.kind === "member" ? viewer.id : "guest",
+            guestName: viewer.kind === "guest" ? guestName : null,
             body,
             mentions: [],
             createdAt: new Date().toISOString(),
@@ -120,7 +164,7 @@ function CommentsProvider({
           )
         ),
     }),
-    [comments, focus, highlight, sessionId]
+    [comments, focus, highlight, sessionId, viewer, canComment, guestName]
   )
   return (
     <CommentsContext.Provider value={value}>
@@ -160,7 +204,7 @@ function CommentButton({
   anchorId: string
   className?: string
 }) {
-  const { highlight, focus } = useComments()
+  const { highlight, focus, canComment } = useComments()
   const list = useAnchor(anchorId)
   const hasHighlight = !!highlight && list.some((c) => c.id === highlight)
   const [open, setOpen] = useState(hasHighlight)
@@ -174,6 +218,8 @@ function CommentButton({
   }, [focus, anchorId])
   const faces = [...new Set(list.map((c) => c.authorId))].slice(0, 3)
   const count = list.length
+  // Nothing to read and no way to write: no pill at all.
+  if (!count && !canComment) return null
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -196,7 +242,10 @@ function CommentButton({
               <>
                 <span className="flex -space-x-1.5">
                   {faces.map((id) => {
-                    const p = person(id, null)
+                    const p = person(
+                      id,
+                      list.find((c) => c.authorId === id)?.guestName ?? null
+                    )
                     return (
                       <PersonAvatar
                         key={id}
@@ -240,7 +289,7 @@ function Threads({
   anchorId: string
   list: Array<ArtifactComment>
 }) {
-  const { post } = useComments()
+  const { post, canComment } = useComments()
   const roots = list.filter((c) => !c.parentId)
   const [draft, setDraft] = useState("")
 
@@ -257,27 +306,37 @@ function Threads({
           />
         ))}
       </div>
-      <form
-        onSubmit={(e) => {
-          e.preventDefault()
-          if (!draft.trim()) return
-          post(anchorKind, anchorId, draft.trim(), null)
-          setDraft("")
-        }}
-        className={cn(
-          "flex items-start gap-2 p-2.5",
-          roots.length > 0 && "border-t border-hairline"
-        )}
-      >
-        <SelfAvatar />
-        <Composer
-          value={draft}
-          onChange={setDraft}
-          placeholder={
-            roots.length ? "Start a new thread…" : "Start a discussion…"
-          }
-        />
-      </form>
+      {canComment ? (
+        <GuestGate
+          className={cn(roots.length > 0 && "border-t border-hairline")}
+        >
+          <form
+            onSubmit={(e) => {
+              e.preventDefault()
+              if (!draft.trim()) return
+              post(anchorKind, anchorId, draft.trim(), null)
+              setDraft("")
+            }}
+            className={cn(
+              "flex items-start gap-2 p-2.5",
+              roots.length > 0 && "border-t border-hairline"
+            )}
+          >
+            <SelfAvatar />
+            <Composer
+              value={draft}
+              onChange={setDraft}
+              placeholder={
+                roots.length ? "Start a new thread…" : "Start a discussion…"
+              }
+            />
+          </form>
+        </GuestGate>
+      ) : (
+        <p className="border-t border-hairline px-3 py-2.5 text-2xs text-muted-foreground">
+          Comments are read-only on this link.
+        </p>
+      )}
     </div>
   )
 }
@@ -293,7 +352,7 @@ function Thread({
   anchorKind: CommentAnchorKindApi
   anchorId: string
 }) {
-  const { post, resolve, highlight } = useComments()
+  const { post, resolve, highlight, viewer, canComment } = useComments()
   const [replying, setReplying] = useState(false)
   const [draft, setDraft] = useState("")
   const resolved = !!root.resolvedAt
@@ -304,15 +363,22 @@ function Thread({
         comment={root}
         marked={highlight === root.id}
         actions={
-          <>
-            <Action
-              onClick={() => resolve(root.id, !resolved)}
-              icon={resolved ? undefined : CheckIcon}
-            >
-              {resolved ? "Reopen" : "Resolve"}
-            </Action>
-            <Action onClick={() => setReplying((v) => !v)}>Reply</Action>
-          </>
+          canComment || viewer.kind === "member" ? (
+            <>
+              {/* Resolving is a member's call, not a guest's. */}
+              {viewer.kind === "member" && (
+                <Action
+                  onClick={() => resolve(root.id, !resolved)}
+                  icon={resolved ? undefined : CheckIcon}
+                >
+                  {resolved ? "Reopen" : "Resolve"}
+                </Action>
+              )}
+              {canComment && (
+                <Action onClick={() => setReplying((v) => !v)}>Reply</Action>
+              )}
+            </>
+          ) : undefined
         }
       />
       {replies.map((r) => (
@@ -321,24 +387,26 @@ function Thread({
         </div>
       ))}
       {replying && (
-        <form
-          onSubmit={(e) => {
-            e.preventDefault()
-            if (!draft.trim()) return
-            post(anchorKind, anchorId, draft.trim(), root.id)
-            setDraft("")
-            setReplying(false)
-          }}
-          className="mt-2 flex items-start gap-2 pl-6"
-        >
-          <SelfAvatar />
-          <Composer
-            value={draft}
-            onChange={setDraft}
-            placeholder="Reply…"
-            autoFocus
-          />
-        </form>
+        <GuestGate className="mt-2 pl-6">
+          <form
+            onSubmit={(e) => {
+              e.preventDefault()
+              if (!draft.trim()) return
+              post(anchorKind, anchorId, draft.trim(), root.id)
+              setDraft("")
+              setReplying(false)
+            }}
+            className="mt-2 flex items-start gap-2 pl-6"
+          >
+            <SelfAvatar />
+            <Composer
+              value={draft}
+              onChange={setDraft}
+              placeholder="Reply…"
+              autoFocus
+            />
+          </form>
+        </GuestGate>
       )}
     </div>
   )
@@ -413,7 +481,11 @@ function Action({
 }
 
 function SelfAvatar() {
-  const me = person(SELF, null)
+  const { viewer, guestName } = useComments()
+  const me =
+    viewer.kind === "member"
+      ? person(viewer.id, null)
+      : { name: guestName ?? "Guest" }
   return (
     <PersonAvatar
       size="xs"
@@ -422,6 +494,53 @@ function SelfAvatar() {
       image={me.image}
       className="mt-1 size-4.5"
     />
+  )
+}
+
+/**
+ * Before a guest's first comment: ask their name, once. Members, and guests
+ * who have already given one, pass straight through to the composer.
+ */
+function GuestGate({
+  className,
+  children,
+}: {
+  className?: string
+  children: React.ReactNode
+}) {
+  const { viewer, guestName, setGuestName } = useComments()
+  const [name, setName] = useState("")
+  if (viewer.kind === "member" || guestName) return <>{children}</>
+  return (
+    <form
+      onSubmit={(e) => {
+        e.preventDefault()
+        if (name.trim()) setGuestName(name.trim())
+      }}
+      className={cn("flex flex-col gap-2 p-2.5", className)}
+    >
+      <p className="text-2xs text-muted-foreground">
+        Commenting as a guest. Your name shows beside what you write.
+      </p>
+      <div className="flex gap-1.5">
+        <input
+          autoFocus
+          value={name}
+          maxLength={60}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="Your name"
+          aria-label="Your name"
+          className="h-8 min-w-0 flex-1 rounded-lg border border-border bg-surface px-2 text-xs outline-none placeholder:text-disabled focus:border-border-strong"
+        />
+        <button
+          type="submit"
+          disabled={!name.trim()}
+          className="duration-fast h-8 cursor-pointer rounded-lg bg-foreground px-3 text-2xs font-medium text-background transition-opacity hover:opacity-85 disabled:cursor-not-allowed disabled:opacity-40"
+        >
+          Continue
+        </button>
+      </div>
+    </form>
   )
 }
 

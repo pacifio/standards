@@ -1,15 +1,19 @@
 "use client"
 
 import { useEffect, useMemo, useRef } from "react"
-import { GitBranchIcon, XIcon } from "lucide-react"
+import { ExternalLinkIcon, GitBranchIcon, XIcon } from "lucide-react"
+import { cn } from "cn"
 
 import type { SessionDetailApi } from "@/mock/sessions-api"
 import { ago } from "@/mock/time"
+import { DashedRails } from "@/components/blocks/dashed-rails"
+import { ScrollRail } from "@/components/blocks/scroll-rail"
 import { Icon } from "@/components/ui/icon"
 import { ModelMark, agentFamily } from "@/components/ui/model-badge"
 import { IconButton } from "@/components/ui/icon-button"
 import { StatusIcon } from "@/components/ui/status-icon"
 import { CommentButton, CommentsProvider, useComments } from "./comments"
+import type { Viewer } from "./comments"
 import { CommentsMorph } from "./comments-morph"
 import { ShareMorph } from "./share-morph"
 import { EntryRail, groupEntries } from "./entry-rail"
@@ -20,9 +24,10 @@ import { SessionStats } from "./session-stats"
  * detail, on this system's tokens.
  *
  * Masthead (title, chips, four stats), then the entries on a rail, then a
- * floating bar: share on the left, the comment count on the right. The reader fills whatever it is given —
- * the dock at any of its three sizes — and tightens at compact width via
- * its container.
+ * floating bar: share on the left, the comment count on the right. In the
+ * dock it fills whatever it is given and tightens at compact width via its
+ * container; on the public page (`variant="page"`) it is a column between
+ * dashed rails, and the page brings its own chrome.
  */
 
 const STATUS_LABEL = {
@@ -37,13 +42,22 @@ function SessionReader({
   highlight,
   toolbar,
   onClose,
+  variant = "panel",
+  viewer,
 }: {
   detail: SessionDetailApi
   /** A comment id to open and mark. */
   highlight?: string
   /** Controls for the panel's header, e.g. its size toggle. */
   toolbar?: React.ReactNode
-  onClose: () => void
+  onClose?: () => void
+  /**
+   * `panel`: inside the dock, with its own header. `page`: the public link,
+   * where the page supplies the chrome and the column sits between rails.
+   */
+  variant?: "panel" | "page"
+  /** Who is reading; defaults to the signed-in member. */
+  viewer?: Viewer
 }) {
   return (
     <CommentsProvider
@@ -51,20 +65,31 @@ function SessionReader({
       sessionId={detail.summary.id}
       initial={detail.comments}
       highlight={highlight}
+      viewer={viewer}
     >
-      <Reader detail={detail} toolbar={toolbar} onClose={onClose} />
+      <Reader
+        detail={detail}
+        toolbar={toolbar}
+        onClose={onClose}
+        variant={variant}
+      />
     </CommentsProvider>
   )
 }
+
+/** The public, standalone link for a session. */
+const publicPath = (id: string) => `/mock/s/${id}`
 
 function Reader({
   detail,
   toolbar,
   onClose,
+  variant,
 }: {
   detail: SessionDetailApi
   toolbar?: React.ReactNode
-  onClose: () => void
+  onClose?: () => void
+  variant: "panel" | "page"
 }) {
   const { summary: s, entries } = detail
 
@@ -110,29 +135,90 @@ function Reader({
       data-slot="session-reader"
       className="relative flex min-h-0 flex-1 flex-col"
     >
-      <header className="flex h-11 shrink-0 items-center gap-2 border-b border-hairline px-3">
-        <StatusIcon status={s.status} />
-        <span className="text-xs font-medium">{STATUS_LABEL[s.status]}</span>
-        <span className="mono text-2xs text-muted-foreground">{s.ref}</span>
-        <span className="flex-1" />
-        {toolbar}
-        <IconButton icon={XIcon} label="Close" size="sm" onClick={onClose} />
-      </header>
+      {variant === "panel" && (
+        <header className="flex h-11 shrink-0 items-center gap-2 border-b border-hairline px-3">
+          <StatusIcon status={s.status} />
+          <span className="text-xs font-medium">{STATUS_LABEL[s.status]}</span>
+          <span className="mono text-2xs text-muted-foreground">{s.ref}</span>
+          {/* The session on its own page — the link a share hands out. */}
+          <IconButton
+            icon={ExternalLinkIcon}
+            label="Open in a new tab"
+            size="xs"
+            onClick={() =>
+              window.open(publicPath(s.id), "_blank", "noopener,noreferrer")
+            }
+          />
+          <span className="flex-1" />
+          {toolbar}
+          {onClose && (
+            <IconButton
+              icon={XIcon}
+              label="Close"
+              size="sm"
+              onClick={onClose}
+            />
+          )}
+        </header>
+      )}
 
-      <div ref={scroller} className="min-h-0 flex-1 overflow-y-auto">
-        <div className="mx-auto w-full max-w-230 px-4 pt-6 pb-24 @3xl:px-10 @3xl:pt-8">
-          <Masthead detail={detail} />
-          <div className="mt-7">
-            <EntryRail groups={groups} agent={s.agent} />
+      {variant === "panel" ? (
+        <div ref={scroller} className="min-h-0 flex-1 overflow-y-auto">
+          <div className="mx-auto w-full max-w-230 px-4 pt-6 pb-24 @3xl:px-10 @3xl:pt-8">
+            <Masthead detail={detail} />
+            <div className="mt-7">
+              <EntryRail groups={groups} agent={s.agent} />
+            </div>
           </div>
         </div>
-      </div>
+      ) : (
+        // The page: a container, so the rails answer to its width, and a
+        // column framed by dashed rails, like the inbox.
+        <div
+          ref={scroller}
+          className="@container min-h-0 flex-1 overflow-y-auto"
+        >
+          <div className="flex min-h-full flex-col px-2 @5xl:px-10">
+            <div className="relative mx-auto w-full max-w-232 flex-1 px-5 pt-10 pb-28">
+              {/* Well clear of the column — 9.75rem off the content, three
+                  times the inbox's — and only where the page is wide
+                  enough to hold them there. */}
+              <DashedRails offset="-8.5rem" className="hidden @7xl:block" />
+              <Masthead detail={detail} />
+              <div className="mt-8">
+                <EntryRail groups={groups} agent={s.agent} />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {variant === "page" && (
+        // Reading progress, parked in the left gutter at mid-height. Only
+        // where the gutter is wide enough to hold it clear of the column.
+        <ScrollRail
+          container={scroller}
+          className="absolute top-1/2 left-8 hidden -translate-y-1/2 xl:block"
+        />
+      )}
 
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-linear-to-b from-transparent to-card"
+        className={cn(
+          "pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-linear-to-b from-transparent",
+          variant === "panel" ? "to-card" : "to-background"
+        )}
       />
-      <BottomBar detail={detail} entries={entries} />
+      {variant === "panel" ? (
+        <BottomBar detail={detail} entries={entries} />
+      ) : (
+        // On the page the bar keeps to the column, not the window's edges.
+        <div className="@container pointer-events-none absolute inset-x-0 bottom-0 px-2 @5xl:px-10">
+          <div className="relative mx-auto max-w-232">
+            <BottomBar detail={detail} entries={entries} />
+          </div>
+        </div>
+      )}
     </div>
   )
 }
