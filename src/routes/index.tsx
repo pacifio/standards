@@ -2,7 +2,6 @@ import { Link, createFileRoute } from "@tanstack/react-router"
 import { ArrowUpRightIcon } from "lucide-react"
 
 import { DashedRails } from "@/components/blocks/dashed-rails"
-import { PlusCorners } from "@/components/blocks/plus-decorator"
 import { Panel } from "@/components/patterns/panel"
 import { Icon } from "@/components/ui/icon"
 
@@ -26,8 +25,8 @@ const ENTRIES = [
 ] as const
 
 /**
- * The front door. Two ringed panels on a dashed-rail field with cross-hair
- * corners — the whole language in one screen, before you open either half.
+ * The front door. Two ringed panels on a dashed-rail field — the whole
+ * language in one screen, before you open either half.
  */
 function Home() {
   return (
@@ -46,7 +45,6 @@ function Home() {
       </div>
 
       <div className="relative grid w-full max-w-2xl gap-4 sm:grid-cols-2">
-        <PlusCorners />
         {ENTRIES.map((e, i) => (
           <Link key={e.to} to={e.to} className="group/card outline-none">
             <Panel
