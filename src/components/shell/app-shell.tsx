@@ -36,7 +36,8 @@ import { SPRING_DOCK } from "@/lib/motion"
 import { useMeasure } from "@/lib/use-measure"
 import { useOrg } from "@/lib/org-context"
 import { useTheme } from "@/lib/theme"
-import { CONVERSATIONS, MEMBERS, PROJECTS, SESSIONS } from "@/mock/data"
+import { MEMBERS, PROJECTS, SESSIONS } from "@/mock/data"
+import { RECENT_CHATS } from "@/mock/chat"
 import { INBOX } from "@/mock/inbox"
 import { PersonAvatar } from "@/components/patterns/person-avatar"
 import { SegmentedIconGroup } from "@/components/patterns/segmented"
@@ -442,7 +443,7 @@ function AppShell({ children }: { children: React.ReactNode }) {
                 </SidebarGroup>
 
                 <SidebarGroup label="Quick chats">
-                  {CONVERSATIONS.map((c) => (
+                  {RECENT_CHATS.slice(0, 5).map((c) => (
                     <SidebarItem
                       key={c.id}
                       to="/mock/chat"

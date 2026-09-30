@@ -162,24 +162,3 @@ export type InboxPage = {
 }
 
 export type MarkReadRequest = { ids?: Array<string>; all?: boolean }
-
-export type Conversation = {
-  id: string
-  name: string
-  kind: "channel" | "dm" | "group"
-  initials: string
-  unread: number
-  lastMessage: string
-  at: string
-}
-
-export type ChatMessage = {
-  id: string
-  author: string
-  authorInitials: string
-  body: string
-  at: string
-  pinned?: boolean
-  /** A session or checkpoint pulled into the thread. */
-  artifactRef?: { ref: string; title: string }
-}

@@ -1,21 +1,32 @@
+import { useMemo, useState } from "react"
 import { createFileRoute, useNavigate } from "@tanstack/react-router"
+import { AnimatePresence, motion } from "motion/react"
 import {
-  HashIcon,
-  MessageSquareIcon,
-  PaperclipIcon,
-  PhoneIcon,
-  PinIcon,
-  SendIcon,
-  UsersIcon,
-} from "lucide-react"
-import { cn } from "cn"
-
-import { CONVERSATIONS, MESSAGES } from "@/mock/data"
-import { Icon } from "@/components/ui/icon"
-import { IconButton } from "@/components/ui/icon-button"
-import { ScrollFade } from "@/components/ui/scroll-fade"
-import { Textarea } from "@/components/ui/textarea"
-import { PersonAvatar } from "@/components/patterns/person-avatar"
+  CHANNELS,
+  CONTACT_IDS,
+  DIRECT,
+  DISCOVERABLE,
+  DRAFTS,
+  FILES,
+  MESSAGES,
+  SELF_ID,
+} from "@/mock/chat"
+import type {
+  ChatAttachment,
+  ChatConversation,
+  ChatMessage,
+  PromptDraft,
+} from "@/mock/chat"
+import { MOCK_NOW } from "@/mock/time"
+import { SPRING_RAIL } from "@/lib/motion"
+import { Dock } from "@/components/shell/app-shell"
+import { firstName, member } from "@/components/chat/chat-avatar"
+import { ChatHeader } from "@/components/chat/chat-header"
+import { Composer } from "@/components/chat/composer"
+import type { ReplyTarget } from "@/components/chat/composer"
+import { ConversationList } from "@/components/chat/conversation-list"
+import { MessageList } from "@/components/chat/message-list"
+import { SidePanel } from "@/components/chat/side-panel"
 
 export const Route = createFileRoute("/mock/_app/chat")({
   component: ChatScreen,
@@ -26,166 +37,253 @@ export const Route = createFileRoute("/mock/_app/chat")({
 })
 
 /**
- * Chat.
+ * Chat, in three panels.
  *
- * A narrow conversation rail on the surface tone, a hairline, then the
- * thread. Messages are left-aligned for everyone including you: right-
- * aligning your own is an SMS convention that halves the usable width.
+ *   list │ conversation │ drafts & files
  *
- * The composer is the same ringed card as every other input well in the
- * app, so a thread and its reply box read as one object.
+ * The list is the Atlas desktop app's comms home. The conversation reads
+ * like a team chat — one column, grouped by author, day dividers — rather
+ * than a phone's bubbles, because a team's history is read back, not just
+ * replied to. The third panel is the dock, so it is its own curved panel
+ * beside the page and takes the dock's sizes when a draft needs room.
+ *
+ * Everything is local state over the fixtures: sending, reacting, pinning,
+ * joining a channel and starting a conversation all work, and all reset on
+ * reload.
  */
 function ChatScreen() {
   const { c: selectedParam } = Route.useSearch()
   const navigate = useNavigate({ from: Route.fullPath })
-  const selected =
-    CONVERSATIONS.find((c) => c.id === selectedParam) ?? CONVERSATIONS[0]
-  const selectedId = selected.id
-  const setSelectedId = (id: string) =>
+
+  const [channels, setChannels] = useState(CHANNELS)
+  const [direct, setDirect] = useState(DIRECT)
+  const [discover, setDiscover] = useState(DISCOVERABLE)
+  const [contacts, setContacts] = useState(CONTACT_IDS)
+  const [messages, setMessages] = useState(MESSAGES)
+  const [drafts, setDrafts] = useState(DRAFTS)
+  const [panelOpen, setPanelOpen] = useState(true)
+  const [listOpen, setListOpen] = useState(true)
+  const [replyTo, setReplyTo] = useState<ReplyTarget | null>(null)
+
+  const joined = [...channels, ...direct]
+  const selected = joined.find((c) => c.id === selectedParam) ?? joined[0]
+
+  function select(id: string) {
+    setReplyTo(null)
+    // Opening a conversation reads it.
+    const clear = (list: Array<ChatConversation>) =>
+      list.map((c) => (c.id === id ? { ...c, unread: 0, mentions: 0 } : c))
+    setChannels(clear)
+    setDirect(clear)
     void navigate({ search: { c: id }, replace: true })
-  const pinned = MESSAGES.filter((m) => m.pinned)
+  }
+
+  function openDm(memberId: string) {
+    const existing = direct.find(
+      (c) => c.kind === "dm" && c.memberIds.includes(memberId)
+    )
+    if (existing) return select(existing.id)
+    const dm: ChatConversation = {
+      id: `dm-${memberId}`,
+      kind: "dm",
+      name: member(memberId).name,
+      memberIds: [SELF_ID, memberId],
+      unread: 0,
+      mentions: 0,
+      lastActivityAt: MOCK_NOW,
+    }
+    setDirect((d) => [...d, dm])
+    setContacts((c) => c.filter((id) => id !== memberId))
+    select(dm.id)
+  }
+
+  function createGroup(ids: Array<string>) {
+    if (ids.length === 1) return openDm(ids[0])
+    const group: ChatConversation = {
+      id: `g-${ids.join("-")}`,
+      kind: "group",
+      name: ids.map((id) => firstName(member(id).name)).join(", "),
+      memberIds: [SELF_ID, ...ids],
+      unread: 0,
+      mentions: 0,
+      lastActivityAt: MOCK_NOW,
+    }
+    setDirect((d) => (d.some((x) => x.id === group.id) ? d : [group, ...d]))
+    select(group.id)
+  }
+
+  function createChannel(name: string, isPrivate: boolean) {
+    const id = `ch-${name}`
+    if (!channels.some((c) => c.id === id)) {
+      setChannels((c) => [
+        ...c,
+        {
+          id,
+          kind: "channel",
+          name,
+          private: isPrivate,
+          memberIds: [SELF_ID],
+          unread: 0,
+          mentions: 0,
+          lastActivityAt: MOCK_NOW,
+        },
+      ])
+    }
+    select(id)
+  }
+
+  function join(id: string) {
+    const c = discover.find((x) => x.id === id)
+    if (!c) return
+    setDiscover((d) => d.filter((x) => x.id !== id))
+    setChannels((list) => [
+      ...list,
+      { ...c, memberIds: [...c.memberIds, SELF_ID] },
+    ])
+    select(id)
+  }
+
+  function send(body: string, attachments: Array<ChatAttachment>) {
+    const m: ChatMessage = {
+      id: `local-${messages.length}`,
+      convId: selected.id,
+      authorId: SELF_ID,
+      body,
+      // After the last message, so the transcript's order holds.
+      createdAt: MOCK_NOW,
+      replyToId: replyTo?.id,
+      attachments: attachments.length ? attachments : undefined,
+    }
+    setMessages((all) => [...all, m])
+    setReplyTo(null)
+  }
+
+  function react(id: string, emoji: string) {
+    setMessages((all) =>
+      all.map((m) => {
+        if (m.id !== id) return m
+        const reactions = [...(m.reactions ?? [])]
+        const i = reactions.findIndex((r) => r.emoji === emoji)
+        if (i === -1) {
+          reactions.push({ emoji, userIds: [SELF_ID] })
+        } else {
+          const r = reactions[i]
+          const userIds = r.userIds.includes(SELF_ID)
+            ? r.userIds.filter((u) => u !== SELF_ID)
+            : [...r.userIds, SELF_ID]
+          if (userIds.length) reactions[i] = { ...r, userIds }
+          else reactions.splice(i, 1)
+        }
+        return { ...m, reactions }
+      })
+    )
+  }
+
+  function pin(id: string) {
+    setMessages((all) =>
+      all.map((m) => (m.id === id ? { ...m, pinned: !m.pinned } : m))
+    )
+  }
+
+  function createDraft(title: string): PromptDraft {
+    const d: PromptDraft = {
+      id: `draft-${drafts.length}`,
+      convId: selected.id,
+      title,
+      createdBy: SELF_ID,
+      createdAt: MOCK_NOW,
+      updatedAt: MOCK_NOW,
+      body: `# ${title}\n\n`,
+    }
+    setDrafts((all) => [d, ...all])
+    return d
+  }
+
+  const thread = useMemo(
+    () => messages.filter((m) => m.convId === selected.id),
+    [messages, selected.id]
+  )
+  const pinned = thread.filter((m) => m.pinned)
 
   return (
     <>
       <div className="flex min-h-0 flex-1">
-        <ScrollFade className="w-60 shrink-0 border-r border-hairline bg-surface">
-          <div className="flex flex-col gap-px p-1.5">
-            <span className="px-2 pt-1.5 pb-1 micro">Conversations</span>
-            {CONVERSATIONS.map((c) => (
-              <button
-                key={c.id}
-                type="button"
-                onClick={() => setSelectedId(c.id)}
-                aria-current={c.id === selectedId ? "true" : undefined}
-                className={cn(
-                  "flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left",
-                  "duration-fast transition-colors ease-out-strong",
-                  "hover:bg-element-hover aria-[current=true]:bg-element-selected"
-                )}
-              >
-                {c.kind === "channel" ? (
-                  <span className="flex size-5 items-center justify-center rounded-md bg-muted text-muted-foreground">
-                    <Icon icon={HashIcon} size="xs" />
-                  </span>
-                ) : (
-                  <PersonAvatar size="xs" name={c.name} initials={c.initials} />
-                )}
-                <span className="flex min-w-0 flex-1 flex-col">
-                  <span
-                    className={cn(
-                      "truncate text-xs",
-                      c.unread > 0
-                        ? "font-medium text-foreground"
-                        : "text-secondary-foreground"
-                    )}
-                  >
-                    {c.name}
-                  </span>
-                  <span className="truncate caption">{c.lastMessage}</span>
-                </span>
-                {c.unread > 0 && (
-                  <span className="flex h-4 min-w-4 shrink-0 items-center justify-center rounded-full bg-destructive px-1 text-3xs font-semibold text-destructive-foreground tnum">
-                    {c.unread}
-                  </span>
-                )}
-              </button>
-            ))}
-          </div>
-        </ScrollFade>
+        {/* The list folds away to give the conversation the width; it
+            slides rather than snaps, on the rail's spring. */}
+        <AnimatePresence initial={false}>
+          {listOpen && (
+            <motion.div
+              key="list"
+              initial={{ width: 0, opacity: 0 }}
+              animate={{ width: "auto", opacity: 1 }}
+              exit={{ width: 0, opacity: 0 }}
+              transition={SPRING_RAIL}
+              className="flex shrink-0 overflow-hidden"
+            >
+              <ConversationList
+                channels={channels}
+                direct={direct}
+                contacts={contacts}
+                discover={discover}
+                selectedId={selected.id}
+                onSelect={select}
+                onOpenDm={openDm}
+                onCreateGroup={createGroup}
+                onCreateChannel={createChannel}
+                onJoin={join}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         <div className="flex min-w-0 flex-1 flex-col">
-          {/* The conversation's own header: what you are in and what you
-              can do in it. There is no page bar above the panel. */}
-          <div className="flex h-11 shrink-0 items-center gap-2 border-b border-hairline px-4">
-            <Icon
-              icon={selected.kind === "channel" ? HashIcon : MessageSquareIcon}
-              size="sm"
-              className="text-muted-foreground"
-            />
-            <span className="truncate text-xs font-medium">
-              {selected.name}
-            </span>
-            <div className="ml-auto flex items-center gap-0.5">
-              <IconButton icon={PinIcon} label="Pinned messages" size="sm" />
-              <IconButton icon={PhoneIcon} label="Start a call" size="sm" />
-              <IconButton icon={UsersIcon} label="Members" size="sm" />
-            </div>
-          </div>
-          {pinned.length > 0 && (
-            <div className="flex h-8 shrink-0 items-center gap-2 border-b border-hairline px-4">
-              <Icon
-                icon={PinIcon}
-                size="xs"
-                className="text-muted-foreground"
-              />
-              <span className="truncate caption">{pinned[0].body}</span>
-            </div>
-          )}
-
-          <ScrollFade className="min-h-0 flex-1">
-            <div className="flex flex-col gap-4 px-5 py-4">
-              {MESSAGES.map((m) => (
-                <div key={m.id} className="flex gap-2.5">
-                  <PersonAvatar
-                    size="md"
-                    className="mt-px"
-                    name={m.author}
-                    initials={m.authorInitials}
-                  />
-                  <div className="flex min-w-0 flex-1 flex-col gap-1">
-                    <p className="flex items-baseline gap-2">
-                      <span className="text-xs font-medium">{m.author}</span>
-                      <span className="caption tnum">{m.at}</span>
-                    </p>
-                    <p className="text-xs text-balance text-secondary-foreground">
-                      {m.body}
-                    </p>
-                    {m.artifactRef && (
-                      // A session pulled into the thread. A ringed card
-                      // rather than a link, so the reference survives being
-                      // skimmed.
-                      <a
-                        href="#"
-                        className="duration-fast mt-0.5 flex w-fit max-w-full items-center gap-2 rounded-lg bg-card px-2.5 py-1.5 ring-1 ring-foreground/10 transition-colors hover:bg-element-hover"
-                      >
-                        <span className="shrink-0 mono text-2xs text-muted-foreground">
-                          {m.artifactRef.ref}
-                        </span>
-                        <span className="truncate text-xs">
-                          {m.artifactRef.title}
-                        </span>
-                      </a>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </ScrollFade>
-
-          <div className="shrink-0 border-t border-hairline p-3">
-            <div className="flex items-end gap-1 rounded-xl bg-card p-1.5 ring-1 ring-foreground/10 focus-within:ring-foreground/25">
-              <div className="min-w-0 flex-1">
-                <Textarea
-                  rows={1}
-                  placeholder={`Message ${selected.name}`}
-                  className="max-h-32 min-h-7 resize-none border-0 bg-transparent px-1.5 py-1.5 shadow-none ring-0 focus-visible:ring-0"
-                />
-              </div>
-              <IconButton
-                icon={PaperclipIcon}
-                label="Attach a file"
-                size="sm"
-              />
-              <IconButton
-                icon={SendIcon}
-                label="Send"
-                size="sm"
-                variant="default"
-              />
-            </div>
-          </div>
+          <ChatHeader
+            conversation={selected}
+            pinned={pinned}
+            panelOpen={panelOpen}
+            onTogglePanel={() => setPanelOpen((v) => !v)}
+            listOpen={listOpen}
+            onToggleList={() => setListOpen((v) => !v)}
+          />
+          <MessageList
+            key={selected.id}
+            messages={thread}
+            isDm={selected.kind === "dm"}
+            onReact={react}
+            onPin={pin}
+            onReply={(m) =>
+              setReplyTo({
+                id: m.id,
+                author: member(m.authorId).name,
+                body: m.body,
+              })
+            }
+          />
+          <Composer
+            placeholder={
+              selected.kind === "channel"
+                ? `Message #${selected.name}`
+                : `Message ${selected.name}`
+            }
+            replyTo={replyTo}
+            onCancelReply={() => setReplyTo(null)}
+            onSend={send}
+          />
         </div>
       </div>
+
+      <Dock>
+        {panelOpen && (
+          <SidePanel
+            key={selected.id}
+            conversation={selected}
+            drafts={drafts.filter((d) => d.convId === selected.id)}
+            files={FILES.filter((f) => f.convId === selected.id)}
+            onCreateDraft={createDraft}
+            onClose={() => setPanelOpen(false)}
+          />
+        )}
+      </Dock>
     </>
   )
 }

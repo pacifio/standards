@@ -87,6 +87,19 @@ export const clock = (iso: string) => CLOCK.format(new Date(iso))
 /** "14:02". */
 export const hm = (iso: string) => HM.format(new Date(iso))
 
+const SHORT_DATE = new Intl.DateTimeFormat("en-US", {
+  timeZone: MOCK_TIME_ZONE,
+  day: "numeric",
+  month: "short",
+})
+
+/** "27 Sep" — day first, three-letter month (en-GB would say "Sept"). */
+export function shortDate(iso: string): string {
+  const parts = SHORT_DATE.formatToParts(new Date(iso))
+  const get = (t: string) => parts.find((p) => p.type === t)?.value ?? ""
+  return `${get("day")} ${get("month")}`
+}
+
 /** Minutes before `MOCK_NOW`, as an ISO instant in the mock's zone. */
 export function minutesBefore(minutes: number): string {
   return new Date(Date.parse(MOCK_NOW) - minutes * 60_000).toISOString()

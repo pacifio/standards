@@ -1,6 +1,4 @@
 import type {
-  ChatMessage,
-  Conversation,
   InviteLink,
   Member,
   Organisation,
@@ -812,97 +810,6 @@ export const TIMELINE_ENTRIES: Array<TimelineEntry> = [
     detail:
       "Facets now come back sorted and deduplicated. The fixture assumed insertion order, so I updated it rather than reintroducing the sort on the client.",
     at: "14:03:40",
-  },
-]
-
-export const CONVERSATIONS: Array<Conversation> = [
-  {
-    id: "c1",
-    name: "engineering",
-    kind: "channel",
-    initials: "EN",
-    unread: 3,
-    lastMessage: "Uzayer: the facet sort is stable now",
-    at: "12m",
-  },
-  {
-    id: "c2",
-    name: "design-review",
-    kind: "channel",
-    initials: "DR",
-    unread: 0,
-    lastMessage: "Talha: pulled the dashed rail into the mock",
-    at: "1h",
-  },
-  {
-    id: "c3",
-    name: "Uzayer Masud",
-    kind: "dm",
-    initials: "UM",
-    unread: 1,
-    lastMessage: "can you look at ATL-273 before standup",
-    at: "2h",
-  },
-  {
-    id: "c4",
-    name: "Talha, Azraf",
-    kind: "group",
-    initials: "TA",
-    unread: 0,
-    lastMessage: "you: shipping the settings shell tomorrow",
-    at: "Yesterday",
-  },
-  {
-    id: "c5",
-    name: "releases",
-    kind: "channel",
-    initials: "RE",
-    unread: 0,
-    lastMessage: "Atlas 0.4.2 is out",
-    at: "2d",
-  },
-]
-
-export const MESSAGES: Array<ChatMessage> = [
-  {
-    id: "msg1",
-    author: "Uzayer Masud",
-    authorInitials: "UM",
-    body: "The board query groups by project already, so I added the agent facet on the same join rather than a second round trip.",
-    at: "13:58",
-    pinned: true,
-  },
-  {
-    id: "msg2",
-    author: "Talha Razz",
-    authorInitials: "TR",
-    body: "Does that change the response shape for anyone on the old client?",
-    at: "14:01",
-  },
-  {
-    id: "msg3",
-    author: "Uzayer Masud",
-    authorInitials: "UM",
-    body: "No — facets was already an array, it is just sorted and deduplicated now.",
-    at: "14:03",
-    artifactRef: {
-      ref: "ATL-57",
-      title: "API for Timeline board filters and facets",
-    },
-  },
-  {
-    id: "msg4",
-    author: "Adib Mohsin",
-    authorInitials: "AM",
-    body: "Good. Let's get the sort into the spec so the next client does not re-sort it defensively.",
-    at: "14:09",
-  },
-  {
-    id: "msg5",
-    author: "Azraf Al Monzim",
-    authorInitials: "AM",
-    body: "I'll add it to the checkpoint spec section this afternoon.",
-    at: "14:11",
   },
 ]
 
