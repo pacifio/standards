@@ -16,3 +16,4 @@ todos.json
 .atlas/
 
 *.mp4
+.vercel
