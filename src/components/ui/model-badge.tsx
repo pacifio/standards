@@ -11,7 +11,7 @@ import { cn } from "cn"
  * theme's ink instead of vanishing on the dark canvas.
  */
 
-type Family = "claude" | "openai" | "gemini" | "cursor"
+type Family = "claude" | "openai" | "gemini" | "cursor" | "opencode"
 
 function familyOf(model: string): Family | null {
   const m = model.toLowerCase()
@@ -23,13 +23,14 @@ function familyOf(model: string): Family | null {
   return null
 }
 
-/** The mark for a coding agent: Claude Code, Codex, Gemini CLI, Cursor. */
+/** The mark for a coding agent: Claude Code, Codex, Gemini CLI, Cursor, OpenCode. */
 function agentFamily(agent: string): Family | null {
   const a = agent.toLowerCase()
   if (a.includes("claude")) return "claude"
   if (a.includes("codex") || a.includes("openai")) return "openai"
   if (a.includes("gemini")) return "gemini"
   if (a.includes("cursor")) return "cursor"
+  if (a.includes("opencode")) return "opencode"
   return null
 }
 
@@ -46,6 +47,7 @@ function ModelMark({
   family: Family
   className?: string
 }) {
+  if (family === "opencode") return <OpenCodeMark className={className} />
   const mono = MONO[family]
   if (mono) {
     return (
@@ -67,6 +69,30 @@ function ModelMark({
       aria-hidden="true"
       className={cn("size-3 shrink-0", className)}
     />
+  )
+}
+
+/**
+ * OpenCode's mark: a frame with a block set in its lower half. Its brand
+ * files (`public/logos/models/opencode-{dark,light}.svg`) are the same
+ * geometry in two colourings — light frame and dim block for dark
+ * backgrounds, the reverse for light. Drawn inline on theme tokens rather
+ * than as two images, so it takes the right colouring in ANY theme scope,
+ * including a surface flipped to the other theme inside the page.
+ */
+function OpenCodeMark({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 240 300"
+      aria-hidden="true"
+      className={cn("h-3 w-auto shrink-0", className)}
+    >
+      <path d="M180 240H60V120H180V240Z" className="fill-foreground/25" />
+      <path
+        d="M180 60H60V240H180V60ZM240 300H0V0H240V300Z"
+        className="fill-foreground"
+      />
+    </svg>
   )
 }
 

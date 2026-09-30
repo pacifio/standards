@@ -35,8 +35,6 @@
   --popover: oklch(0.17 0 0);
 
   --foreground: oklch(0.97 0 0);
-  --card-foreground: var(--foreground);
-  --popover-foreground: var(--foreground);
   --secondary-foreground: oklch(0.8 0 0);
   --muted-foreground: oklch(0.62 0 0);
   --text-disabled: oklch(0.4 0 0);
@@ -45,18 +43,13 @@
   --primary: oklch(0.97 0 0);
   --primary-foreground: oklch(0.08 0 0);
   --primary-hover: oklch(0.9 0 0);
-  --primary-muted: color-mix(in oklch, var(--primary) 8%, transparent);
 
   --secondary: oklch(0.16 0 0);
-  --muted: var(--surface-raised);
-  --accent: var(--secondary);
-  --accent-foreground: var(--foreground);
 
   /* --- edges: two weights, both alpha so they composite on any step --- */
   --hairline: oklch(1 0 0 / 6%);
   --border: oklch(1 0 0 / 8%);
   --border-strong: oklch(1 0 0 / 16%);
-  --border-illustration: var(--border);
   /* A segmented control: a recessed track and the raised thumb that slides
      inside it. The thumb is always a step LIGHTER than the track — which
      in dark means a lighter grey, and in light means white on grey. */
@@ -83,12 +76,7 @@
   --warning: oklch(0.8 0.15 78);
   --error: oklch(0.68 0.19 22);
   --info: oklch(0.7 0.13 232);
-  --destructive: var(--error);
   --destructive-foreground: oklch(0.99 0 0);
-  --success-muted: color-mix(in oklch, var(--success) 14%, transparent);
-  --warning-muted: color-mix(in oklch, var(--warning) 14%, transparent);
-  --error-muted: color-mix(in oklch, var(--error) 14%, transparent);
-  --info-muted: color-mix(in oklch, var(--info) 14%, transparent);
 
   /* --- hues: the second place, for identity --- */
   --hue-grey: oklch(0.7 0.02 259);
@@ -110,32 +98,14 @@
   --chart-5: oklch(0.28 0 0);
 
   /* --- sidebar --- */
-  --sidebar: var(--surface);
-  --sidebar-foreground: var(--foreground);
   --sidebar-accent: oklch(0.15 0 0);
-  --sidebar-accent-foreground: var(--foreground);
-  --sidebar-border: var(--hairline);
 
   --glass: oklch(0.1 0 0 / 72%);
-  --selection: color-mix(in oklch, var(--foreground) 22%, transparent);
   --scrollbar-thumb: oklch(1 0 0 / 14%);
 
   /* --- the two shadow rungs, achromatic --- */
   --shadow-md: 0 4px 12px oklch(0 0 0 / 0.55);
   --shadow-lg: 0 8px 24px oklch(0 0 0 / 0.65), 0 16px 48px oklch(0 0 0 / 0.6);
-
-  --diff-added: var(--success-muted);
-  --diff-added-foreground: var(--success);
-  --diff-removed: var(--error-muted);
-  --diff-removed-foreground: var(--error);
-
-  --syntax-comment: var(--muted-foreground);
-  --syntax-keyword: var(--hue-purple);
-  --syntax-string: var(--hue-green);
-  --syntax-number: var(--hue-orange);
-
-  --agent-chip-foreground: var(--foreground);
-  --agent-chip-background: var(--element-selected);
 }
 
 [data-theme="light"] {
@@ -205,4 +175,42 @@
 
   --shadow-md: 0 4px 12px oklch(0 0 0 / 0.11);
   --shadow-lg: 0 8px 24px oklch(0 0 0 / 0.14), 0 16px 48px oklch(0 0 0 / 0.1);
+}
+
+/* Tokens defined in terms of other tokens. A custom property that holds
+   `var(--x)` resolves where it is DECLARED and is inherited already
+   resolved — so if these lived only in the dark block, an element flipped
+   to `data-theme="light"` inside a dark page would inherit the dark
+   answers (white text on a white popover). Declaring them on every theme
+   scope makes each scope re-resolve them against its own base values. */
+:root,
+[data-theme="dark"],
+[data-theme="light"] {
+  --card-foreground: var(--foreground);
+  --popover-foreground: var(--foreground);
+  --primary-muted: color-mix(in oklch, var(--primary) 8%, transparent);
+  --muted: var(--surface-raised);
+  --accent: var(--secondary);
+  --accent-foreground: var(--foreground);
+  --border-illustration: var(--border);
+  --destructive: var(--error);
+  --success-muted: color-mix(in oklch, var(--success) 14%, transparent);
+  --warning-muted: color-mix(in oklch, var(--warning) 14%, transparent);
+  --error-muted: color-mix(in oklch, var(--error) 14%, transparent);
+  --info-muted: color-mix(in oklch, var(--info) 14%, transparent);
+  --sidebar: var(--surface);
+  --sidebar-foreground: var(--foreground);
+  --sidebar-accent-foreground: var(--foreground);
+  --sidebar-border: var(--hairline);
+  --selection: color-mix(in oklch, var(--foreground) 22%, transparent);
+  --diff-added: var(--success-muted);
+  --diff-added-foreground: var(--success);
+  --diff-removed: var(--error-muted);
+  --diff-removed-foreground: var(--error);
+  --syntax-comment: var(--muted-foreground);
+  --syntax-keyword: var(--hue-purple);
+  --syntax-string: var(--hue-green);
+  --syntax-number: var(--hue-orange);
+  --agent-chip-foreground: var(--foreground);
+  --agent-chip-background: var(--element-selected);
 }

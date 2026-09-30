@@ -209,7 +209,8 @@ function ProjectsScreen() {
       />
 
       {/* The page's one action, floating in the corner rather than
-          competing with the filters in the header. */}
+          competing with the filters in the header. The dashboard's invite
+          button's size, so the two primary "+" read as one control. */}
       <Tooltip>
         <TooltipTrigger
           render={
@@ -217,7 +218,7 @@ function ProjectsScreen() {
               type="button"
               aria-label="New project"
               onClick={() => setCreating(true)}
-              className="duration-fast absolute right-5 bottom-5 z-10 flex size-12 cursor-pointer items-center justify-center rounded-full bg-foreground text-background shadow-lg transition-transform ease-out-strong hover:scale-105 active:scale-95"
+              className="duration-fast absolute right-3 bottom-3 z-10 flex size-control-xl cursor-pointer items-center justify-center rounded-full bg-foreground text-background shadow-lg transition-transform ease-out-strong hover:scale-105 active:scale-95"
             >
               <Icon icon={PlusIcon} size="md" />
             </button>

@@ -1,27 +1,34 @@
 "use client"
 
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useState } from "react"
 import { Dialog as DialogPrimitive } from "@base-ui/react/dialog"
 import { AnimatePresence, motion } from "motion/react"
 import {
   ArrowRightIcon,
+  BrainIcon,
   CheckIcon,
   ChevronLeftIcon,
   FolderGitIcon,
   GitBranchIcon,
   GlobeIcon,
   LockIcon,
+  ScrollTextIcon,
+  SparklesIcon,
   XIcon,
 } from "lucide-react"
+import type { LucideIcon } from "lucide-react"
 import { cn } from "cn"
 
 import { MEMBERS } from "@/mock/data"
-import type { Project } from "@/mock/types"
+import type { LabelTone, Project } from "@/mock/types"
 import { hueFor } from "@/lib/hue"
+import { useOrg } from "@/lib/org-context"
+import { useTheme } from "@/lib/theme"
 import { SPRING_PILL } from "@/lib/motion"
 import { useMeasure } from "@/lib/use-measure"
-import { PersonAvatar } from "@/components/patterns/person-avatar"
+import { AtlasMark } from "@/components/ui/atlas-mark"
 import { Icon } from "@/components/ui/icon"
+import { ModelMark } from "@/components/ui/model-badge"
 import { Spinner } from "@/components/ui/spinner"
 import { HueDot, Tag } from "@/components/ui/tag"
 
@@ -99,6 +106,10 @@ function NewProjectDrawer({
   const [draft, setDraft] = useState<Draft>(EMPTY)
   const [saving, setSaving] = useState(false)
   const [measure, box] = useMeasure<HTMLDivElement>()
+  // The sheet is drawn in the other theme — dark over a light page, light
+  // over a dark one — so it reads as a layer above the grid, not part of it.
+  const { appearance } = useTheme()
+  const inverted = appearance === "dark" ? "light" : "dark"
 
   // Every open starts over.
   useEffect(() => {
@@ -170,6 +181,7 @@ function NewProjectDrawer({
       <DialogPrimitive.Portal>
         <DialogPrimitive.Backdrop className="duration-base fixed inset-0 z-overlay bg-background/60 backdrop-blur-sm transition-opacity data-ending-style:opacity-0 data-starting-style:opacity-0" />
         <DialogPrimitive.Popup
+          data-theme={inverted}
           className={cn(
             "fixed inset-x-4 bottom-4 z-modal mx-auto max-w-96 overflow-hidden rounded-3xl bg-popover text-popover-foreground shadow-lg ring-1 ring-foreground/10 outline-none",
             // Rises from below the fold, and sinks back into it.
@@ -457,103 +469,236 @@ function ReviewStep({ draft, slug }: { draft: Draft; slug: string }) {
 /* --- Illustration ------------------------------------------------------- */
 
 /**
- * The project, assembling as you name it: a folder card at the centre of
- * dashed orbits takes the name, the slug and the project's own hue (from
- * the same `hueFor` that colours it everywhere else), and the teammates who
- * will see it wait on the orbits.
+ * Where a project sits in Atlas: the coding agents at the top feed it —
+ * their connectors draw in and carry a light down each line — into one
+ * endpoint, the project's own path, which updates as you type. Below, the
+ * project gathers memory and transcripts, with its logo at the heart.
+ *
+ * The connectors live in one SVG so the curves stay true; the badges are
+ * HTML laid over it at the same x positions (as % of the 200-unit
+ * viewBox), so they get real type and icons.
  */
+
+const AGENTS: Array<{ label: string; x: number; mark: React.ReactNode }> = [
+  { label: "Atlas", x: 31, mark: <AtlasMark className="size-3" /> },
+  { label: "Claude", x: 77, mark: <ModelMark family="claude" /> },
+  { label: "Codex", x: 124, mark: <ModelMark family="openai" /> },
+  {
+    label: "OpenCode",
+    x: 170,
+    mark: <ModelMark family="opencode" />,
+  },
+]
+
+/** From each badge's foot down to the endpoint chip at (100, 44). */
+const WIRES = [
+  "M 31 12 v 13 q 0 5 5 5 h 59 q 5 0 5 5 v 9",
+  "M 77 12 v 8 q 0 5 5 5 h 13 q 5 0 5 5 v 14",
+  "M 124 12 v 8 q 0 5 -5 5 h -14 q -5 0 -5 5 v 14",
+  "M 170 12 v 13 q 0 5 -5 5 h -60 q -5 0 -5 5 v 9",
+]
+
+/** Monogram ink per hue — spelled out so the classes exist. */
+const HUE_TEXT: Record<LabelTone, string> = {
+  grey: "text-hue-grey",
+  indigo: "text-hue-indigo",
+  purple: "text-hue-purple",
+  cyan: "text-hue-cyan",
+  green: "text-hue-green",
+  amber: "text-hue-amber",
+  orange: "text-hue-orange",
+  red: "text-hue-red",
+}
+
 function ProjectStage({ name, slug }: { name: string; slug: string }) {
+  const { org } = useOrg()
   const hue = hueFor(`p-${slug || "new"}`)
-  const faces = useMemo(
-    () => MEMBERS.filter((m) => m.status === "active" && m.image).slice(0, 4),
-    []
-  )
-  const SPOTS = [
-    { x: 14, y: 30 },
-    { x: 20, y: 76 },
-    { x: 84, y: 26 },
-    { x: 86, y: 72 },
-  ]
+  const words = name.trim().split(/\s+/).filter(Boolean)
+  const monogram = (
+    words.length > 1 ? words[0][0] + words[1][0] : (words[0]?.slice(0, 2) ?? "")
+  ).toUpperCase()
+
   return (
-    <div className="relative h-40 overflow-hidden rounded-2xl border border-hairline bg-surface">
-      <svg
-        aria-hidden="true"
-        viewBox="0 0 320 160"
-        preserveAspectRatio="xMidYMid slice"
-        className="absolute inset-0 size-full text-foreground/16"
-      >
-        {[46, 86, 126, 166].map((r) => (
-          <circle
-            key={r}
-            cx="160"
-            cy="80"
-            r={r}
-            fill="none"
-            stroke="currentColor"
-            strokeDasharray="3 5"
-          />
-        ))}
-      </svg>
-
-      {faces.map((m, i) => (
-        <motion.span
-          key={m.id}
-          initial={{ opacity: 0, scale: 0.5 }}
-          animate={{ opacity: 1, scale: 1, y: [0, -3, 0] }}
-          transition={{
-            opacity: { delay: 0.1 + i * 0.06 },
-            scale: { ...SPRING_PILL, delay: 0.1 + i * 0.06 },
-            y: { duration: 3.2, delay: i * 0.5, repeat: Infinity },
-          }}
-          style={{ left: `${SPOTS[i].x}%`, top: `${SPOTS[i].y}%` }}
-          className="absolute -translate-1/2 rounded-full ring-2 ring-surface"
+    <div className="relative pb-7">
+      {/* Agents, and the wires from them. */}
+      <div className="relative aspect-[200/44] w-full">
+        <svg
+          aria-hidden="true"
+          viewBox="0 0 200 44"
+          className="absolute inset-0 size-full overflow-visible text-border-strong"
         >
-          <PersonAvatar
-            size="xs"
-            name={m.name}
-            email={m.email}
-            image={m.image}
-          />
-        </motion.span>
-      ))}
+          {WIRES.map((d, i) => (
+            <motion.path
+              key={d}
+              d={d}
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={0.5}
+              initial={{ pathLength: 0 }}
+              animate={{ pathLength: 1 }}
+              transition={{
+                duration: 0.9,
+                delay: 0.1 + i * 0.05,
+                ease: "easeOut",
+              }}
+            />
+          ))}
+          {/* A light rides each wire toward the endpoint, staggered. */}
+          {WIRES.map((d, i) => (
+            // Hidden until its animation begins, or it waits at the SVG's
+            // origin, a stray dot in the corner.
+            <circle key={`l-${d}`} r={1.1} opacity={0} className="fill-info">
+              <animateMotion
+                dur="2.4s"
+                begin={`${1 + i * 0.6}s`}
+                repeatCount="indefinite"
+                path={d}
+                keyPoints="0;1"
+                keyTimes="0;1"
+                calcMode="spline"
+                keySplines="0.4 0 0.2 1"
+              />
+              <animate
+                attributeName="opacity"
+                values="0;1;1;0"
+                keyTimes="0;0.1;0.85;1"
+                dur="2.4s"
+                begin={`${1 + i * 0.6}s`}
+                repeatCount="indefinite"
+              />
+            </circle>
+          ))}
+        </svg>
+        {AGENTS.map((a, i) => (
+          <motion.span
+            key={a.label}
+            initial={{ opacity: 0, y: -4 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ ...SPRING_PILL, delay: i * 0.05 }}
+            style={{ left: `${(a.x / 200) * 100}%`, top: `${(7 / 44) * 100}%` }}
+            className="absolute flex h-6 -translate-x-1/2 -translate-y-1/2 items-center gap-1.5 rounded-full border border-border bg-card px-2 text-3xs font-medium whitespace-nowrap shadow-md"
+          >
+            <span className="flex text-foreground">{a.mark}</span>
+            {a.label}
+          </motion.span>
+        ))}
+      </div>
 
-      {/* The card: a folder tab, then the project as it is being named. */}
-      <motion.div
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ ...SPRING_PILL, delay: 0.05 }}
-        className="absolute top-1/2 left-1/2 w-44 -translate-1/2"
-      >
-        <span className="ml-3 block h-2 w-12 rounded-t-md border border-b-0 border-border bg-card" />
-        <div className="rounded-xl rounded-tl-none border border-border bg-card px-3 py-2.5 shadow-md">
-          <div className="flex items-center gap-1.5">
+      {/* The project: a framed field with its endpoint on the top edge. */}
+      <div className="relative">
+        {/* The slab beneath, for depth. */}
+        <div
+          aria-hidden="true"
+          className="absolute -bottom-3 left-1/2 h-16 w-3/5 -translate-x-1/2 rounded-lg bg-foreground/4"
+        />
+        <div className="relative z-10 h-36 overflow-hidden rounded-xl border border-foreground/15 bg-background">
+          {/* A dotted field across the whole body, corner to corner. The
+              rings sit ON it and are opaque, so the dots stop at their
+              edges and the rings read as solid shapes laid over paper. */}
+          <div
+            aria-hidden="true"
+            className="absolute inset-0"
+            style={{
+              backgroundImage:
+                "radial-gradient(circle, var(--border-strong) 1px, transparent 1.2px)",
+              backgroundSize: "10px 10px",
+              backgroundPosition: "center bottom",
+            }}
+          />
+          {/* The box is tall enough (9rem) that the largest ring's crown,
+              7.5rem up, clears the endpoint chip on the top edge.
+              Largest first, so each smaller ring lands on top. Each is the
+              page colour underneath (to hide the dots) with its own tint
+              over it, a touch stronger toward the centre. */}
+          {(
+            [
+              ["-bottom-30", "size-60", "after:bg-foreground/2", 3],
+              ["-bottom-24", "size-48", "after:bg-foreground/3", 2],
+              ["-bottom-18", "size-36", "after:bg-foreground/4", 1],
+              ["-bottom-12", "size-24", "after:bg-foreground/5", 0],
+            ] as const
+          ).map(([bottom, size, tint, i]) => (
             <motion.span
-              key={hue}
-              initial={{ scale: 0.4 }}
-              animate={{ scale: 1 }}
-              transition={SPRING_PILL}
-              className="flex"
-            >
-              <HueDot hue={hue} />
-            </motion.span>
-            <span
+              key={i}
+              aria-hidden="true"
+              animate={{ scale: [1, 1.025, 1] }}
+              transition={{
+                duration: 2,
+                delay: i * 0.25,
+                repeat: Infinity,
+                repeatDelay: 1,
+              }}
               className={cn(
-                "truncate text-xs font-medium",
-                !name.trim() && "text-disabled"
+                "absolute left-1/2 -translate-x-1/2 rounded-full border-t-[1.5px] border-foreground/20 bg-background",
+                "after:absolute after:inset-0 after:rounded-full",
+                bottom,
+                size,
+                tint
               )}
-            >
-              {name.trim() || "Untitled project"}
-            </span>
-          </div>
-          <p className="mt-0.5 truncate mono text-3xs text-muted-foreground">
-            /{slug || "…"}
-          </p>
-          <div className="mt-2 flex items-center gap-1 text-3xs text-disabled">
-            <Icon icon={FolderGitIcon} size="xs" />0 sessions
-          </div>
+            />
+          ))}
+          <Badge className="bottom-5 left-5" icon={BrainIcon}>
+            Memory
+          </Badge>
+          <Badge className="top-12 right-5" icon={ScrollTextIcon}>
+            Transcription
+          </Badge>
         </div>
-      </motion.div>
+
+        {/* The endpoint: the project's path, where every wire lands. */}
+        <span className="absolute -top-3 left-1/2 z-20 flex h-6 max-w-[80%] -translate-x-1/2 items-center gap-1.5 rounded-lg border border-border bg-card px-2 text-3xs shadow-md">
+          <Icon icon={SparklesIcon} size="xs" className="shrink-0" />
+          <span className="truncate mono">
+            {org.slug}/
+            <span className="text-foreground">{slug || "new-project"}</span>
+          </span>
+        </span>
+
+        {/* The project's logo, at the heart. */}
+        <span className="absolute -bottom-7 left-1/2 z-20 flex size-14 -translate-x-1/2 items-center justify-center rounded-full border-t border-border bg-card shadow-md ring-1 ring-foreground/10 ring-offset-2 ring-offset-background">
+          <AnimatePresence mode="popLayout" initial={false}>
+            <motion.span
+              key={monogram || "empty"}
+              initial={{ opacity: 0, scale: 0.6 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.6 }}
+              transition={SPRING_PILL}
+              className={cn("text-sm font-semibold", HUE_TEXT[hue])}
+            >
+              {monogram || (
+                <Icon
+                  icon={FolderGitIcon}
+                  size="md"
+                  className="text-foreground"
+                />
+              )}
+            </motion.span>
+          </AnimatePresence>
+        </span>
+      </div>
     </div>
+  )
+}
+
+function Badge({
+  icon,
+  className,
+  children,
+}: {
+  icon: LucideIcon
+  className?: string
+  children: React.ReactNode
+}) {
+  return (
+    <span
+      className={cn(
+        "absolute z-10 flex h-6 items-center gap-1.5 rounded-full border border-border bg-card px-2.5 text-3xs font-medium",
+        className
+      )}
+    >
+      <Icon icon={icon} size="xs" />
+      {children}
+    </span>
   )
 }
 
