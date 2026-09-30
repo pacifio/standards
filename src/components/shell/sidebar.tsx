@@ -153,11 +153,11 @@ function RailTip({
   )
 }
 
-/** The ⌘K affordance. Collapsed, it is just the glyph. */
+/** The ⌘K affordance. Collapsed, it is just the glyph, in a circle. */
 function SidebarSearch({ onOpen }: { onOpen: () => void }) {
   const { collapsed } = useSidebar()
   return (
-    <div className="px-2 pb-2">
+    <div className="flex justify-center px-2 pb-2">
       {/* The Atlas desktop app's search field (comms-home.tsx): a recessed
           well at the panel's own radius, a quiet glyph and a quiet prompt.
           It opens the command menu rather than filtering in place, so ⌘K
@@ -167,13 +167,16 @@ function SidebarSearch({ onOpen }: { onOpen: () => void }) {
           type="button"
           onClick={onOpen}
           aria-keyshortcuts="Meta+K"
+          aria-label="Jump to anything"
           className={cn(
-            "flex h-7 w-full items-center gap-1.5 rounded-xl border border-border bg-surface px-2.5 text-xs text-disabled",
+            "flex h-7 shrink-0 items-center border border-border bg-surface text-xs text-disabled",
             "duration-fast transition-colors ease-out-strong hover:border-border-strong hover:text-muted-foreground",
-            collapsed && "justify-center px-0"
+            collapsed
+              ? "w-7 justify-center rounded-full"
+              : "w-full gap-1.5 rounded-xl px-2.5"
           )}
         >
-          <Icon icon={SearchIcon} size="xs" />
+          <Icon icon={SearchIcon} size="xs" className="shrink-0" />
           {!collapsed && (
             <span className="flex-1 truncate text-left">Jump to anything…</span>
           )}

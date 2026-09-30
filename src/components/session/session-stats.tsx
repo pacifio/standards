@@ -99,7 +99,6 @@ function ContextCell({
   const lit = share > 0 ? Math.max(1, Math.round(share * SEGMENTS)) : 0
   const warnAt = Math.round(SEGMENTS * 0.75)
   const hotAt = Math.round(SEGMENTS * 0.9)
-  const level = share >= 0.9 ? "high" : share >= 0.75 ? "warn" : "ok"
   const tone = (i: number) =>
     i >= hotAt ? "bg-error" : i >= warnAt ? "bg-warning" : "bg-success"
 
@@ -118,22 +117,16 @@ function ContextCell({
     <div className="min-w-0 bg-card px-3 py-2.5">
       <dt className="micro">Context</dt>
       <dd>
-        <p className="mt-1 flex items-center gap-1.5">
+        {/* The fraction rides beside the percentage, so this cell keeps
+            the same two lines as its neighbours — value, then one row
+            beneath — with the bar as that row. */}
+        <p className="mt-1 flex items-baseline gap-1.5">
           <span className="mono text-md font-medium tracking-tight">
             {pct}%
           </span>
-          {level !== "ok" && (
-            <span
-              className={cn(
-                "rounded-full px-1.5 text-4xs font-medium tracking-wider uppercase ring-1",
-                level === "high"
-                  ? "bg-error-muted text-error ring-error/40"
-                  : "bg-warning-muted text-warning ring-warning/40"
-              )}
-            >
-              Warn
-            </span>
-          )}
+          <span className="truncate mono text-3xs text-disabled">
+            {formatTokens(used)}/{formatTokens(size)}
+          </span>
         </p>
         <div
           ref={bar}
@@ -142,7 +135,7 @@ function ContextCell({
           aria-valuemin={0}
           aria-valuemax={size}
           aria-valuenow={used}
-          className="mt-2 flex h-3 items-stretch gap-0.5"
+          className="mt-1 flex h-3 items-stretch gap-0.5"
         >
           {ticks.slice(0, lit)}
           <span
@@ -151,9 +144,6 @@ function ContextCell({
           />
           {ticks.slice(lit)}
         </div>
-        <p className="mt-1 truncate mono text-3xs text-disabled">
-          {formatTokens(used)} / {formatTokens(size)}
-        </p>
       </dd>
     </div>
   )
